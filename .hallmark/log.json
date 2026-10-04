@@ -1,0 +1,49 @@
+[
+  {
+    "date": "2026-08-10",
+    "macrostructure": "Marquee Hero",
+    "theme": "custom",
+    "theme_axes": "light / high-contrast-serif / warm",
+    "vibe": "aged brass, ivory dial, oxblood leather",
+    "enrichment": "none in hero (typography only); Tier-A CSS watch-face icons in product grid; Tier-A/B SVG movement diagram in heritage section",
+    "nav": "N9 Edge-aligned minimal (superseded 2026-08-11, see next entry)",
+    "footer": "Ft1 Mast-headed",
+    "brief": "Zesprit · vintage luxury watch e-commerce homepage"
+  },
+  {
+    "date": "2026-08-11",
+    "component": "nav",
+    "nav": "custom Centered-lockup (left link row · centred brand mark · icon/cart/CTA cluster) — adapted from a user-supplied reference screenshot; rebuilt in the project's locked ivory/brass/oxblood tokens rather than the reference's sage-green swatch",
+    "brief": "Zesprit — header restyle to match reference (The Horologist), rebranded to Zespritwatch"
+  },
+  {
+    "date": "2026-10-04",
+    "component": "admin-dashboard",
+    "scope": "Module 1 of the admin platform — auth shell + Products + Collections, per Shopify-style reference screenshots",
+    "design": "Dark --color-ink sidebar (nav) + light --color-paper content area, reusing the exact same tokens/fonts as the public site (no new palette). Admin login card uses the same auth-card pattern as a quiet Hallmark component-scope build, not a new macrostructure — this is application chrome, not a marketing page.",
+    "nav": "custom dashboard sidebar (Products/Collections live; Orders/Customers/Content/Analytics/Messages shown as roadmap stubs)",
+    "backend": "Supabase (Postgres + Auth + Storage), schema in supabase/migrations/0001_products_collections.sql (superseded same day, see next entry)",
+    "brief": "Zesprit admin — Collections, Products (Shopify-style edit screen: title, rich-text description, media grid w/ drag-reorder, category/vendor, collections, tags, price-on-request toggle), storefront homepage now reads published products from Supabase with a graceful fallback to placeholder content when unconfigured"
+  },
+  {
+    "date": "2026-10-04",
+    "component": "admin-dashboard-backend",
+    "scope": "Re-wired Module 1 onto a shared, already-live Supabase DB instead of a new empty one — no visual/design change, schema + field-set change only",
+    "why": "User revealed a pre-existing separate app (Watch Report, admin.zespritwatch.com, Prisma-owned `watches`/`brands` schema, ~107 real watches already in it) and asked to share its DB rather than run two parallel schemas",
+    "schema_change": "Dropped the invented products/collections/product_images/admin_users tables (never applied anywhere). Extended the real `watches` table (descriptionHtml, tags) and added collections/watch_collections — see Bussiness Report/prisma/schema.prisma. Brand/Category/Vendor/Price fields and the draft/active status toggle removed from the Products form (no longer exist in the shared schema — status is read-only here, price is permanently 'Price on request', business fields stay owned by Watch Report). Create/Delete removed from /admin/products — new watches are entered in Watch Report only.",
+    "security": "anon role column-restricted via Postgres GRANT SELECT (not just RLS) to public-safe columns only — verified via curl that purchasePrice/customerInfo are unreachable with the anon key",
+    "nav": "unchanged from previous entry",
+    "brief": "Zesprit admin + storefront now read/write the real shared inventory DB; homepage shows actual watches instead of placeholder content"
+  },
+  {
+    "date": "2026-10-04",
+    "component": "orders-module-and-watch-detail-page",
+    "scope": "Module 2 — Orders. New public product detail page (/watches/[id], diptych: photo + title/description/tags + request-to-buy form) and /admin/orders (list w/ status filter + search + pagination, detail w/ editable status/price, manual-entry form).",
+    "design": "Detail page reuses the exact same tokens/fonts/hairline language as the rest of the public site (new .watch-detail / .order-form classes in globals.css) — no new palette. Admin Orders screens reuse the same admin.css patterns as Products (table, pagination, panel forms).",
+    "schema": "New `orders` table + OrderStatus enum (PENDING/CONFIRMED/FULFILLED/CANCELLED) in the shared Prisma schema (Bussiness Report). No self-checkout — an Order is a request-to-buy the owner follows up on manually, confirmed back in Module 1 planning.",
+    "security": "anon can only INSERT orders (id + the 4 customer-facing columns — never status/source/agreedPriceCents), never SELECT/UPDATE/DELETE — verified via curl. authenticated has full CRUD.",
+    "cross_cutting_db_fixes": "Discovered and fixed two latent bugs affecting the whole shared schema, not just orders: (1) `id` columns had no Postgres-level default — Prisma generates UUIDs client-side, so any insert from this app (not just orders — collections too) was failing with a NOT NULL violation on id; added `default gen_random_uuid()` to watches/collections/orders.id. (2) `updatedAt` likewise relied on Prisma's client-side @updatedAt with no DB trigger, so edits made from this app (e.g. editing a product's catalogue fields) were silently leaving updatedAt stale; added a `set_updated_at()` trigger on watches and orders. See Bussiness Report/prisma/rls/0004_id_defaults.sql and 0005_updated_at_defaults.sql. Worth checking for this same pattern before adding any future table to the shared schema.",
+    "email": "Resend wired in (src/lib/email.ts, graceful no-op if RESEND_API_KEY/ORDER_NOTIFICATION_EMAIL unset) — key not yet provided by user as of this entry, see project memory.",
+    "brief": "Customers can now request to buy a specific watch from its own page; owner manages all requests (website + manually-logged) from /admin/orders"
+  }
+]

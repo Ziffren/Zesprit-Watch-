@@ -1,0 +1,17 @@
+-- Record only — the actual migration lives in the Watch Report repo, since
+-- that's where Prisma owns the schema/migration history for this shared
+-- database (/Users/phamhiendz/Bussiness Report):
+--
+--   prisma/schema.prisma         — added Watch.descriptionHtml, Watch.tags,
+--                                   Collection + WatchCollection models
+--                                   (migration 20261004120831_add_catalog_fields)
+--   prisma/rls/0001_public_catalog_access.sql — RLS policies + column-level
+--                                   grants + the `watch-photos` storage bucket
+--
+-- Applied 2026-10-04 directly against the live DB via
+-- `npx prisma migrate dev` + `npx prisma db execute` from that repo.
+--
+-- Why it's not a Supabase-managed migration here: Prisma (not Supabase CLI)
+-- owns this schema's migration history, and a second independent migration
+-- tool pointed at the same tables would drift and conflict. If you need to
+-- change the shared schema again, do it from the Watch Report repo.
