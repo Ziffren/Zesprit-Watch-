@@ -90,6 +90,41 @@ export type Post = {
   updatedAt: string;
 };
 
+export type AnalyticsOverview = {
+  totalVisits30d: number;
+  uniqueVisitors30d: number;
+  liveNow: number;
+  returningVisitors30d: number;
+  totalRevenueCents: number;
+  ordersCount: number;
+};
+
+export type DailyTraffic = {
+  day: string;
+  views: number;
+  visitors: number;
+};
+
+export type TopViewedProduct = {
+  watchId: string;
+  productName: string;
+  brand: string;
+  views: number;
+};
+
+export type CountryStat = {
+  country: string;
+  visitors: number;
+};
+
+export type TopCustomer = {
+  userId: string;
+  name: string | null;
+  email: string;
+  totalCents: number;
+  orderCount: number;
+};
+
 export function formatCents(cents: number | null): string {
   if (cents == null) return "—";
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });

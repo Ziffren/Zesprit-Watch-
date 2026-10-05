@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, EB_Garamond } from "next/font/google";
+import { PageTracker } from "./page-tracker";
 import "./globals.css";
 
 const bodoniModa = Bodoni_Moda({
@@ -27,7 +28,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${bodoniModa.variable} ${ebGaramond.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <PageTracker />
+        {children}
+      </body>
     </html>
   );
 }

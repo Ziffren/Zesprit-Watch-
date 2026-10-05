@@ -699,3 +699,70 @@
   max-width: none;
   margin: 0 0 var(--space-sm);
 }
+
+/* ---------- Analytics (Module 5) ---------- */
+
+.analytics-traffic-chart {
+  width: 100%;
+  height: auto;
+  margin-top: var(--space-sm);
+}
+
+.analytics-chart-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  fill: var(--color-ink);
+}
+
+.analytics-chart-axis-label {
+  font-size: 11px;
+  fill: var(--color-muted);
+}
+
+.analytics-bar-list {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.analytics-bar-list__row {
+  display: grid;
+  grid-template-columns: 9rem 1fr 3rem;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.analytics-bar-list__label {
+  display: grid;
+  font-size: var(--text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-bar-list__track {
+  height: 10px;
+  background: var(--color-paper-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.analytics-bar-list__fill {
+  height: 100%;
+  background: var(--color-accent-2);
+  border-radius: 2px;
+}
+
+.analytics-bar-list__value {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  text-align: right;
+  color: var(--color-ink-2);
+}
+
+@media (max-width: 40rem) {
+  .analytics-bar-list__row {
+    grid-template-columns: 6rem 1fr 2.5rem;
+  }
+}

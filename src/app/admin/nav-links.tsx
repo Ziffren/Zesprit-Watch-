@@ -15,7 +15,9 @@ const salesLinks = [
 
 const contentLinks = [{ href: "/admin/content", label: "Journal" }];
 
-const comingSoon = [{ label: "Analytics" }, { label: "Messages" }];
+const insightsLinks = [{ href: "/admin/analytics", label: "Analytics" }];
+
+const comingSoon = [{ label: "Messages" }];
 
 export function AdminNav() {
   const pathname = usePathname();
@@ -48,6 +50,18 @@ export function AdminNav() {
 
       <p className="admin-nav__group-label">Content</p>
       {contentLinks.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className="admin-nav__link"
+          data-active={pathname.startsWith(link.href)}
+        >
+          {link.label}
+        </Link>
+      ))}
+
+      <p className="admin-nav__group-label">Insights</p>
+      {insightsLinks.map((link) => (
         <Link
           key={link.href}
           href={link.href}

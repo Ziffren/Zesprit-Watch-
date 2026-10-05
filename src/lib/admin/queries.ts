@@ -1,13 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
+  AnalyticsOverview,
   Collection,
+  CountryStat,
   CustomerWithCounts,
   CustomerWithDetails,
+  DailyTraffic,
   OrderStatus,
   OrderWithWatch,
   Post,
   PostStatus,
   ProductWithRelations,
+  TopCustomer,
+  TopViewedProduct,
 } from "./types";
 
 export async function listCollections(): Promise<
@@ -342,4 +347,63 @@ export async function getPost(id: string): Promise<Post | null> {
   const { data, error } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
   if (error) throw new Error(`Couldn't load post: ${error.message}`);
   return data as Post | null;
+}
+
+// ---------------------------------------------------------------------------
+// Analytics
+// ---------------------------------------------------------------------------
+
+export async function getAnalyticsOverview(): Promise<AnalyticsOverview> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_analytics_overview").single();
+  if (error) throw new Error(`Couldn't load analytics overview: ${error.message}`);
+  return data as AnalyticsOverview;
+}
+
+export async function getDailyTraffic(days = 30): Promise<DailyTraffic[]> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const { data, error } = await supabase
+    .from("analytics_daily_traffic")
+    .select("day, views, visitors")
+    .gte("day", since.toISOString().slice(0, 10))
+    .order("day", { ascending: true });
+  if (error) throw new Error(`Couldn't load traffic: ${error.message}`);
+
+  // Fill in zero-days so the chart doesn't skip gaps where nobody visited.
+  const byDay = new Map((data ?? []).map((d) => [d.day, d as DailyTraffic]));
+  const series: DailyTraffic[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    series.push(byDay.get(key) ?? { day: key, views: 0, visitors: 0 });
+  }
+  return series;
+}
+
+export async function getTopViewedProducts(limit = 8): Promise<TopViewedProduct[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("analytics_top_products")
+    .select("*")
+    .limit(limit);
+  if (error) throw new Error(`Couldn't load top products: ${error.message}`);
+  return (data ?? []) as TopViewedProduct[];
+}
+
+export async function getCountryStats(limit = 8): Promise<CountryStat[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("analytics_countries").select("*").limit(limit);
+  if (error) throw new Error(`Couldn't load country stats: ${error.message}`);
+  return (data ?? []) as CountryStat[];
+}
+
+export async function getTopCustomersBySpend(limit = 8): Promise<TopCustomer[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("analytics_top_customers").select("*").limit(limit);
+  if (error) throw new Error(`Couldn't load top customers: ${error.message}`);
+  return (data ?? []) as TopCustomer[];
 }
