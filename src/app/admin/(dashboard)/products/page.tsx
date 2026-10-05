@@ -35,21 +35,15 @@ export default async function ProductsPage({
     <>
       <header className="admin-topbar">
         <p className="admin-topbar__title">Products</p>
-        <a
-          className="admin-btn"
-          href="https://admin.zespritwatch.com/report/new"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Add new watch in Watch Report ↗
-        </a>
+        <Link className="admin-btn admin-btn--primary" href="/admin/products/new">
+          New product
+        </Link>
       </header>
 
       <div className="admin-content">
         <p className="admin-hint" style={{ marginBottom: "var(--space-md)" }}>
-          New watches are entered in Watch Report (purchase price, dates, condition).
-          This screen edits the catalogue fields — description, photos, tags, collections —
-          for watches that are already in inventory.
+          This catalogue is fully owned here — Watch Report is a separate business
+          ledger with no connection to it.
         </p>
 
         <div className="admin-stats-row">
@@ -58,12 +52,8 @@ export default async function ProductsPage({
             <span className="admin-stat-tile__value">{stats.inStock}</span>
           </div>
           <div className="admin-stat-tile">
-            <span className="admin-stat-tile__label">Purchased this month</span>
-            <span className="admin-stat-tile__value">{stats.purchasedThisMonth}</span>
-          </div>
-          <div className="admin-stat-tile">
-            <span className="admin-stat-tile__label">Sold this month</span>
-            <span className="admin-stat-tile__value">{stats.soldThisMonth}</span>
+            <span className="admin-stat-tile__label">Added this month</span>
+            <span className="admin-stat-tile__value">{stats.addedThisMonth}</span>
           </div>
         </div>
 
@@ -89,7 +79,7 @@ export default async function ProductsPage({
           <p className="admin-empty">
             {q
               ? `No products match "${q}".`
-              : "No watches yet. Add one in Watch Report first."}
+              : "No products yet — create the first one."}
           </p>
         ) : (
           <>

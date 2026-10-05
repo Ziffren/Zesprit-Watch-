@@ -459,7 +459,7 @@
 
 .admin-stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: var(--rule-hair);
   background: var(--color-rule);
   border: var(--rule-hair) solid var(--color-rule);

@@ -45,7 +45,7 @@ export async function submitOrder(
   const supabase = user ? sessionClient : createPublicClient();
 
   const { data: watch } = await supabase
-    .from("watches")
+    .from("products")
     .select("productName, status")
     .eq("id", watchId)
     .maybeSingle();

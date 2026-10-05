@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { WatchStatus } from "@/lib/admin/types";
 
 export async function saveProduct(formData: FormData) {
   const supabase = await createClient();
@@ -10,6 +11,7 @@ export async function saveProduct(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const productName = String(formData.get("productName") ?? "").trim();
   const brand = String(formData.get("brand") ?? "").trim();
+  const status = String(formData.get("status") ?? "AVAILABLE") as WatchStatus;
   const descriptionHtml = String(formData.get("descriptionHtml") ?? "");
   const tags = formData.getAll("tags").map(String).filter(Boolean);
   const photoUrls = formData.getAll("photoUrls").map(String).filter(Boolean);
@@ -17,25 +19,36 @@ export async function saveProduct(formData: FormData) {
 
   if (!productName) throw new Error("Title is required.");
   if (!brand) throw new Error("Brand is required.");
-  if (!id) {
-    throw new Error(
-      "New watches are created in Watch Report (admin.zespritwatch.com) — this screen only edits the catalogue fields of an existing watch."
-    );
+
+  const payload = { productName, brand, status, descriptionHtml, tags, photoUrls };
+  let productId = id;
+
+  if (id) {
+    const { error } = await supabase.from("products").update(payload).eq("id", id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { data, error } = await supabase.from("products").insert(payload).select("id").single();
+    if (error) throw new Error(error.message);
+    productId = data.id;
   }
 
-  const { error } = await supabase
-    .from("watches")
-    .update({ productName, brand, descriptionHtml, tags, photoUrls })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
-
-  await supabase.from("watch_collections").delete().eq("watchId", id);
+  await supabase.from("watch_collections").delete().eq("watchId", productId);
   if (collectionIds.length > 0) {
     await supabase
       .from("watch_collections")
-      .insert(collectionIds.map((collectionId) => ({ watchId: id, collectionId })));
+      .insert(collectionIds.map((collectionId) => ({ watchId: productId, collectionId })));
   }
 
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+  redirect("/admin/products");
+}
+
+export async function deleteProduct(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  await supabase.from("products").delete().eq("id", id);
   revalidatePath("/admin/products");
   revalidatePath("/");
   redirect("/admin/products");

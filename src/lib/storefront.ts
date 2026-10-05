@@ -40,7 +40,7 @@ export async function getWatchDetail(id: string): Promise<WatchDetail | null> {
   try {
     const supabase = createPublicClient();
     const { data, error } = await supabase
-      .from("watches")
+      .from("products")
       .select("id, productName, brand, status, descriptionHtml, tags, photoUrls")
       .eq("id", id)
       .maybeSingle();
@@ -127,10 +127,11 @@ export async function getFeaturedPieces(): Promise<StorefrontPiece[]> {
 
   try {
     const supabase = createPublicClient();
-    // anon is column-restricted (see Bussiness Report/prisma/rls/0001_public_catalog_access.sql)
-    // to exactly these public-safe columns — business fields aren't reachable here.
+    // products is Zesprit Watch's own, fully independent catalogue table
+    // (see Bussiness Report/prisma/rls/0013_split_products_from_watches.sql)
+    // — no business fields exist on it at all, nothing to restrict.
     const { data, error } = await supabase
-      .from("watches")
+      .from("products")
       .select("id, productName, brand, tags, photoUrls, status, createdAt")
       .eq("status", "AVAILABLE")
       .order("createdAt", { ascending: false })

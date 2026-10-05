@@ -38,12 +38,12 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
     supabase.from("customer_profiles").select("*").eq("userId", user.id).maybeSingle(),
     supabase
       .from("saved_watches")
-      .select("createdAt, watches(id, productName, brand, photoUrls, status)")
+      .select("createdAt, watches:products(id, productName, brand, photoUrls, status)")
       .eq("userId", user.id)
       .order("createdAt", { ascending: false }),
     supabase
       .from("orders")
-      .select("id, status, createdAt, watches(id, productName, brand)")
+      .select("id, status, createdAt, watches:products(id, productName, brand)")
       .eq("userId", user.id)
       .order("createdAt", { ascending: false }),
   ]);

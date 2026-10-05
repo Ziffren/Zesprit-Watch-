@@ -50,7 +50,7 @@ export async function getCollection(id: string): Promise<Collection | null> {
 export async function listProducts(): Promise<ProductWithRelations[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("watches")
+    .from("products")
     .select(
       "id, productName, brand, status, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)"
     )
@@ -85,7 +85,7 @@ export async function listProductsPage({
   const to = from + pageSize - 1;
 
   let query = supabase
-    .from("watches")
+    .from("products")
     .select(
       "id, productName, brand, status, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)",
       { count: "exact" }
@@ -112,45 +112,33 @@ export async function listProductsPage({
 
 export type ProductStats = {
   inStock: number;
-  purchasedThisMonth: number;
-  soldThisMonth: number;
+  addedThisMonth: number;
 };
 
+// Only `inStock`/`addedThisMonth` — this app no longer has purchase/sale
+// date data (that's Watch Report's own business ledger now, a fully
+// separate table as of 2026-10-05). "Added this month" is based on this
+// catalogue's own createdAt, the closest honest equivalent.
 export async function getProductStats(): Promise<ProductStats> {
   const supabase = await createClient();
   const now = new Date();
-  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
-    .toISOString()
-    .slice(0, 10);
-  const nextMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1))
-    .toISOString()
-    .slice(0, 10);
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
 
-  const [inStock, purchased, sold] = await Promise.all([
-    supabase.from("watches").select("id", { count: "exact", head: true }).eq("status", "AVAILABLE"),
-    supabase
-      .from("watches")
-      .select("id", { count: "exact", head: true })
-      .gte("purchaseDate", monthStart)
-      .lt("purchaseDate", nextMonthStart),
-    supabase
-      .from("watches")
-      .select("id", { count: "exact", head: true })
-      .gte("soldDate", monthStart)
-      .lt("soldDate", nextMonthStart),
+  const [inStock, added] = await Promise.all([
+    supabase.from("products").select("id", { count: "exact", head: true }).eq("status", "AVAILABLE"),
+    supabase.from("products").select("id", { count: "exact", head: true }).gte("createdAt", monthStart),
   ]);
 
   return {
     inStock: inStock.count ?? 0,
-    purchasedThisMonth: purchased.count ?? 0,
-    soldThisMonth: sold.count ?? 0,
+    addedThisMonth: added.count ?? 0,
   };
 }
 
 export async function getProduct(id: string): Promise<ProductWithRelations | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("watches")
+    .from("products")
     .select(
       "id, productName, brand, status, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)"
     )
@@ -188,7 +176,7 @@ export async function listOrdersPage({
 
   let query = supabase
     .from("orders")
-    .select("*, watches(id, productName, brand)", { count: "exact" })
+    .select("*, watches:products(id, productName, brand)", { count: "exact" })
     .order("createdAt", { ascending: false })
     .range(from, to);
 
@@ -228,7 +216,7 @@ export async function getOrder(id: string): Promise<OrderWithWatch | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("orders")
-    .select("*, watches(id, productName, brand)")
+    .select("*, watches:products(id, productName, brand)")
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(`Couldn't load order: ${error.message}`);
@@ -286,7 +274,7 @@ export async function getCustomer(userId: string): Promise<CustomerWithDetails |
   const { data, error } = await supabase
     .from("customer_profiles")
     .select(
-      "*, saved_watches(createdAt, watches(id, productName, brand)), orders(*, watches(id, productName, brand))"
+      "*, saved_watches(createdAt, watches:products(id, productName, brand)), orders(*, watches:products(id, productName, brand))"
     )
     .eq("userId", userId)
     .maybeSingle();
