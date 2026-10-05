@@ -4,6 +4,9 @@
 
 .admin-root {
   --admin-sidebar-w: 15.5rem;
+  /* Shopify-reference radius for buttons/inputs/controls in this admin
+     shell only — the public storefront keeps its sharper --radius-sm. */
+  --admin-radius: 8px;
   font-family: var(--font-body);
   color: var(--color-ink);
   background: var(--color-paper-2);
@@ -81,7 +84,7 @@
   color: var(--color-ink);
   background: var(--color-paper);
   border: var(--rule-hair) solid var(--color-rule-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--admin-radius);
   padding: var(--space-sm) var(--space-md);
   width: 100%;
 }
@@ -110,7 +113,7 @@
   font-size: var(--text-sm);
   letter-spacing: 0.02em;
   padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-sm);
+  border-radius: var(--admin-radius);
   border: var(--rule-hair) solid var(--color-ink);
   background: var(--color-paper);
   color: var(--color-ink);
@@ -209,7 +212,7 @@
   justify-content: space-between;
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm);
+  border-radius: var(--admin-radius);
   color: color-mix(in oklch, var(--color-paper) 85%, transparent);
   text-decoration: none;
   font-size: var(--text-sm);
@@ -450,7 +453,7 @@
   font-size: var(--text-sm);
   padding: var(--space-xs) var(--space-md);
   border: var(--rule-hair) solid var(--color-rule-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--admin-radius);
   background: var(--color-paper);
   min-width: 14rem;
 }
@@ -667,7 +670,7 @@
 
 .admin-editor {
   border: var(--rule-hair) solid var(--color-rule-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--admin-radius);
 }
 
 .admin-editor__toolbar {
@@ -686,7 +689,7 @@
   place-items: center;
   background: none;
   border: var(--rule-hair) solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: calc(var(--admin-radius) - 2px);
   cursor: pointer;
   color: var(--color-ink);
 }
