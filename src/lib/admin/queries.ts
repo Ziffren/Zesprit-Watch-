@@ -6,6 +6,8 @@ import type {
   CustomerWithCounts,
   CustomerWithDetails,
   DailyTraffic,
+  Message,
+  MessageStatus,
   OrderStatus,
   OrderWithWatch,
   Post,
@@ -406,4 +408,70 @@ export async function getTopCustomersBySpend(limit = 8): Promise<TopCustomer[]> 
   const { data, error } = await supabase.from("analytics_top_customers").select("*").limit(limit);
   if (error) throw new Error(`Couldn't load top customers: ${error.message}`);
   return (data ?? []) as TopCustomer[];
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+export type MessageListPage = {
+  messages: Message[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
+export async function listMessagesPage({
+  page = 1,
+  pageSize = 50,
+  q,
+  status,
+}: {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  status?: MessageStatus;
+} = {}): Promise<MessageListPage> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("messages")
+    .select("*", { count: "exact" })
+    .order("createdAt", { ascending: false })
+    .range(from, to);
+
+  if (status) query = query.eq("status", status);
+
+  const term = q?.trim().replace(/[,()%]/g, "");
+  if (term) {
+    query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%`);
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(`Couldn't load messages: ${error.message}`);
+
+  return {
+    messages: (data ?? []) as Message[],
+    total: count ?? 0,
+    page,
+    pageSize,
+  };
+}
+
+export async function getUnreadMessageCount(): Promise<number> {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("messages")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "UNREAD");
+  return count ?? 0;
+}
+
+export async function getMessage(id: string): Promise<Message | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("messages").select("*").eq("id", id).maybeSingle();
+  if (error) throw new Error(`Couldn't load message: ${error.message}`);
+  return data as Message | null;
 }

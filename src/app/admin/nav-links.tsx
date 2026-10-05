@@ -17,9 +17,9 @@ const contentLinks = [{ href: "/admin/content", label: "Journal" }];
 
 const insightsLinks = [{ href: "/admin/analytics", label: "Analytics" }];
 
-const comingSoon = [{ label: "Messages" }];
+const inboxLinks = [{ href: "/admin/messages", label: "Messages" }];
 
-export function AdminNav() {
+export function AdminNav({ unreadMessageCount = 0 }: { unreadMessageCount?: number }) {
   const pathname = usePathname();
 
   return (
@@ -72,12 +72,19 @@ export function AdminNav() {
         </Link>
       ))}
 
-      <p className="admin-nav__group-label">Roadmap</p>
-      {comingSoon.map((item) => (
-        <span key={item.label} className="admin-nav__link" data-soon="true">
-          {item.label}
-          <span className="admin-nav__soon-badge">Soon</span>
-        </span>
+      <p className="admin-nav__group-label">Inbox</p>
+      {inboxLinks.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className="admin-nav__link"
+          data-active={pathname.startsWith(link.href)}
+        >
+          {link.label}
+          {unreadMessageCount > 0 && (
+            <span className="admin-nav__unread-badge">{unreadMessageCount}</span>
+          )}
+        </Link>
       ))}
     </nav>
   );

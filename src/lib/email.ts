@@ -44,3 +44,41 @@ export async function sendOrderNotification(params: {
     console.error("Failed to send order notification email:", err);
   }
 }
+
+export async function sendMessageNotification(params: {
+  name: string;
+  email: string;
+  phone: string | null;
+  message: string;
+  messageId: string;
+}) {
+  if (!resend || !notificationEmail) {
+    console.warn(
+      "Resend isn't configured (RESEND_API_KEY / ORDER_NOTIFICATION_EMAIL) — skipping message notification email."
+    );
+    return;
+  }
+
+  const lines = [
+    `New message from ${params.name}`,
+    "",
+    `Email: ${params.email}`,
+    params.phone ? `Phone: ${params.phone}` : null,
+    "",
+    params.message,
+    "",
+    `View in admin: https://zesprit-watch.vercel.app/admin/messages/${params.messageId}`,
+  ].filter((line): line is string => line !== null);
+
+  try {
+    await resend.emails.send({
+      from: "Zesprit Watch <onboarding@resend.dev>",
+      to: notificationEmail,
+      subject: `New message — ${params.name}`,
+      text: lines.join("\n"),
+    });
+  } catch (err) {
+    // Never let an email failure block the message from being saved.
+    console.error("Failed to send message notification email:", err);
+  }
+}

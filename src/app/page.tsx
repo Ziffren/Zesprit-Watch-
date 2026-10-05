@@ -229,7 +229,7 @@ export default async function Home() {
           Vintage watches, restored to keep time again.
         </p>
         <p className="links muted">
-          <Link href="/journal">Journal</Link> · Care Guide · Contact
+          <Link href="/journal">Journal</Link> · Care Guide · <Link href="/contact">Contact</Link>
         </p>
       </footer>
     </>

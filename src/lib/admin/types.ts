@@ -125,6 +125,20 @@ export type TopCustomer = {
   orderCount: number;
 };
 
+export type MessageStatus = "UNREAD" | "READ";
+
+export type Message = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  message: string;
+  status: MessageStatus;
+  userId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export function formatCents(cents: number | null): string {
   if (cents == null) return "—";
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
