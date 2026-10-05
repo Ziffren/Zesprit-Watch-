@@ -8,9 +8,12 @@ const catalogueLinks = [
   { href: "/admin/collections", label: "Collections" },
 ];
 
-const salesLinks = [{ href: "/admin/orders", label: "Orders" }];
+const salesLinks = [
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/customers", label: "Customers" },
+];
 
-const comingSoon = [{ label: "Customers" }, { label: "Content" }, { label: "Analytics" }, { label: "Messages" }];
+const comingSoon = [{ label: "Content" }, { label: "Analytics" }, { label: "Messages" }];
 
 export function AdminNav() {
   const pathname = usePathname();

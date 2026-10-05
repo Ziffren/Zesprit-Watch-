@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getWatchDetail } from "@/lib/storefront";
 import { OrderForm } from "./order-form";
+import { SaveButton } from "./save-button";
 
 export default async function WatchDetailPage({
   params,
@@ -51,7 +52,10 @@ export default async function WatchDetailPage({
           <div className="watch-detail__info">
             <p className="watch-detail__brand">{watch.brand}</p>
             <h1 className="watch-detail__title">{watch.name}</h1>
-            <p className="watch-detail__price">Price on request</p>
+            <div className="watch-detail__price-row">
+              <p className="watch-detail__price">Price on request</p>
+              <SaveButton watchId={watch.id} />
+            </div>
 
             {watch.descriptionHtml && (
               <div

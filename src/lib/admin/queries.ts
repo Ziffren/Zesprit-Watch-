@@ -1,5 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Collection, OrderStatus, OrderWithWatch, ProductWithRelations } from "./types";
+import type {
+  Collection,
+  CustomerWithCounts,
+  CustomerWithDetails,
+  OrderStatus,
+  OrderWithWatch,
+  ProductWithRelations,
+} from "./types";
 
 export async function listCollections(): Promise<
   (Collection & { product_count: number })[]
@@ -217,4 +224,63 @@ export async function getOrder(id: string): Promise<OrderWithWatch | null> {
     .maybeSingle();
   if (error) throw new Error(`Couldn't load order: ${error.message}`);
   return data as unknown as OrderWithWatch | null;
+}
+
+// ---------------------------------------------------------------------------
+// Customers
+// ---------------------------------------------------------------------------
+
+export type CustomerListPage = {
+  customers: CustomerWithCounts[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
+export async function listCustomersPage({
+  page = 1,
+  pageSize = 50,
+  q,
+}: {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+} = {}): Promise<CustomerListPage> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("customer_profiles")
+    .select("*, saved_watches(watchId), orders(id)", { count: "exact" })
+    .order("createdAt", { ascending: false })
+    .range(from, to);
+
+  const term = q?.trim().replace(/[,()%]/g, "");
+  if (term) {
+    query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%`);
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(`Couldn't load customers: ${error.message}`);
+
+  return {
+    customers: (data ?? []) as unknown as CustomerWithCounts[],
+    total: count ?? 0,
+    page,
+    pageSize,
+  };
+}
+
+export async function getCustomer(userId: string): Promise<CustomerWithDetails | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("customer_profiles")
+    .select(
+      "*, saved_watches(createdAt, watches(id, productName, brand)), orders(*, watches(id, productName, brand))"
+    )
+    .eq("userId", userId)
+    .maybeSingle();
+  if (error) throw new Error(`Couldn't load customer: ${error.message}`);
+  return data as unknown as CustomerWithDetails | null;
 }

@@ -2,18 +2,21 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "./env";
 
-// Any authenticated Supabase user counts as admin here — this app shares its
-// Auth user pool with Watch Report (admin.zespritwatch.com), which is itself
-// single-owner (see that project's requireUser()). No separate admin_users
-// table needed.
+// Customers now have their own Supabase Auth accounts (/account signup), so
+// "authenticated" no longer implies "admin" — both share the same Postgres
+// role. /admin/* requires a row in admin_users (checked via RLS-backed
+// SELECT below); /account/* just requires any signed-in user.
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isLoginRoute = request.nextUrl.pathname === "/admin/login";
+  const path = request.nextUrl.pathname;
+  const isAdminRoute = path.startsWith("/admin");
+  const isAdminLoginRoute = path === "/admin/login";
+  const isAccountRoute = path.startsWith("/account");
+  const isAccountAuthRoute = path === "/account/login" || path === "/account/signup";
 
   if (!isSupabaseConfigured) {
-    if (isAdminRoute && !isLoginRoute) {
+    if (isAdminRoute && !isAdminLoginRoute) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin/login";
       url.searchParams.set("error", "not-configured");
@@ -41,16 +44,39 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (isAdminRoute && !isLoginRoute && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    return NextResponse.redirect(url);
+  if (isAdminRoute) {
+    const isAdmin =
+      !!user &&
+      !!(
+        await supabase.from("admin_users").select("userId").eq("userId", user.id).maybeSingle()
+      ).data;
+
+    if (!isAdminLoginRoute && !isAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      if (user) url.searchParams.set("error", "not-admin");
+      return NextResponse.redirect(url);
+    }
+    if (isAdminLoginRoute && isAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/products";
+      return NextResponse.redirect(url);
+    }
+    return response;
   }
 
-  if (isLoginRoute && user) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/products";
-    return NextResponse.redirect(url);
+  if (isAccountRoute) {
+    if (!isAccountAuthRoute && !user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/account/login";
+      url.searchParams.set("next", path);
+      return NextResponse.redirect(url);
+    }
+    if (isAccountAuthRoute && user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/account";
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;

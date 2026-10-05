@@ -1,6 +1,7 @@
 "use server";
 
 import { createPublicClient } from "@/lib/supabase/public";
+import { createClient } from "@/lib/supabase/server";
 import { sendOrderNotification } from "@/lib/email";
 
 export type SubmitOrderState = {
@@ -33,7 +34,15 @@ export async function submitOrder(
     return { status: "error", message: "Enter a valid email address." };
   }
 
-  const supabase = createPublicClient();
+  // If a customer is logged in, submit through their own session (cookie
+  // client) so the order can be linked to their account — only the
+  // `authenticated` role is granted the "userId" column, not anon. Guests
+  // (no session) keep using the plain anon client, unchanged.
+  const sessionClient = await createClient();
+  const {
+    data: { user },
+  } = await sessionClient.auth.getUser();
+  const supabase = user ? sessionClient : createPublicClient();
 
   const { data: watch } = await supabase
     .from("watches")
@@ -45,12 +54,18 @@ export async function submitOrder(
     return { status: "error", message: "This piece is no longer available." };
   }
 
-  // anon can't read rows back (orders RLS), so the id is generated here and
-  // sent explicitly rather than selected after insert.
+  // Neither role can read rows back (orders RLS has no customer/anon SELECT
+  // beyond "own orders"), so the id is generated here and sent explicitly
+  // rather than selected after insert.
   const orderId = crypto.randomUUID();
   const { error } = await supabase.from("orders").insert({
     id: orderId,
     watchId,
+    // Only included when logged in — anon isn't granted this column at
+    // all, and explicitly sending `userId: null` would still trip that
+    // grant check (Postgres cares whether the column is referenced, not
+    // its value).
+    ...(user ? { userId: user.id } : {}),
     customerName,
     customerEmail,
     customerPhone: customerPhone || null,

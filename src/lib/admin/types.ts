@@ -57,6 +57,24 @@ export type OrderWithWatch = Order & {
   watches: Pick<Product, "id" | "productName" | "brand"> | null;
 };
 
+export type Customer = {
+  userId: string;
+  email: string;
+  name: string | null;
+  phone: string | null;
+  createdAt: string;
+};
+
+export type CustomerWithCounts = Customer & {
+  saved_watches: { watchId: string }[];
+  orders: { id: string }[];
+};
+
+export type CustomerWithDetails = Customer & {
+  saved_watches: { createdAt: string; watches: Pick<Product, "id" | "productName" | "brand"> | null }[];
+  orders: OrderWithWatch[];
+};
+
 export function formatCents(cents: number | null): string {
   if (cents == null) return "—";
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });

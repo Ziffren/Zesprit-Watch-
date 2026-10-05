@@ -22,10 +22,21 @@ export async function signIn(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return { error: "That email or password wasn't recognized." };
+  }
+
+  const { data: adminRow } = await supabase
+    .from("admin_users")
+    .select("userId")
+    .eq("userId", data.user.id)
+    .maybeSingle();
+
+  if (!adminRow) {
+    await supabase.auth.signOut();
+    return { error: "This account doesn't have admin access." };
   }
 
   redirect("/admin/products");

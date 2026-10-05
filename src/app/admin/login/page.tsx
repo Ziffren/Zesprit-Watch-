@@ -13,9 +13,11 @@ export default function LoginPage({
   const [state, formAction, pending] = useActionState(signIn, initialState);
 
   const notice =
-    resolvedSearchParams.error === "not-configured"
-      ? "Supabase isn't configured yet — add your project keys to .env.local."
-      : null;
+    resolvedSearchParams.error === "not-admin"
+      ? "That account doesn't have admin access."
+      : resolvedSearchParams.error === "not-configured"
+        ? "Supabase isn't configured yet — add your project keys to .env.local."
+        : null;
 
   return (
     <div className="admin-auth">
