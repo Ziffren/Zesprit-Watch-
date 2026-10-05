@@ -72,6 +72,56 @@ function anglesFromId(id: string): { hour: number; min: number } {
   return { hour: h, min: (h * 7) % 360 };
 }
 
+export type JournalPostSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  coverImageUrl: string | null;
+  publishedAt: string | null;
+};
+
+export type JournalPost = JournalPostSummary & {
+  bodyHtml: string | null;
+};
+
+export async function getPublishedPosts(): Promise<JournalPostSummary[]> {
+  if (!isSupabaseConfigured) return [];
+
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("posts")
+      .select("id, title, slug, excerpt, coverImageUrl, publishedAt")
+      .eq("status", "PUBLISHED")
+      .order("publishedAt", { ascending: false });
+
+    if (error || !data) return [];
+    return data as JournalPostSummary[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPostBySlug(slug: string): Promise<JournalPost | null> {
+  if (!isSupabaseConfigured) return null;
+
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("posts")
+      .select("id, title, slug, excerpt, coverImageUrl, bodyHtml, publishedAt")
+      .eq("slug", slug)
+      .eq("status", "PUBLISHED")
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return data as JournalPost;
+  } catch {
+    return null;
+  }
+}
+
 export async function getFeaturedPieces(): Promise<StorefrontPiece[]> {
   if (!isSupabaseConfigured) return placeholderPieces;
 

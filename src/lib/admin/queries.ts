@@ -5,6 +5,8 @@ import type {
   CustomerWithDetails,
   OrderStatus,
   OrderWithWatch,
+  Post,
+  PostStatus,
   ProductWithRelations,
 } from "./types";
 
@@ -283,4 +285,61 @@ export async function getCustomer(userId: string): Promise<CustomerWithDetails |
     .maybeSingle();
   if (error) throw new Error(`Couldn't load customer: ${error.message}`);
   return data as unknown as CustomerWithDetails | null;
+}
+
+// ---------------------------------------------------------------------------
+// Content (Journal posts)
+// ---------------------------------------------------------------------------
+
+export type PostListPage = {
+  posts: Post[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
+export async function listPostsPage({
+  page = 1,
+  pageSize = 50,
+  q,
+  status,
+}: {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  status?: PostStatus;
+} = {}): Promise<PostListPage> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("posts")
+    .select("*", { count: "exact" })
+    .order("createdAt", { ascending: false })
+    .range(from, to);
+
+  if (status) query = query.eq("status", status);
+
+  const term = q?.trim().replace(/[,()%]/g, "");
+  if (term) {
+    query = query.ilike("title", `%${term}%`);
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw new Error(`Couldn't load posts: ${error.message}`);
+
+  return {
+    posts: (data ?? []) as Post[],
+    total: count ?? 0,
+    page,
+    pageSize,
+  };
+}
+
+export async function getPost(id: string): Promise<Post | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+  if (error) throw new Error(`Couldn't load post: ${error.message}`);
+  return data as Post | null;
 }

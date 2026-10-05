@@ -75,6 +75,21 @@ export type CustomerWithDetails = Customer & {
   orders: OrderWithWatch[];
 };
 
+export type PostStatus = "DRAFT" | "PUBLISHED";
+
+export type Post = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  bodyHtml: string | null;
+  coverImageUrl: string | null;
+  status: PostStatus;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export function formatCents(cents: number | null): string {
   if (cents == null) return "—";
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });

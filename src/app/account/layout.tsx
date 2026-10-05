@@ -14,7 +14,9 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       <footer className="foot-mast">
         <p className="wordmark">Z&rsquo;esprit Watch</p>
         <p className="tagline muted">Vintage watches, restored to keep time again.</p>
-        <p className="links muted">Journal · Care Guide · Contact</p>
+        <p className="links muted">
+          <Link href="/journal">Journal</Link> · Care Guide · Contact
+        </p>
       </footer>
     </>
   );

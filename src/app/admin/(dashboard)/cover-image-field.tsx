@@ -3,7 +3,13 @@
 import { useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function CoverImageField({ initialUrl }: { initialUrl: string | null }) {
+export function CoverImageField({
+  initialUrl,
+  pathPrefix = "collections",
+}: {
+  initialUrl: string | null;
+  pathPrefix?: string;
+}) {
   const [url, setUrl] = useState(initialUrl);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +20,7 @@ export function CoverImageField({ initialUrl }: { initialUrl: string | null }) {
     setError(null);
     try {
       const supabase = createClient();
-      const path = `collections/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+      const path = `${pathPrefix}/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
       const { error: uploadError } = await supabase.storage
         .from("watch-photos")
         .upload(path, file, { upsert: false });
