@@ -118,6 +118,11 @@ export type LocationStat = {
   visitors: number;
 };
 
+export type DeviceStat = {
+  device: string;
+  visitors: number;
+};
+
 export type TopCustomer = {
   userId: string;
   name: string | null;

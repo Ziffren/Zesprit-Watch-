@@ -2,6 +2,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
+// Classifies the User-Agent into a coarse, non-identifying category for
+// aggregate device-mix stats. The raw header is read here and discarded —
+// never stored, never logged. Deliberately not a full UA parse (no
+// browser/OS/version) — just enough to answer "mobile or desktop."
+function classifyDevice(userAgent: string | null): "Mobile" | "Tablet" | "Desktop" | null {
+  if (!userAgent) return null;
+  if (/iPad|Android(?!.*Mobile)/i.test(userAgent)) return "Tablet";
+  if (/Mobi|iPhone|iPod|Android/i.test(userAgent)) return "Mobile";
+  return "Desktop";
+}
+
 // Fire-and-forget pageview logging for the admin Analytics dashboard
 // (/admin/analytics). Never blocks or breaks the page it's called from —
 // any failure here is swallowed, both by the caller (page-tracker.tsx) and
@@ -20,6 +31,7 @@ export async function POST(request: NextRequest) {
     const region = request.headers.get("x-vercel-ip-country-region");
     const cityRaw = request.headers.get("x-vercel-ip-city");
     const city = cityRaw ? decodeURIComponent(cityRaw) : null;
+    const deviceType = classifyDevice(request.headers.get("user-agent"));
 
     const supabase = await createClient();
     const {
@@ -33,6 +45,7 @@ export async function POST(request: NextRequest) {
       country,
       region,
       city,
+      deviceType,
       referrer,
     });
   } catch {

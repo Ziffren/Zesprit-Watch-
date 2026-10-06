@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   getAnalyticsOverview,
   getDailyTraffic,
+  getDeviceStats,
   getSessionLocations,
   getTopCustomersBySpend,
   getTopViewedProducts,
@@ -13,13 +14,15 @@ import { TrafficChart } from "./traffic-chart";
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
-  const [overview, traffic, topProducts, locations, topCustomers] = await Promise.all([
+  const [overview, traffic, topProducts, locations, devices, topCustomers] = await Promise.all([
     getAnalyticsOverview(),
     getDailyTraffic(30),
     getTopViewedProducts(8),
     getSessionLocations(8),
+    getDeviceStats(),
     getTopCustomersBySpend(8),
   ]);
+  const deviceTotal = devices.reduce((sum, d) => sum + d.visitors, 0);
 
   return (
     <>
@@ -125,6 +128,21 @@ export default async function AnalyticsPage() {
                   label: [l.country, l.region, l.city].filter(Boolean).join(" · "),
                   value: l.visitors,
                   valueLabel: String(l.visitors),
+                }))}
+              />
+            </div>
+
+            <div className="admin-panel">
+              <h2>Devices</h2>
+              <p className="admin-hint">
+                Aggregate mix only — no per-visitor device or IP data is collected.
+              </p>
+              <BarList
+                items={devices.map((d) => ({
+                  label: d.device,
+                  value: d.visitors,
+                  valueLabel:
+                    deviceTotal > 0 ? `${Math.round((d.visitors / deviceTotal) * 100)}%` : "0%",
                 }))}
               />
             </div>

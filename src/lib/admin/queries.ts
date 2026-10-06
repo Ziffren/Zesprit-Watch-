@@ -5,6 +5,7 @@ import type {
   CustomerWithCounts,
   CustomerWithDetails,
   DailyTraffic,
+  DeviceStat,
   LocationStat,
   Message,
   MessageStatus,
@@ -389,6 +390,13 @@ export async function getSessionLocations(limit = 8): Promise<LocationStat[]> {
   const { data, error } = await supabase.from("analytics_locations").select("*").limit(limit);
   if (error) throw new Error(`Couldn't load session locations: ${error.message}`);
   return (data ?? []) as LocationStat[];
+}
+
+export async function getDeviceStats(): Promise<DeviceStat[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("analytics_devices").select("*");
+  if (error) throw new Error(`Couldn't load device stats: ${error.message}`);
+  return (data ?? []) as DeviceStat[];
 }
 
 export async function getTopCustomersBySpend(limit = 8): Promise<TopCustomer[]> {
