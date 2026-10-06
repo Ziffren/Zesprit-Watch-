@@ -149,5 +149,14 @@
     "schema": "page_views gained latitude/longitude numeric(4,1), rounded to 1 decimal (~11 km) in /api/track from Vercel's x-vercel-ip-latitude/longitude headers — coarser than the city name already stored. New analytics_map_points view (security_invoker, admin-only) aggregates by rounded coordinate over 30 days with a live-now count; no per-visitor point is ever exposed.",
     "cleanup_note": "A real production visit (JP · Osaka) landed in page_views during testing. Cleanup deleted only the 33 seeded rows by exact (city, lat, lng) match and left the real row. Earlier sessions wiped page_views wholesale with 'delete from page_views'; now that the site gets real traffic, cleanup must target seeded rows specifically.",
     "brief": "/admin/analytics has a Shopify-style rotating globe with live and 30-day visitor pins, in the Hallmark palette"
+  },
+  {
+    "date": "2026-10-06",
+    "component": "brand-collections-and-collection-editor",
+    "scope": "Brand is no longer a free-text field on the product form; it is picked from collections flagged as brands. Seeded one brand collection per distinct brand (22) with every product assigned, and rebuilt the collection create/edit page to match the product page (Shopify-style).",
+    "data": "collections.isBrand (0019_brand_collections.sql). Six shorthand/misspelled brand names from Watch Report data entry were corrected on products only before becoming public collection names: FrederiqueConstant -> Frédérique Constant, Baume&M -> Baume & Mercier, Tiffany&Co -> Tiffany & Co., MauriceLarcoix -> Maurice Lacroix, Chrnoswish -> Chronoswiss, Swarosky -> Swarovski. Watch Report's watches rows untouched. products.brand stays as a denormalized mirror of the chosen brand collection's name, since the storefront, admin list/search and analytics all read it.",
+    "invariant": "Exactly one brand per product. Product form: brand collections render as a required radio group, themed collections as checkboxes, both inside Organization. Collection form: adding a product to a brand collection removes it from any other brand collection and rewrites products.brand (chunked 100 ids per request to keep PostgREST URLs short).",
+    "design": "Collection editor mirrors the product editor: breadcrumb + type badge header, title/slug/rich-text description in the main column, a Products panel with search-to-add (thumbnail, brand, a 'moves here from X' hint on brand collections) and a removable list, Collection type select + cover image in the side column. Replaced the old 525-row checkbox list. Collections list gained a Type column. Fixed a latent CSS bug: .admin-field input styled radios/checkboxes as full-width text boxes; reset for .admin-chip-select.",
+    "brief": "Brands are collections now (22 seeded, all 525 products assigned); collections are edited Shopify-style with search-to-add products"
   }
 ]

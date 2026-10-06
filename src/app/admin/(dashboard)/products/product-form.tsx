@@ -7,9 +7,12 @@ import { deleteProduct, saveProduct } from "./actions";
 
 export async function ProductForm({ product }: { product: ProductWithRelations | null }) {
   const collections = await listCollections();
+  const brands = collections.filter((c) => c.isBrand);
+  const themes = collections.filter((c) => !c.isBrand);
   const assigned = new Set(
     product ? product.watch_collections.map((wc) => wc.collectionId) : []
   );
+  const currentBrandId = brands.find((b) => assigned.has(b.id))?.id;
 
   return (
     <form className="admin-form" action={saveProduct}>
@@ -20,10 +23,6 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
           <label className="admin-field">
             <span>Title</span>
             <input name="productName" defaultValue={product?.productName} required />
-          </label>
-          <label className="admin-field">
-            <span>Brand</span>
-            <input name="brand" defaultValue={product?.brand} required />
           </label>
           <label className="admin-field">
             <span>Description</span>
@@ -66,10 +65,31 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
         <div className="admin-panel">
           <h2>Organization</h2>
           <div className="admin-field">
-            <span>Collections</span>
+            <span>Brand collection (choose one)</span>
             <div className="admin-chip-select">
-              {collections.length === 0 && <p className="admin-hint">No collections yet.</p>}
-              {collections.map((c) => (
+              {brands.length === 0 && (
+                <p className="admin-hint">No brand collections yet — create one in Collections.</p>
+              )}
+              {brands.map((c) => (
+                <label key={c.id}>
+                  <input
+                    type="radio"
+                    name="brand_collection_id"
+                    value={c.id}
+                    defaultChecked={c.id === currentBrandId}
+                    required
+                  />
+                  {c.name}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="admin-field">
+            <span>Other collections</span>
+            <div className="admin-chip-select">
+              {themes.length === 0 && <p className="admin-hint">No themed collections yet.</p>}
+              {themes.map((c) => (
                 <label key={c.id}>
                   <input
                     type="checkbox"

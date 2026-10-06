@@ -10,7 +10,7 @@ export async function saveProduct(formData: FormData) {
 
   const id = String(formData.get("id") ?? "");
   const productName = String(formData.get("productName") ?? "").trim();
-  const brand = String(formData.get("brand") ?? "").trim();
+  const brandCollectionId = String(formData.get("brand_collection_id") ?? "");
   const status = String(formData.get("status") ?? "AVAILABLE") as WatchStatus;
   const priceInput = String(formData.get("price") ?? "").trim();
   const priceCents = priceInput ? Math.round(parseFloat(priceInput) * 100) : null;
@@ -20,10 +20,21 @@ export async function saveProduct(formData: FormData) {
   const collectionIds = formData.getAll("collection_ids").map(String);
 
   if (!productName) throw new Error("Title is required.");
-  if (!brand) throw new Error("Brand is required.");
+  if (!brandCollectionId) throw new Error("Choose a brand collection.");
   if (priceInput && (Number.isNaN(priceCents) || priceCents! < 0)) {
     throw new Error("Enter a valid price.");
   }
+
+  // products.brand mirrors the chosen brand collection's name — the
+  // storefront, admin list, search, and analytics all read that column.
+  const { data: brandCollection, error: brandError } = await supabase
+    .from("collections")
+    .select("name")
+    .eq("id", brandCollectionId)
+    .eq("isBrand", true)
+    .maybeSingle();
+  if (brandError || !brandCollection) throw new Error("That brand collection no longer exists.");
+  const brand = brandCollection.name;
 
   const payload = { productName, brand, status, priceCents, descriptionHtml, tags, photoUrls };
   let productId = id;
@@ -37,12 +48,11 @@ export async function saveProduct(formData: FormData) {
     productId = data.id;
   }
 
+  const allCollectionIds = [brandCollectionId, ...collectionIds.filter((c) => c !== brandCollectionId)];
   await supabase.from("watch_collections").delete().eq("watchId", productId);
-  if (collectionIds.length > 0) {
-    await supabase
-      .from("watch_collections")
-      .insert(collectionIds.map((collectionId) => ({ watchId: productId, collectionId })));
-  }
+  await supabase
+    .from("watch_collections")
+    .insert(allCollectionIds.map((collectionId) => ({ watchId: productId, collectionId })));
 
   revalidatePath("/admin/products");
   revalidatePath("/");

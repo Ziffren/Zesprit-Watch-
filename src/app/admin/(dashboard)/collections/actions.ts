@@ -14,11 +14,12 @@ export async function saveCollection(formData: FormData) {
   const description = String(formData.get("description") ?? "").trim() || null;
   const coverImageUrl = String(formData.get("coverImageUrl") ?? "").trim() || null;
   const productIds = formData.getAll("product_ids").map(String);
+  const isBrand = formData.get("collection_type") === "brand";
 
   if (!name) throw new Error("Name is required.");
 
   const slug = slugify(slugInput || name);
-  const payload = { name, slug, description, coverImageUrl };
+  const payload = { name, slug, description, coverImageUrl, isBrand };
 
   let collectionId = id;
 
@@ -35,6 +36,28 @@ export async function saveCollection(formData: FormData) {
     collectionId = data.id;
   }
 
+  // A product has exactly one brand: anything added to this brand collection
+  // leaves its previous brand collection, and products.brand follows.
+  if (isBrand && productIds.length > 0) {
+    const { data: otherBrands } = await supabase
+      .from("collections")
+      .select("id")
+      .eq("isBrand", true)
+      .neq("id", collectionId);
+    const otherBrandIds = (otherBrands ?? []).map((b) => b.id);
+    for (let i = 0; i < productIds.length; i += 100) {
+      const chunk = productIds.slice(i, i + 100);
+      if (otherBrandIds.length > 0) {
+        await supabase
+          .from("watch_collections")
+          .delete()
+          .in("watchId", chunk)
+          .in("collectionId", otherBrandIds);
+      }
+      await supabase.from("products").update({ brand: name }).in("id", chunk);
+    }
+  }
+
   await supabase.from("watch_collections").delete().eq("collectionId", collectionId);
   if (productIds.length > 0) {
     await supabase.from("watch_collections").insert(
@@ -43,6 +66,8 @@ export async function saveCollection(formData: FormData) {
   }
 
   revalidatePath("/admin/collections");
+  revalidatePath("/admin/products");
+  revalidatePath("/");
   redirect("/admin/collections");
 }
 

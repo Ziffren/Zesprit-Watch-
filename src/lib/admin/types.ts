@@ -16,6 +16,7 @@ export type Collection = {
   slug: string;
   description: string | null;
   coverImageUrl: string | null;
+  isBrand: boolean;
   createdAt: string;
 };
 

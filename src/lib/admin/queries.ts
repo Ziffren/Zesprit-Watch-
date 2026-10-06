@@ -63,6 +63,36 @@ export async function listProducts(): Promise<ProductWithRelations[]> {
   return (data ?? []) as unknown as ProductWithRelations[];
 }
 
+export type PickerProduct = {
+  id: string;
+  productName: string;
+  brand: string;
+  status: "AVAILABLE" | "SOLD";
+  photoUrls: string[];
+};
+
+// Lightweight list for the collection editor's product picker — no
+// description HTML, no relations.
+export async function listProductsForPicker(): Promise<PickerProduct[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, productName, brand, status, photoUrls")
+    .order("productName");
+  if (error) throw new Error(`Couldn't load products: ${error.message}`);
+  return (data ?? []) as PickerProduct[];
+}
+
+export async function listCollectionProductIds(collectionId: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("watch_collections")
+    .select("watchId")
+    .eq("collectionId", collectionId);
+  if (error) throw new Error(`Couldn't load collection products: ${error.message}`);
+  return (data ?? []).map((r) => r.watchId);
+}
+
 export type ProductListPage = {
   products: ProductWithRelations[];
   total: number;

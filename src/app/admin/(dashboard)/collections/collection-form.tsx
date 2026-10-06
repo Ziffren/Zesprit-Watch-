@@ -1,17 +1,15 @@
-import { listProducts } from "@/lib/admin/queries";
+import { listCollectionProductIds, listProductsForPicker } from "@/lib/admin/queries";
 import type { Collection } from "@/lib/admin/types";
 import { CoverImageField } from "../cover-image-field";
+import { RichTextEditor } from "../products/rich-text-editor";
+import { CollectionProducts } from "./collection-products";
 import { deleteCollection, saveCollection } from "./actions";
 
 export async function CollectionForm({ collection }: { collection: Collection | null }) {
-  const products = await listProducts();
-  const assigned = new Set(
-    collection
-      ? products
-          .filter((p) => p.watch_collections.some((wc) => wc.collectionId === collection.id))
-          .map((p) => p.id)
-      : []
-  );
+  const [products, assignedIds] = await Promise.all([
+    listProductsForPicker(),
+    collection ? listCollectionProductIds(collection.id) : Promise.resolve([] as string[]),
+  ]);
 
   return (
     <form className="admin-form" action={saveCollection}>
@@ -20,55 +18,56 @@ export async function CollectionForm({ collection }: { collection: Collection | 
       <div className="admin-form__main">
         <div className="admin-panel">
           <label className="admin-field">
-            <span>Name</span>
-            <input name="name" defaultValue={collection?.name} required />
+            <span>Title</span>
+            <input
+              name="name"
+              defaultValue={collection?.name}
+              placeholder="e.g. Grand Seiko, or Dress watches"
+              required
+            />
           </label>
           <label className="admin-field">
             <span>Slug</span>
-            <input name="slug" defaultValue={collection?.slug} placeholder="auto-generated from name" />
+            <input name="slug" defaultValue={collection?.slug} placeholder="auto-generated from title" />
           </label>
           <label className="admin-field">
             <span>Description</span>
-            <textarea name="description" rows={4} defaultValue={collection?.description ?? ""} />
+            <RichTextEditor name="description" initialHtml={collection?.description ?? null} />
           </label>
         </div>
 
         <div className="admin-panel">
-          <h2>Watches in this collection</h2>
-          <p className="admin-hint">
-            Brand-based grouping doesn&rsquo;t need a collection — the storefront can already
-            filter by brand directly. Use collections for themed groupings (e.g. &ldquo;GMT &amp;
-            Travel&rdquo;).
-          </p>
-          <div className="admin-chip-select">
-            {products.length === 0 && <p className="admin-hint">No watches yet.</p>}
-            {products.map((p) => (
-              <label key={p.id}>
-                <input
-                  type="checkbox"
-                  name="product_ids"
-                  value={p.id}
-                  defaultChecked={assigned.has(p.id)}
-                />
-                {p.productName}
-              </label>
-            ))}
-          </div>
+          <CollectionProducts
+            allProducts={products}
+            initialIds={assignedIds}
+            brandName={collection?.isBrand ? collection.name : null}
+          />
         </div>
       </div>
 
       <div className="admin-form__side">
+        <div className="admin-panel">
+          <h2>Collection type</h2>
+          <label className="admin-field">
+            <span>Type</span>
+            <select name="collection_type" defaultValue={collection?.isBrand ? "brand" : "theme"}>
+              <option value="brand">Brand</option>
+              <option value="theme">Themed collection</option>
+            </select>
+          </label>
+          <p className="admin-hint">
+            Brand collections are what products pick their brand from (one per product). Themed
+            collections are free groupings like &ldquo;GMT &amp; Travel&rdquo;.
+          </p>
+        </div>
+
         <div className="admin-panel">
           <CoverImageField initialUrl={collection?.coverImageUrl ?? null} />
         </div>
 
         <div className="admin-form__actions" style={{ justifyContent: "space-between" }}>
           {collection ? (
-            <button
-              className="admin-btn admin-btn--danger"
-              type="submit"
-              formAction={deleteCollection}
-            >
+            <button className="admin-btn admin-btn--danger" type="submit" formAction={deleteCollection}>
               Delete
             </button>
           ) : (
