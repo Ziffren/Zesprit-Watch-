@@ -12,6 +12,8 @@ export async function saveProduct(formData: FormData) {
   const productName = String(formData.get("productName") ?? "").trim();
   const brand = String(formData.get("brand") ?? "").trim();
   const status = String(formData.get("status") ?? "AVAILABLE") as WatchStatus;
+  const priceInput = String(formData.get("price") ?? "").trim();
+  const priceCents = priceInput ? Math.round(parseFloat(priceInput) * 100) : null;
   const descriptionHtml = String(formData.get("descriptionHtml") ?? "");
   const tags = formData.getAll("tags").map(String).filter(Boolean);
   const photoUrls = formData.getAll("photoUrls").map(String).filter(Boolean);
@@ -19,8 +21,11 @@ export async function saveProduct(formData: FormData) {
 
   if (!productName) throw new Error("Title is required.");
   if (!brand) throw new Error("Brand is required.");
+  if (priceInput && (Number.isNaN(priceCents) || priceCents! < 0)) {
+    throw new Error("Enter a valid price.");
+  }
 
-  const payload = { productName, brand, status, descriptionHtml, tags, photoUrls };
+  const payload = { productName, brand, status, priceCents, descriptionHtml, tags, photoUrls };
   let productId = id;
 
   if (id) {

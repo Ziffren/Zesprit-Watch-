@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getProductStats, listProductsPage } from "@/lib/admin/queries";
+import { formatCents } from "@/lib/admin/types";
 
 export const dynamic = "force-dynamic";
 
@@ -90,6 +91,7 @@ export default async function ProductsPage({
                     <th aria-hidden="true"></th>
                     <th>Title</th>
                     <th>Brand</th>
+                    <th>Price</th>
                     <th>Status</th>
                     <th>Collections</th>
                   </tr>
@@ -115,6 +117,7 @@ export default async function ProductsPage({
                         </Link>
                       </td>
                       <td>{p.brand}</td>
+                      <td>{formatCents(p.priceCents)}</td>
                       <td>
                         <span
                           className="admin-badge"

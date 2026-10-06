@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getWatchDetail } from "@/lib/storefront";
+import { formatPrice } from "@/lib/admin/types";
 import { OrderForm } from "./order-form";
 import { SaveButton } from "./save-button";
 
@@ -53,7 +54,9 @@ export default async function WatchDetailPage({
             <p className="watch-detail__brand">{watch.brand}</p>
             <h1 className="watch-detail__title">{watch.name}</h1>
             <div className="watch-detail__price-row">
-              <p className="watch-detail__price">Price on request</p>
+              <p className="watch-detail__price" data-set={watch.priceCents != null}>
+                {formatPrice(watch.priceCents)}
+              </p>
               <SaveButton watchId={watch.id} />
             </div>
 

@@ -438,6 +438,15 @@ button {
   font-style: italic;
 }
 
+/* A real price reads as a confident figure, not the soft "ask us" notice
+   italic/muted styling was designed for — "Price on request" keeps that
+   treatment, a set price doesn't. */
+.product__price[data-set="true"] {
+  color: var(--color-ink);
+  font-style: normal;
+  font-weight: 500;
+}
+
 .product__view {
   justify-self: start;
   font-size: var(--text-sm);
@@ -691,6 +700,13 @@ button {
 .watch-detail__price {
   font-style: italic;
   color: var(--color-muted);
+  font-size: var(--text-lg);
+}
+
+.watch-detail__price[data-set="true"] {
+  color: var(--color-ink);
+  font-style: normal;
+  font-weight: 600;
 }
 
 .watch-detail__price-row {

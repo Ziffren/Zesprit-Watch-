@@ -34,6 +34,21 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
         <div className="admin-panel">
           <MediaGrid initialUrls={product?.photoUrls ?? []} />
         </div>
+
+        <div className="admin-panel">
+          <h2>Price</h2>
+          <label className="admin-field">
+            <span>Price (USD)</span>
+            <input
+              type="number"
+              name="price"
+              step="0.01"
+              min="0"
+              placeholder="Leave blank for &ldquo;Price on request&rdquo;"
+              defaultValue={product?.priceCents != null ? (product.priceCents / 100).toFixed(2) : ""}
+            />
+          </label>
+        </div>
       </div>
 
       <div className="admin-form__side">

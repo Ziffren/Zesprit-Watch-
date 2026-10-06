@@ -52,7 +52,7 @@ export async function listProducts(): Promise<ProductWithRelations[]> {
   const { data, error } = await supabase
     .from("products")
     .select(
-      "id, productName, brand, status, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)"
+      "id, productName, brand, status, priceCents, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)"
     )
     .order("status", { ascending: true })
     .order("updatedAt", { ascending: false });
@@ -87,7 +87,7 @@ export async function listProductsPage({
   let query = supabase
     .from("products")
     .select(
-      "id, productName, brand, status, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)",
+      "id, productName, brand, status, priceCents, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)",
       { count: "exact" }
     )
     .order("status", { ascending: true })
@@ -140,7 +140,7 @@ export async function getProduct(id: string): Promise<ProductWithRelations | nul
   const { data, error } = await supabase
     .from("products")
     .select(
-      "id, productName, brand, status, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)"
+      "id, productName, brand, status, priceCents, descriptionHtml, tags, photoUrls, createdAt, updatedAt, watch_collections(collectionId)"
     )
     .eq("id", id)
     .maybeSingle();

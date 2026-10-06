@@ -147,7 +147,9 @@ export default async function Home() {
               <div className="product__meta">
                 <h3 className="product__name">{p.name}</h3>
                 <p className="product__detail">{p.detail}</p>
-                <p className="product__price">{p.price}</p>
+                <p className="product__price" data-set={p.priceSet}>
+                  {p.price}
+                </p>
               </div>
               <Link className="product__view" href={`/watches/${p.id}`}>
                 View piece →

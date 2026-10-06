@@ -7,6 +7,7 @@ export type StorefrontPiece = {
   name: string;
   detail: string;
   price: string;
+  priceSet: boolean;
   imageUrl: string | null;
   hour: number;
   min: number;
@@ -14,12 +15,12 @@ export type StorefrontPiece = {
 
 // Shown until the owner publishes real products in /admin/products.
 const placeholderPieces: StorefrontPiece[] = [
-  { id: "meridian", name: "The Meridian", detail: "Hand-wound · steel case", price: "Price on request", imageUrl: null, hour: 35, min: 210 },
-  { id: "aviator", name: "The Aviator", detail: "Automatic · brushed steel", price: "Price on request", imageUrl: null, hour: 130, min: 40 },
-  { id: "regent", name: "The Regent", detail: "Manual wind · gold-tone case", price: "Price on request", imageUrl: null, hour: 260, min: 300 },
-  { id: "wanderer", name: "The Wanderer", detail: "Automatic · steel & leather", price: "Price on request", imageUrl: null, hour: 15, min: 95 },
-  { id: "compass", name: "The Compass", detail: "Hand-wound · chronograph", price: "Price on request", imageUrl: null, hour: 190, min: 250 },
-  { id: "ledger", name: "The Ledger", detail: "Automatic · steel case", price: "Price on request", imageUrl: null, hour: 80, min: 340 },
+  { id: "meridian", name: "The Meridian", detail: "Hand-wound · steel case", price: "Price on request", priceSet: false, imageUrl: null, hour: 35, min: 210 },
+  { id: "aviator", name: "The Aviator", detail: "Automatic · brushed steel", price: "Price on request", priceSet: false, imageUrl: null, hour: 130, min: 40 },
+  { id: "regent", name: "The Regent", detail: "Manual wind · gold-tone case", price: "Price on request", priceSet: false, imageUrl: null, hour: 260, min: 300 },
+  { id: "wanderer", name: "The Wanderer", detail: "Automatic · steel & leather", price: "Price on request", priceSet: false, imageUrl: null, hour: 15, min: 95 },
+  { id: "compass", name: "The Compass", detail: "Hand-wound · chronograph", price: "Price on request", priceSet: false, imageUrl: null, hour: 190, min: 250 },
+  { id: "ledger", name: "The Ledger", detail: "Automatic · steel case", price: "Price on request", priceSet: false, imageUrl: null, hour: 80, min: 340 },
 ];
 
 export type WatchDetail = {
@@ -27,6 +28,7 @@ export type WatchDetail = {
   name: string;
   brand: string;
   status: "AVAILABLE" | "SOLD";
+  priceCents: number | null;
   descriptionHtml: string | null;
   tags: string[];
   photoUrls: string[];
@@ -41,7 +43,7 @@ export async function getWatchDetail(id: string): Promise<WatchDetail | null> {
     const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("products")
-      .select("id, productName, brand, status, descriptionHtml, tags, photoUrls")
+      .select("id, productName, brand, status, priceCents, descriptionHtml, tags, photoUrls")
       .eq("id", id)
       .maybeSingle();
 
@@ -53,6 +55,7 @@ export async function getWatchDetail(id: string): Promise<WatchDetail | null> {
       name: data.productName,
       brand: data.brand,
       status: data.status,
+      priceCents: data.priceCents,
       descriptionHtml: data.descriptionHtml,
       tags: data.tags ?? [],
       photoUrls: data.photoUrls ?? [],
@@ -132,7 +135,7 @@ export async function getFeaturedPieces(): Promise<StorefrontPiece[]> {
     // — no business fields exist on it at all, nothing to restrict.
     const { data, error } = await supabase
       .from("products")
-      .select("id, productName, brand, tags, photoUrls, status, createdAt")
+      .select("id, productName, brand, tags, photoUrls, status, priceCents, createdAt")
       .eq("status", "AVAILABLE")
       .order("createdAt", { ascending: false })
       .limit(6);
@@ -145,7 +148,8 @@ export async function getFeaturedPieces(): Promise<StorefrontPiece[]> {
         id: p.id,
         name: p.productName,
         detail: p.tags?.length ? p.tags.slice(0, 2).join(" · ") : p.brand,
-        price: formatPrice(),
+        price: formatPrice(p.priceCents),
+        priceSet: p.priceCents != null,
         imageUrl: p.photoUrls?.[0] ?? null,
         hour,
         min,

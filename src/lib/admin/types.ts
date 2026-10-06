@@ -1,14 +1,12 @@
-// Mirrors the shared `watches` / `collections` / `watch_collections` /
-// `orders` tables owned by the Watch Report app (prisma/schema.prisma in
-// /Users/phamhiendz/Bussiness Report). Field names are the exact Postgres
-// column names Prisma created (camelCase, unmapped) so there's no
+// Mirrors tables owned by the shared Supabase project (prisma/schema.prisma
+// in /Users/phamhiendz/Bussiness Report). Field names are the exact
+// Postgres column names Prisma created (camelCase, unmapped) so there's no
 // translation layer between this file and what Supabase/PostgREST returns.
 //
-// This app only ever reads/writes the catalog columns (productName, brand,
-// descriptionHtml, tags, photoUrls) — never the business columns
-// (purchasePrice, servicePrice, salePrice, customerInfo, etc.), which stay
-// owned by the Watch Report admin. `status` is shown read-only here; it's
-// only ever changed in Watch Report, tied to real sale data.
+// `products`/`collections`/`watch_collections` are fully owned by this app
+// (full CRUD from /admin) — independent of Watch Report's own `watches`
+// table since the 2026-10-05 split. `priceCents` is this app's own public
+// asking price, unrelated to Watch Report's purchase/sale price data.
 
 export type WatchStatus = "AVAILABLE" | "SOLD";
 
@@ -26,6 +24,7 @@ export type Product = {
   productName: string;
   brand: string;
   status: WatchStatus;
+  priceCents: number | null;
   descriptionHtml: string | null;
   tags: string[];
   photoUrls: string[];
@@ -153,10 +152,10 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-// There is no public list-price field in the shared schema — purchase/sale
-// prices are business-internal (Watch Report only) and never exposed here.
-// Every catalogue item is deliberately "Price on request", matching the
-// storefront's existing concierge voice.
-export function formatPrice(): string {
-  return "Price on request";
+// Public storefront price display. A product with no priceCents set still
+// shows "Price on request" (the original concierge voice), now as a
+// fallback rather than the only option.
+export function formatPrice(cents: number | null): string {
+  if (cents == null) return "Price on request";
+  return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
