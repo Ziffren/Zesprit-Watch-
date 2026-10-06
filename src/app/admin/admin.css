@@ -1336,3 +1336,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+.admin-form__error {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: var(--rule-hair) solid var(--color-accent-2);
+  border-radius: var(--admin-radius);
+  background: color-mix(in oklch, var(--color-accent-2) 8%, var(--color-paper));
+  color: var(--color-accent-2);
+  font-size: var(--text-sm);
+}

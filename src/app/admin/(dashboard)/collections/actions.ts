@@ -6,7 +6,33 @@ import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/admin/types";
 import { sanitizeRules } from "@/lib/collection-rules";
 
-export async function saveCollection(formData: FormData) {
+export type SaveCollectionState = { error: string | null };
+
+// Returns a uniquely-taken slug: the requested one if free, otherwise
+// `slug-2`, `slug-3`… (like Shopify handles). Excludes the collection being
+// edited so re-saving doesn't collide with itself.
+async function uniqueSlug(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  base: string,
+  selfId: string
+): Promise<{ slug: string; takenBy: string | null }> {
+  const { data } = await supabase
+    .from("collections")
+    .select("id, name, slug")
+    .like("slug", `${base}%`);
+  const others = (data ?? []).filter((c) => c.id !== selfId);
+  const taken = new Set(others.map((c) => c.slug));
+  const takenBy = others.find((c) => c.slug === base)?.name ?? null;
+  if (!taken.has(base)) return { slug: base, takenBy: null };
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n++;
+  return { slug: `${base}-${n}`, takenBy };
+}
+
+export async function saveCollection(
+  _prev: SaveCollectionState,
+  formData: FormData
+): Promise<SaveCollectionState> {
   const supabase = await createClient();
 
   const id = String(formData.get("id") ?? "");
@@ -29,12 +55,31 @@ export async function saveCollection(formData: FormData) {
   const excludeRules = isSmart ? parse("exclude_json") : [];
   const matchAll = formData.get("match_all") !== "false";
 
-  if (!name) throw new Error("Name is required.");
+  if (!name) return { error: "Title is required." };
   if (isSmart && rules.length === 0) {
-    throw new Error("An automated collection needs at least one condition.");
+    return { error: "An automated collection needs at least one condition." };
   }
 
-  const slug = slugify(slugInput || name);
+  const base = slugify(slugInput || name);
+  if (!base) return { error: "Title needs at least one letter or number." };
+  const { slug, takenBy } = await uniqueSlug(supabase, base, id);
+  // A slug typed by hand is a deliberate URL choice — don't silently change it.
+  if (slugInput && takenBy) {
+    return { error: `The slug "${base}" is already used by "${takenBy}". Choose another or leave it blank.` };
+  }
+
+  if (isBrand) {
+    const { data: sameName } = await supabase
+      .from("collections")
+      .select("id")
+      .eq("isBrand", true)
+      .ilike("name", name.replace(/[%_\\]/g, (ch) => `\\${ch}`))
+      .neq("id", id || "00000000-0000-0000-0000-000000000000");
+    if (sameName && sameName.length > 0) {
+      return { error: `A brand collection named "${name}" already exists.` };
+    }
+  }
+
   const payload = {
     name,
     slug,
@@ -51,14 +96,14 @@ export async function saveCollection(formData: FormData) {
 
   if (id) {
     const { error } = await supabase.from("collections").update(payload).eq("id", id);
-    if (error) throw new Error(error.message);
+    if (error) return { error: `Couldn't save: ${error.message}` };
   } else {
     const { data, error } = await supabase
       .from("collections")
       .insert(payload)
       .select("id")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) return { error: `Couldn't create the collection: ${error.message}` };
     collectionId = data.id;
   }
 

@@ -3,9 +3,7 @@
 import { useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
-import Link from "@tiptap/extension-link";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Image from "@tiptap/extension-image";
@@ -51,11 +49,11 @@ export function RichTextEditor({
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
-      Underline,
+      // StarterKit v3 already bundles Link and Underline — configure them
+      // here rather than registering them a second time.
+      StarterKit.configure({ link: { openOnClick: false, autolink: false } }),
       TextStyle,
       Color,
-      Link.configure({ openOnClick: false, autolink: false }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Image,
     ],

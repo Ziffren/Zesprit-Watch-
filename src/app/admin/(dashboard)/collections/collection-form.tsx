@@ -3,7 +3,8 @@ import type { Collection } from "@/lib/admin/types";
 import { CoverImageField } from "../cover-image-field";
 import { RichTextEditor } from "../products/rich-text-editor";
 import { CollectionBuilder, type CollectionType } from "./collection-builder";
-import { deleteCollection, saveCollection } from "./actions";
+import { deleteCollection } from "./actions";
+import { CollectionFormShell, SaveCollectionButton } from "./collection-form-shell";
 
 export async function CollectionForm({ collection }: { collection: Collection | null }) {
   const [products, manualIds] = await Promise.all([
@@ -47,14 +48,12 @@ export async function CollectionForm({ collection }: { collection: Collection | 
       ) : (
         <span />
       )}
-      <button className="admin-btn admin-btn--primary" type="submit">
-        Save collection
-      </button>
+      <SaveCollectionButton />
     </div>
   );
 
   return (
-    <form className="admin-form" action={saveCollection}>
+    <CollectionFormShell>
       <input type="hidden" name="id" value={collection?.id ?? ""} />
       <CollectionBuilder
         allProducts={products}
@@ -70,6 +69,6 @@ export async function CollectionForm({ collection }: { collection: Collection | 
         header={header}
         actions={actions}
       />
-    </form>
+    </CollectionFormShell>
   );
 }
