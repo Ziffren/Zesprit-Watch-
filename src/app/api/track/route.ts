@@ -17,6 +17,9 @@ export async function POST(request: NextRequest) {
     if (!path || !sessionId) return new NextResponse(null, { status: 204 });
 
     const country = request.headers.get("x-vercel-ip-country");
+    const region = request.headers.get("x-vercel-ip-country-region");
+    const cityRaw = request.headers.get("x-vercel-ip-city");
+    const city = cityRaw ? decodeURIComponent(cityRaw) : null;
 
     const supabase = await createClient();
     const {
@@ -28,6 +31,8 @@ export async function POST(request: NextRequest) {
       sessionId,
       customerId: user?.id ?? null,
       country,
+      region,
+      city,
       referrer,
     });
   } catch {

@@ -2,10 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import type {
   AnalyticsOverview,
   Collection,
-  CountryStat,
   CustomerWithCounts,
   CustomerWithDetails,
   DailyTraffic,
+  LocationStat,
   Message,
   MessageStatus,
   OrderStatus,
@@ -384,11 +384,11 @@ export async function getTopViewedProducts(limit = 8): Promise<TopViewedProduct[
   return (data ?? []) as TopViewedProduct[];
 }
 
-export async function getCountryStats(limit = 8): Promise<CountryStat[]> {
+export async function getSessionLocations(limit = 8): Promise<LocationStat[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("analytics_countries").select("*").limit(limit);
-  if (error) throw new Error(`Couldn't load country stats: ${error.message}`);
-  return (data ?? []) as CountryStat[];
+  const { data, error } = await supabase.from("analytics_locations").select("*").limit(limit);
+  if (error) throw new Error(`Couldn't load session locations: ${error.message}`);
+  return (data ?? []) as LocationStat[];
 }
 
 export async function getTopCustomersBySpend(limit = 8): Promise<TopCustomer[]> {

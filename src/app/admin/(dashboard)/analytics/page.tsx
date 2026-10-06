@@ -1,8 +1,8 @@
 import Link from "next/link";
 import {
   getAnalyticsOverview,
-  getCountryStats,
   getDailyTraffic,
+  getSessionLocations,
   getTopCustomersBySpend,
   getTopViewedProducts,
 } from "@/lib/admin/queries";
@@ -13,11 +13,11 @@ import { TrafficChart } from "./traffic-chart";
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
-  const [overview, traffic, topProducts, countries, topCustomers] = await Promise.all([
+  const [overview, traffic, topProducts, locations, topCustomers] = await Promise.all([
     getAnalyticsOverview(),
     getDailyTraffic(30),
     getTopViewedProducts(8),
-    getCountryStats(8),
+    getSessionLocations(8),
     getTopCustomersBySpend(8),
   ]);
 
@@ -119,12 +119,12 @@ export default async function AnalyticsPage() {
 
           <div className="admin-form__side">
             <div className="admin-panel">
-              <h2>Visitors by country</h2>
+              <h2>Sessions by location</h2>
               <BarList
-                items={countries.map((c) => ({
-                  label: c.country,
-                  value: c.visitors,
-                  valueLabel: String(c.visitors),
+                items={locations.map((l) => ({
+                  label: [l.country, l.region, l.city].filter(Boolean).join(" · "),
+                  value: l.visitors,
+                  valueLabel: String(l.visitors),
                 }))}
               />
             </div>

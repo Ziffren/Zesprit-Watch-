@@ -111,8 +111,10 @@ export type TopViewedProduct = {
   views: number;
 };
 
-export type CountryStat = {
+export type LocationStat = {
   country: string;
+  region: string | null;
+  city: string | null;
   visitors: number;
 };
 
