@@ -142,20 +142,61 @@ export async function getFeaturedPieces(): Promise<StorefrontPiece[]> {
 
     if (error || !data || data.length === 0) return placeholderPieces;
 
-    return data.map((p) => {
-      const { hour, min } = anglesFromId(p.id);
-      return {
-        id: p.id,
-        name: p.productName,
-        detail: p.tags?.length ? p.tags.slice(0, 2).join(" · ") : p.brand,
-        price: formatPrice(p.priceCents),
-        priceSet: p.priceCents != null,
-        imageUrl: p.photoUrls?.[0] ?? null,
-        hour,
-        min,
-      };
-    });
+    return data.map(toPiece);
   } catch {
     return placeholderPieces;
   }
+}
+
+// "More from <brand>" under a product page. Falls back to the newest pieces
+// when the brand has nothing else in stock, so the row is never empty.
+export async function getRelatedPieces(
+  brand: string,
+  excludeId: string,
+  limit = 4,
+): Promise<{ pieces: StorefrontPiece[]; sameBrand: boolean }> {
+  if (!isSupabaseConfigured) return { pieces: [], sameBrand: false };
+
+  try {
+    const supabase = createPublicClient();
+    const base = () =>
+      supabase
+        .from("products")
+        .select("id, productName, brand, tags, photoUrls, status, priceCents, createdAt")
+        .eq("status", "AVAILABLE")
+        .neq("id", excludeId)
+        .order("createdAt", { ascending: false })
+        .limit(limit);
+
+    const { data: sameBrand } = await base().eq("brand", brand);
+    if (sameBrand && sameBrand.length > 0) return { pieces: sameBrand.map(toPiece), sameBrand: true };
+
+    const { data: latest } = await base();
+    return { pieces: (latest ?? []).map(toPiece), sameBrand: false };
+  } catch {
+    return { pieces: [], sameBrand: false };
+  }
+}
+
+type PieceRow = {
+  id: string;
+  productName: string;
+  brand: string;
+  tags: string[] | null;
+  photoUrls: string[] | null;
+  priceCents: number | null;
+};
+
+function toPiece(p: PieceRow): StorefrontPiece {
+  const { hour, min } = anglesFromId(p.id);
+  return {
+    id: p.id,
+    name: p.productName,
+    detail: p.tags?.length ? p.tags.slice(0, 2).join(" · ") : p.brand,
+    price: formatPrice(p.priceCents),
+    priceSet: p.priceCents != null,
+    imageUrl: p.photoUrls?.[0] ?? null,
+    hour,
+    min,
+  };
 }

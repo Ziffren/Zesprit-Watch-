@@ -1,10 +1,11 @@
-import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getWatchDetail } from "@/lib/storefront";
+import { getRelatedPieces, getWatchDetail } from "@/lib/storefront";
 import { formatPrice } from "@/lib/admin/types";
+import { ProductCard } from "@/components/product-card";
 import { OrderForm } from "./order-form";
 import { SaveButton } from "./save-button";
+import { ProductGallery } from "./product-gallery";
 
 export default async function WatchDetailPage({
   params,
@@ -16,7 +17,7 @@ export default async function WatchDetailPage({
 
   if (!watch) notFound();
 
-  const cover = watch.photoUrls[0] ?? null;
+  const related = await getRelatedPieces(watch.brand, watch.id);
 
   return (
     <>
@@ -29,25 +30,7 @@ export default async function WatchDetailPage({
       <main>
         <section className="watch-detail">
           <div className="watch-detail__media">
-            {cover ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={cover} alt={watch.name} />
-            ) : (
-              <div
-                className="watch-icon watch-icon--large"
-                style={
-                  {
-                    "--hour-deg": `${watch.hour}deg`,
-                    "--min-deg": `${watch.min}deg`,
-                  } as CSSProperties
-                }
-                aria-hidden="true"
-              >
-                <span className="watch-icon__hand watch-icon__hand--hour" />
-                <span className="watch-icon__hand watch-icon__hand--min" />
-                <span className="watch-icon__hub" />
-              </div>
-            )}
+            <ProductGallery photos={watch.photoUrls} name={watch.name} hour={watch.hour} min={watch.min} />
           </div>
 
           <div className="watch-detail__info">
@@ -59,6 +42,19 @@ export default async function WatchDetailPage({
               </p>
               <SaveButton watchId={watch.id} />
             </div>
+
+            {watch.status === "AVAILABLE" ? (
+              <OrderForm watchId={watch.id} />
+            ) : (
+              <div className="order-form__success">
+                <p className="order-form__success-title">This piece has found its home.</p>
+                <p>
+                  It&rsquo;s no longer available, but{" "}
+                  <Link href="/#collection">browse the current collection</Link> — new pieces
+                  are added regularly.
+                </p>
+              </div>
+            )}
 
             {watch.descriptionHtml && (
               <div
@@ -74,21 +70,21 @@ export default async function WatchDetailPage({
                 ))}
               </ul>
             )}
-
-            {watch.status === "AVAILABLE" ? (
-              <OrderForm watchId={watch.id} />
-            ) : (
-              <div className="order-form__success">
-                <p className="order-form__success-title">This piece has found its home.</p>
-                <p>
-                  It&rsquo;s no longer available, but{" "}
-                  <Link href="/#collection">browse the current collection</Link> — new pieces
-                  are added regularly.
-                </p>
-              </div>
-            )}
           </div>
         </section>
+
+        {related.pieces.length > 0 && (
+          <section className="related" aria-labelledby="related-title">
+            <h2 className="related__title" id="related-title">
+              {related.sameBrand ? `More from ${watch.brand}` : "More from the collection"}
+            </h2>
+            <div className="related__grid">
+              {related.pieces.map((p) => (
+                <ProductCard key={p.id} piece={p} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <footer className="foot-mast">

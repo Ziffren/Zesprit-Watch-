@@ -18,6 +18,8 @@
   --color-accent:     oklch(58% 0.135 78);   /* antique brass */
   --color-accent-2:   oklch(33% 0.100 25);   /* oxblood leather */
   --color-focus:      oklch(60% 0.150 78);
+  --color-scrim:      oklch(16% 0.014 50 / 0.94); /* lightbox backdrop — deep ink */
+  --color-on-scrim:   oklch(97% 0.012 75);
 
   /* Fonts — 2 families, canonical pairing.
    * --font-display / --font-body are injected by next/font in layout.tsx
@@ -59,6 +61,7 @@
   /* Structure */
   --rule-hair: 1px;
   --radius-sm: 2px;
+  --radius-media: 6px; /* product photography — softened like a dial, not a card */
   --nav-h: 119px; /* measured nav-centered__row height above the 40rem breakpoint */
 
   /* Z-index */

@@ -169,5 +169,12 @@
     "product_form": "Automated collections aren't hand-checkable on the product form; it shows a read-only line of which automated collections the product currently matches.",
     "lint_note": "react-hooks/purity flags Date.now() even in a server component; the collection form passes the server's now to the client builder (so date rules preview on the same clock) with a scoped eslint-disable and reason. Elements passed from a server component into a client component's props and rendered among siblings need keys or React warns.",
     "brief": "Automated collections with conditions (tag, price, date added, availability, title, brand) plus exclusions; collection pages redesigned like Shopify with a live product grid"
+  },
+  {
+    "date": "2026-10-06",
+    "component": "product gallery + lightbox + related row",
+    "theme": "custom (locked tokens)",
+    "enrichment": "none",
+    "brief": "Shopify-style /watches/[id]: lead photo + 2-up grid, zoom lightbox (<dialog>), sticky info column, More from <brand> row. New tokens: --radius-media, --color-scrim, --color-on-scrim"
   }
 ]

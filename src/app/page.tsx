@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { getFeaturedPieces } from "@/lib/storefront";
+import { ProductCard } from "@/components/product-card";
 
 export default async function Home() {
   const pieces = await getFeaturedPieces();
@@ -122,39 +123,7 @@ export default async function Home() {
 
         <section className="product-grid" id="collection" aria-label="Selected pieces">
           {pieces.map((p) => (
-            <article className="product" key={p.id}>
-              <div className="product__media">
-                {p.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.imageUrl} alt={p.name} />
-                ) : (
-                  <div
-                    className="watch-icon"
-                    style={
-                      {
-                        "--hour-deg": `${p.hour}deg`,
-                        "--min-deg": `${p.min}deg`,
-                      } as CSSProperties
-                    }
-                    aria-hidden="true"
-                  >
-                    <span className="watch-icon__hand watch-icon__hand--hour" />
-                    <span className="watch-icon__hand watch-icon__hand--min" />
-                    <span className="watch-icon__hub" />
-                  </div>
-                )}
-              </div>
-              <div className="product__meta">
-                <h3 className="product__name">{p.name}</h3>
-                <p className="product__detail">{p.detail}</p>
-                <p className="product__price" data-set={p.priceSet}>
-                  {p.price}
-                </p>
-              </div>
-              <Link className="product__view" href={`/watches/${p.id}`}>
-                View piece →
-              </Link>
-            </article>
+            <ProductCard key={p.id} piece={p} />
           ))}
         </section>
 
