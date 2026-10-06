@@ -7,6 +7,7 @@ import type {
   DailyTraffic,
   DeviceStat,
   LocationStat,
+  MapPoint,
   Message,
   MessageStatus,
   OrderStatus,
@@ -390,6 +391,20 @@ export async function getSessionLocations(limit = 8): Promise<LocationStat[]> {
   const { data, error } = await supabase.from("analytics_locations").select("*").limit(limit);
   if (error) throw new Error(`Couldn't load session locations: ${error.message}`);
   return (data ?? []) as LocationStat[];
+}
+
+export async function getMapPoints(): Promise<MapPoint[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("analytics_map_points").select("*").limit(200);
+  if (error) throw new Error(`Couldn't load map points: ${error.message}`);
+  // numeric columns come back from PostgREST as strings
+  return (data ?? []).map((p) => ({
+    ...p,
+    latitude: Number(p.latitude),
+    longitude: Number(p.longitude),
+    visitors: Number(p.visitors),
+    liveVisitors: Number(p.liveVisitors),
+  })) as MapPoint[];
 }
 
 export async function getDeviceStats(): Promise<DeviceStat[]> {

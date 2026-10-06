@@ -3,6 +3,7 @@ import {
   getAnalyticsOverview,
   getDailyTraffic,
   getDeviceStats,
+  getMapPoints,
   getSessionLocations,
   getTopCustomersBySpend,
   getTopViewedProducts,
@@ -10,18 +11,21 @@ import {
 import { formatCents } from "@/lib/admin/types";
 import { BarList } from "./bar-list";
 import { TrafficChart } from "./traffic-chart";
+import { LiveGlobe } from "./live-globe";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
-  const [overview, traffic, topProducts, locations, devices, topCustomers] = await Promise.all([
-    getAnalyticsOverview(),
-    getDailyTraffic(30),
-    getTopViewedProducts(8),
-    getSessionLocations(8),
-    getDeviceStats(),
-    getTopCustomersBySpend(8),
-  ]);
+  const [overview, traffic, topProducts, locations, devices, topCustomers, mapPoints] =
+    await Promise.all([
+      getAnalyticsOverview(),
+      getDailyTraffic(30),
+      getTopViewedProducts(8),
+      getSessionLocations(8),
+      getDeviceStats(),
+      getTopCustomersBySpend(8),
+      getMapPoints(),
+    ]);
   const deviceTotal = devices.reduce((sum, d) => sum + d.visitors, 0);
 
   return (
@@ -64,6 +68,25 @@ export default async function AnalyticsPage() {
             <span className="admin-stat-tile__label">Orders (confirmed+fulfilled)</span>
             <span className="admin-stat-tile__value">{overview.ordersCount}</span>
           </div>
+        </div>
+
+        <div className="admin-panel live-view">
+          <div className="live-view__list">
+            <h2>Live view</h2>
+            <p className="admin-hint">
+              {overview.liveNow} visitor{overview.liveNow === 1 ? "" : "s"} on the site right now
+              · drag the globe to rotate
+            </p>
+            <h3 className="live-view__subhead">Sessions by location</h3>
+            <BarList
+              items={locations.map((l) => ({
+                label: [l.country, l.region, l.city].filter(Boolean).join(" · "),
+                value: l.visitors,
+                valueLabel: String(l.visitors),
+              }))}
+            />
+          </div>
+          <LiveGlobe points={mapPoints} />
         </div>
 
         <div className="admin-panel">
@@ -121,17 +144,6 @@ export default async function AnalyticsPage() {
           </div>
 
           <div className="admin-form__side">
-            <div className="admin-panel">
-              <h2>Sessions by location</h2>
-              <BarList
-                items={locations.map((l) => ({
-                  label: [l.country, l.region, l.city].filter(Boolean).join(" · "),
-                  value: l.visitors,
-                  valueLabel: String(l.visitors),
-                }))}
-              />
-            </div>
-
             <div className="admin-panel">
               <h2>Devices</h2>
               <p className="admin-hint">

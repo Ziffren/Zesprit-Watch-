@@ -917,3 +917,68 @@
     grid-template-columns: 6rem 1fr 2.5rem;
   }
 }
+
+/* ---------- Live view globe ---------- */
+
+.live-view {
+  display: grid;
+  grid-template-columns: minmax(16rem, 2fr) 3fr;
+  gap: var(--space-xl);
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.live-view__subhead {
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+  margin: var(--space-lg) 0 0;
+}
+
+.live-globe {
+  position: relative;
+  width: 100%;
+  max-width: 34rem;
+  justify-self: center;
+}
+
+.live-globe__canvas {
+  width: 100%;
+  aspect-ratio: 1;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.live-globe__legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+
+.live-globe__legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.live-globe__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+@media (max-width: 60rem) {
+  .live-view {
+    grid-template-columns: 1fr;
+  }
+}

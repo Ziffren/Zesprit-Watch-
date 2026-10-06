@@ -118,6 +118,15 @@ export type LocationStat = {
   visitors: number;
 };
 
+export type MapPoint = {
+  latitude: number;
+  longitude: number;
+  city: string | null;
+  country: string;
+  visitors: number;
+  liveVisitors: number;
+};
+
 export type DeviceStat = {
   device: string;
   visitors: number;

@@ -13,6 +13,14 @@ function classifyDevice(userAgent: string | null): "Mobile" | "Tablet" | "Deskto
   return "Desktop";
 }
 
+// ~11 km precision — coarser than the city name already stored. Only used
+// aggregated, for the admin live-view globe.
+function roundCoord(value: string | null): number | null {
+  if (!value) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.round(n * 10) / 10 : null;
+}
+
 // Fire-and-forget pageview logging for the admin Analytics dashboard
 // (/admin/analytics). Never blocks or breaks the page it's called from —
 // any failure here is swallowed, both by the caller (page-tracker.tsx) and
@@ -32,6 +40,8 @@ export async function POST(request: NextRequest) {
     const cityRaw = request.headers.get("x-vercel-ip-city");
     const city = cityRaw ? decodeURIComponent(cityRaw) : null;
     const deviceType = classifyDevice(request.headers.get("user-agent"));
+    const latitude = roundCoord(request.headers.get("x-vercel-ip-latitude"));
+    const longitude = roundCoord(request.headers.get("x-vercel-ip-longitude"));
 
     const supabase = await createClient();
     const {
@@ -46,6 +56,8 @@ export async function POST(request: NextRequest) {
       region,
       city,
       deviceType,
+      latitude,
+      longitude,
       referrer,
     });
   } catch {
