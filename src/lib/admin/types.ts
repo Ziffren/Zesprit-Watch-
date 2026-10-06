@@ -8,6 +8,8 @@
 // table since the 2026-10-05 split. `priceCents` is this app's own public
 // asking price, unrelated to Watch Report's purchase/sale price data.
 
+import type { Rule } from "@/lib/collection-rules";
+
 export type WatchStatus = "AVAILABLE" | "SOLD";
 
 export type Collection = {
@@ -17,6 +19,10 @@ export type Collection = {
   description: string | null;
   coverImageUrl: string | null;
   isBrand: boolean;
+  isSmart: boolean;
+  matchAll: boolean;
+  rules: Rule[];
+  excludeRules: Rule[];
   createdAt: string;
 };
 

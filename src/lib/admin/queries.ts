@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { matchesCollection, type RuleProduct } from "@/lib/collection-rules";
 import type {
   AnalyticsOverview,
   Collection,
@@ -30,10 +31,29 @@ export async function listCollections(): Promise<
 
   if (error) throw new Error(`Couldn't load collections: ${error.message}`);
 
-  return (data ?? []).map((row) => ({
+  const rows = (data ?? []) as (Collection & { watch_collections?: { count: number }[] })[];
+  // Automated collections have no watch_collections rows — count them by
+  // evaluating their conditions against the catalogue.
+  const products = rows.some((r) => r.isSmart) ? await listProductsForPicker() : [];
+  const now = Date.now();
+
+  return rows.map(({ watch_collections, ...row }) => ({
     ...row,
-    product_count: row.watch_collections?.[0]?.count ?? 0,
-  })) as (Collection & { product_count: number })[];
+    product_count: row.isSmart
+      ? products.filter((p) => matchesCollection(p, row, now)).length
+      : watch_collections?.[0]?.count ?? 0,
+  }));
+}
+
+// Product ids in a collection: computed from conditions for automated
+// collections, from watch_collections for manual/brand ones.
+export async function getCollectionProductIds(collection: Collection): Promise<string[]> {
+  if (collection.isSmart) {
+    const products = await listProductsForPicker();
+    const now = Date.now();
+    return products.filter((p) => matchesCollection(p, collection, now)).map((p) => p.id);
+  }
+  return listCollectionProductIds(collection.id);
 }
 
 export async function getCollection(id: string): Promise<Collection | null> {
@@ -63,21 +83,18 @@ export async function listProducts(): Promise<ProductWithRelations[]> {
   return (data ?? []) as unknown as ProductWithRelations[];
 }
 
-export type PickerProduct = {
+export type PickerProduct = RuleProduct & {
   id: string;
-  productName: string;
-  brand: string;
-  status: "AVAILABLE" | "SOLD";
   photoUrls: string[];
 };
 
-// Lightweight list for the collection editor's product picker — no
-// description HTML, no relations.
+// Lightweight list for the collection editor (picker, items grid, and
+// condition evaluation) — no description HTML, no relations.
 export async function listProductsForPicker(): Promise<PickerProduct[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("products")
-    .select("id, productName, brand, status, photoUrls")
+    .select("id, productName, brand, status, priceCents, tags, createdAt, photoUrls")
     .order("productName");
   if (error) throw new Error(`Couldn't load products: ${error.message}`);
   return (data ?? []) as PickerProduct[];

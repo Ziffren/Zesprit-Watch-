@@ -45,8 +45,8 @@ export default async function CollectionsPage() {
                       </Link>
                     </td>
                     <td>
-                      <span className="admin-badge" data-tone={c.isBrand ? "active" : "draft"}>
-                        {c.isBrand ? "Brand" : "Collection"}
+                      <span className="admin-badge" data-tone={c.isBrand || c.isSmart ? "active" : "draft"}>
+                        {c.isSmart ? "Automated" : c.isBrand ? "Brand" : "Manual"}
                       </span>
                     </td>
                     <td>{c.product_count}</td>

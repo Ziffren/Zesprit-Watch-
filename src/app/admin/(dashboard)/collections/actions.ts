@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/admin/types";
+import { sanitizeRules } from "@/lib/collection-rules";
 
 export async function saveCollection(formData: FormData) {
   const supabase = await createClient();
@@ -13,13 +14,38 @@ export async function saveCollection(formData: FormData) {
   const slugInput = String(formData.get("slug") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
   const coverImageUrl = String(formData.get("coverImageUrl") ?? "").trim() || null;
-  const productIds = formData.getAll("product_ids").map(String);
-  const isBrand = formData.get("collection_type") === "brand";
+  const type = String(formData.get("collection_type") ?? "manual");
+  const isBrand = type === "brand";
+  const isSmart = type === "smart";
+  const productIds = isSmart ? [] : formData.getAll("product_ids").map(String);
+  const parse = (key: string) => {
+    try {
+      return sanitizeRules(JSON.parse(String(formData.get(key) ?? "[]")));
+    } catch {
+      return [];
+    }
+  };
+  const rules = isSmart ? parse("rules_json") : [];
+  const excludeRules = isSmart ? parse("exclude_json") : [];
+  const matchAll = formData.get("match_all") !== "false";
 
   if (!name) throw new Error("Name is required.");
+  if (isSmart && rules.length === 0) {
+    throw new Error("An automated collection needs at least one condition.");
+  }
 
   const slug = slugify(slugInput || name);
-  const payload = { name, slug, description, coverImageUrl, isBrand };
+  const payload = {
+    name,
+    slug,
+    description,
+    coverImageUrl,
+    isBrand,
+    isSmart,
+    matchAll,
+    rules,
+    excludeRules,
+  };
 
   let collectionId = id;
 
@@ -68,7 +94,7 @@ export async function saveCollection(formData: FormData) {
   revalidatePath("/admin/collections");
   revalidatePath("/admin/products");
   revalidatePath("/");
-  redirect("/admin/collections");
+  redirect(`/admin/collections/${collectionId}`);
 }
 
 export async function deleteCollection(formData: FormData) {

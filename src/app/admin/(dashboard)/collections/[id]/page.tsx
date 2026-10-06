@@ -23,8 +23,8 @@ export default async function EditCollectionPage({
           </Link>
           <div className="admin-topbar__heading">
             <p className="admin-topbar__title">{collection.name}</p>
-            <span className="admin-badge" data-tone={collection.isBrand ? "active" : "draft"}>
-              {collection.isBrand ? "Brand" : "Collection"}
+            <span className="admin-badge" data-tone={collection.isBrand || collection.isSmart ? "active" : "draft"}>
+              {collection.isSmart ? "Automated" : collection.isBrand ? "Brand" : "Manual"}
             </span>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { listCollections } from "@/lib/admin/queries";
+import { matchesCollection } from "@/lib/collection-rules";
 import type { ProductWithRelations } from "@/lib/admin/types";
 import { RichTextEditor } from "./rich-text-editor";
 import { MediaGrid } from "./media-grid";
@@ -8,7 +9,10 @@ import { deleteProduct, saveProduct } from "./actions";
 export async function ProductForm({ product }: { product: ProductWithRelations | null }) {
   const collections = await listCollections();
   const brands = collections.filter((c) => c.isBrand);
-  const themes = collections.filter((c) => !c.isBrand);
+  const themes = collections.filter((c) => !c.isBrand && !c.isSmart);
+  const autoMatched = product
+    ? collections.filter((c) => c.isSmart && matchesCollection(product, c))
+    : [];
   const assigned = new Set(
     product ? product.watch_collections.map((wc) => wc.collectionId) : []
   );
@@ -102,6 +106,17 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
               ))}
             </div>
           </div>
+
+          {product && (
+            <div className="admin-field">
+              <span>Automated collections</span>
+              <p className="admin-hint">
+                {autoMatched.length > 0
+                  ? `In ${autoMatched.map((c) => c.name).join(", ")} — added by their conditions (e.g. tags, price, date added). Change those to change this.`
+                  : "Not in any automated collection right now."}
+              </p>
+            </div>
+          )}
 
           <TagsField initialTags={product?.tags ?? []} />
         </div>
