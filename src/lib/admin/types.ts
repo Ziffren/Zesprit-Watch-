@@ -32,6 +32,7 @@ export type Product = {
   brand: string;
   status: WatchStatus;
   priceCents: number | null;
+  soldAt: string | null; // YYYY-MM-DD — set with status SOLD
   descriptionHtml: string | null;
   tags: string[];
   photoUrls: string[];

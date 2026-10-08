@@ -5,6 +5,7 @@ import { RichTextEditor } from "./rich-text-editor";
 import { MediaGrid } from "./media-grid";
 import { TagsField } from "./tags-field";
 import { CollectionsField } from "./collections-field";
+import { StatusField } from "./status-field";
 import { deleteProduct, saveProduct } from "./actions";
 
 export async function ProductForm({ product }: { product: ProductWithRelations | null }) {
@@ -55,13 +56,7 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
       <div className="admin-form__side">
         <div className="admin-panel">
           <h2>Status</h2>
-          <label className="admin-field">
-            <span>Availability</span>
-            <select name="status" defaultValue={product?.status ?? "AVAILABLE"}>
-              <option value="AVAILABLE">Available</option>
-              <option value="SOLD">Sold</option>
-            </select>
-          </label>
+          <StatusField initialStatus={product?.status ?? "AVAILABLE"} initialSoldAt={product?.soldAt ?? null} />
         </div>
 
         <div className="admin-panel">

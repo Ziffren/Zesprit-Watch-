@@ -18,9 +18,13 @@ export async function saveProduct(formData: FormData) {
   const tags = formData.getAll("tags").map(String).filter(Boolean);
   const photoUrls = formData.getAll("photoUrls").map(String).filter(Boolean);
   const collectionIds = formData.getAll("collection_ids").map(String);
+  const soldAtInput = String(formData.get("sold_at") ?? "").trim();
+  // Only a sold piece carries a sold date; going back to Available clears it.
+  const soldAt = status === "SOLD" && soldAtInput ? soldAtInput : null;
 
   if (!productName) throw new Error("Title is required.");
   if (!brandCollectionId) throw new Error("Choose a brand collection.");
+  if (soldAt && !/^\d{4}-\d{2}-\d{2}$/.test(soldAt)) throw new Error("Enter a valid sold date.");
   if (priceInput && (Number.isNaN(priceCents) || priceCents! < 0)) {
     throw new Error("Enter a valid price.");
   }
@@ -36,7 +40,7 @@ export async function saveProduct(formData: FormData) {
   if (brandError || !brandCollection) throw new Error("That brand collection no longer exists.");
   const brand = brandCollection.name;
 
-  const payload = { productName, brand, status, priceCents, descriptionHtml, tags, photoUrls };
+  const payload = { productName, brand, status, priceCents, soldAt, descriptionHtml, tags, photoUrls };
   let productId = id;
 
   if (id) {
