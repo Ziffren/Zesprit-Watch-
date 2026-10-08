@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, EB_Garamond } from "next/font/google";
+import { Suspense } from "react";
 import { PageTracker } from "./page-tracker";
+import { NavigationProgress } from "@/components/navigation-progress";
 import "./globals.css";
 
 const bodoniModa = Bodoni_Moda({
@@ -31,6 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <PageTracker />
         {children}
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
       </body>
     </html>
   );

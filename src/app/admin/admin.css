@@ -1411,3 +1411,92 @@
   color: var(--color-accent-2);
   font-size: var(--text-sm);
 }
+
+/* ---------- Loading skeleton + page entrance ---------- */
+/* Hallmark · component: admin loading skeleton · states: loading (shimmer) · reduced-motion (static) */
+
+.admin-root {
+  --skel-base: var(--color-paper-3);
+  --skel-shine: var(--color-paper);
+}
+
+.skel {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(
+      100deg,
+      var(--skel-base) 30%,
+      var(--skel-shine) 50%,
+      var(--skel-base) 70%
+    )
+    0 0 / 300% 100%;
+  animation: skel-shimmer 1.4s var(--ease-in-out) infinite;
+}
+
+@keyframes skel-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+.skel--title { width: 11rem; height: 1.6rem; }
+.skel--button { width: 7.5rem; height: 2.1rem; border-radius: var(--admin-radius); }
+.skel--label { width: 6rem; height: 0.7rem; }
+.skel--value { width: 3.5rem; height: 1.7rem; margin-top: var(--space-xs); }
+.skel--thumb { width: 2.25rem; height: 2.25rem; flex: none; }
+.skel--line { height: 0.8rem; }
+.skel--pill { width: 4.5rem; height: 1.1rem; margin-left: auto; }
+
+.skel-table__head {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--admin-head-bg);
+  border-bottom: var(--rule-hair) solid var(--admin-line);
+}
+
+.skel-table__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xs) var(--space-md);
+  border-bottom: var(--rule-hair) solid var(--admin-line);
+}
+
+.skel-table__row:last-child {
+  border-bottom: 0;
+}
+
+/* The skeleton fades in (so instant navigations never flash it), and real
+   content rises in when it replaces the skeleton or the previous page —
+   CSS animations play on insertion, so every navigation gets one. */
+.admin-skeleton {
+  animation: admin-fade var(--dur-short) var(--ease-out) 80ms both;
+}
+
+.admin-main > .admin-topbar,
+.admin-main > .admin-content {
+  animation:
+    admin-fade var(--dur-short) var(--ease-out) both,
+    admin-rise var(--dur-long) var(--ease-out) both;
+}
+
+.admin-skeleton > .admin-topbar,
+.admin-skeleton > .admin-content {
+  animation: none;
+}
+
+@keyframes admin-fade {
+  from { opacity: 0; }
+}
+
+@keyframes admin-rise {
+  from { translate: 0 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skel {
+    animation: none;
+  }
+  .admin-main > .admin-topbar,
+  .admin-main > .admin-content {
+    animation: admin-fade var(--dur-micro) linear both;
+  }
+}
