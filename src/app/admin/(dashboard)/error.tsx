@@ -9,7 +9,7 @@ export default function DashboardError({
 }) {
   return (
     <div className="admin-content">
-      <div className="admin-panel" style={{ borderColor: "var(--color-accent-2)" }}>
+      <div className="admin-panel" style={{ boxShadow: "0 0 0 1px var(--color-accent-2)" }}>
         <h2 style={{ color: "var(--color-accent-2)" }}>Something went wrong loading this page</h2>
         <p className="admin-hint">{error.message}</p>
         <div>
