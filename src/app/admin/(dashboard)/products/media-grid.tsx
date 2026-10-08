@@ -4,7 +4,9 @@ import { useEffect, useId, useRef, useState } from "react";
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -12,6 +14,7 @@ import {
 import {
   SortableContext,
   rectSortingStrategy,
+  sortableKeyboardCoordinates,
   useSortable,
   arrayMove,
 } from "@dnd-kit/sortable";
@@ -50,29 +53,36 @@ function ProgressRing({ percent }: { percent: number }) {
 
 function Tile({
   item,
+  position,
   onRemove,
   onRetry,
 }: {
   item: MediaItem;
+  position: number;
   onRemove: (id: string) => void;
   onRetry: (id: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: item.id,
-    disabled: item.status !== "done",
-  });
+  // Every tile is sortable — including ones still uploading, so the order
+  // can be arranged while photos are on their way.
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
 
   return (
     <div
       ref={setNodeRef}
       className="admin-media-tile"
       data-status={item.status}
+      data-dragging={isDragging || undefined}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
+      aria-label={`Photo ${position}${position === 1 ? " (cover)" : ""} — press Space, then arrow keys to move`}
     >
+      {/* draggable=false: stops the browser's native image drag from hijacking the reorder */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={item.url} alt="" />
+      <img src={item.url} alt="" draggable={false} />
+      <span className="media-tile__pos" aria-hidden="true">
+        {position === 1 ? "Cover" : position}
+      </span>
 
       {item.status === "uploading" && (
         <div className="media-tile__overlay" role="progressbar" aria-valuenow={item.progress} aria-valuemin={0} aria-valuemax={100} aria-label="Uploading">
@@ -130,7 +140,13 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
   const itemsRef = useRef(items);
   itemsRef.current = items;
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+  // Mouse: drag after 4px. Touch: press-and-hold 200ms so the page can
+  // still scroll. Keyboard: Space to pick up, arrows to move, Space to drop.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const patch = (id: string, p: Partial<MediaItem>) =>
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...p } : i)));
 
@@ -241,8 +257,8 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
               if (e.dataTransfer.files.length) addFiles(Array.from(e.dataTransfer.files));
             }}
           >
-            {items.map((item) => (
-              <Tile key={item.id} item={item} onRemove={remove} onRetry={retry} />
+            {items.map((item, i) => (
+              <Tile key={item.id} item={item} position={i + 1} onRemove={remove} onRetry={retry} />
             ))}
             <label className="admin-media-add">
               +
@@ -265,7 +281,7 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
           ? `Uploading ${busyCount} photo${busyCount > 1 ? "s" : ""}… ${doneCount} ready.`
           : failed
             ? "Some photos failed — Retry them or remove them before saving."
-            : "Drag tiles to reorder; the first is the cover. You can also drop photos here."}
+            : "Drag photos to change their order — the first one is the cover. You can also drop new photos here."}
       </p>
       {notice && (
         <p className="admin-hint admin-hint--error" role="alert">
