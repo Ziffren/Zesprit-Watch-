@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listCustomersPage } from "@/lib/admin/queries";
+import { AdminSearchBar } from "../search-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -40,23 +41,12 @@ export default async function CustomersPage({
           there&rsquo;s no &ldquo;create customer&rdquo; here.
         </p>
 
-        <form className="admin-toolbar" action="/admin/customers" method="get">
-          <input
-            type="search"
-            name="q"
-            defaultValue={q}
-            placeholder="Search name or email…"
-            aria-label="Search customers"
-          />
-          <button className="admin-btn" type="submit">
-            Search
-          </button>
-          {q && (
-            <Link className="admin-btn admin-btn--ghost" href="/admin/customers" prefetch={false}>
-              Clear
-            </Link>
-          )}
-        </form>
+        <AdminSearchBar
+          basePath="/admin/customers"
+          q={q}
+          placeholder="Search name or email"
+          ariaLabel="Search customers"
+        />
 
         {customers.length === 0 ? (
           <p className="admin-empty">No customers match these filters yet.</p>

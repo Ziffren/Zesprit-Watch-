@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getOrderCounts, listOrdersPage } from "@/lib/admin/queries";
 import { formatCents, type OrderStatus } from "@/lib/admin/types";
+import { AdminSearchBar } from "../search-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -50,31 +51,20 @@ export default async function OrdersPage({
           customer, then update the status once it&rsquo;s confirmed, fulfilled, or cancelled.
         </p>
 
-        <form className="admin-toolbar" action="/admin/orders" method="get">
-          <select name="status" defaultValue={status ?? ""}>
-            <option value="">All statuses</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s[0] + s.slice(1).toLowerCase()} ({counts[s]})
-              </option>
-            ))}
-          </select>
-          <input
-            type="search"
-            name="q"
-            defaultValue={q}
-            placeholder="Search customer name or email…"
-            aria-label="Search orders"
-          />
-          <button className="admin-btn" type="submit">
-            Filter
-          </button>
-          {(q || status) && (
-            <Link className="admin-btn admin-btn--ghost" href="/admin/orders" prefetch={false}>
-              Clear
-            </Link>
-          )}
-        </form>
+        <AdminSearchBar
+          basePath="/admin/orders"
+          q={q}
+          placeholder="Search customer name or email"
+          ariaLabel="Search orders"
+          status={{
+            value: status ?? "",
+            ariaLabel: "Filter by status",
+            options: [
+              { value: "", label: "All" },
+              ...STATUSES.map((s) => ({ value: s, label: `${s[0] + s.slice(1).toLowerCase()} (${counts[s]})` })),
+            ],
+          }}
+        />
 
         {orders.length === 0 ? (
           <p className="admin-empty">No orders match these filters yet.</p>

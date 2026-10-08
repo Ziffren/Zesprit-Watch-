@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listMessagesPage } from "@/lib/admin/queries";
 import type { MessageStatus } from "@/lib/admin/types";
+import { AdminSearchBar } from "../search-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -44,28 +45,21 @@ export default async function MessagesPage({
           address configured for the site, when that&rsquo;s set up.
         </p>
 
-        <form className="admin-toolbar" action="/admin/messages" method="get">
-          <select name="status" defaultValue={status ?? ""}>
-            <option value="">All statuses</option>
-            <option value="UNREAD">Unread</option>
-            <option value="READ">Read</option>
-          </select>
-          <input
-            type="search"
-            name="q"
-            defaultValue={q}
-            placeholder="Search name or email…"
-            aria-label="Search messages"
-          />
-          <button className="admin-btn" type="submit">
-            Filter
-          </button>
-          {(q || status) && (
-            <Link className="admin-btn admin-btn--ghost" href="/admin/messages" prefetch={false}>
-              Clear
-            </Link>
-          )}
-        </form>
+        <AdminSearchBar
+          basePath="/admin/messages"
+          q={q}
+          placeholder="Search name or email"
+          ariaLabel="Search messages"
+          status={{
+            value: status ?? "",
+            ariaLabel: "Filter by status",
+            options: [
+              { value: "", label: "All" },
+              { value: "UNREAD", label: "Unread" },
+              { value: "READ", label: "Read" },
+            ],
+          }}
+        />
 
         {messages.length === 0 ? (
           <p className="admin-empty">No messages match these filters yet.</p>

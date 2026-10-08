@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getProductStats, listProductsPage } from "@/lib/admin/queries";
 import { formatCents } from "@/lib/admin/types";
+import { AdminSearchBar } from "../search-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -58,23 +59,12 @@ export default async function ProductsPage({
           </div>
         </div>
 
-        <form className="admin-toolbar" action="/admin/products" method="get">
-          <input
-            type="search"
-            name="q"
-            defaultValue={q}
-            placeholder="Search title or brand…"
-            aria-label="Search products"
-          />
-          <button className="admin-btn" type="submit">
-            Search
-          </button>
-          {q && (
-            <Link className="admin-btn admin-btn--ghost" href="/admin/products" prefetch={false}>
-              Clear
-            </Link>
-          )}
-        </form>
+        <AdminSearchBar
+          basePath="/admin/products"
+          q={q}
+          placeholder="Search title or brand"
+          ariaLabel="Search products"
+        />
 
         {products.length === 0 ? (
           <p className="admin-empty">

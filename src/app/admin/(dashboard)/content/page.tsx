@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listPostsPage } from "@/lib/admin/queries";
 import type { PostStatus } from "@/lib/admin/types";
+import { AdminSearchBar } from "../search-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -47,28 +48,21 @@ export default async function ContentPage({
           Published.
         </p>
 
-        <form className="admin-toolbar" action="/admin/content" method="get">
-          <select name="status" defaultValue={status ?? ""}>
-            <option value="">All statuses</option>
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-          </select>
-          <input
-            type="search"
-            name="q"
-            defaultValue={q}
-            placeholder="Search title…"
-            aria-label="Search posts"
-          />
-          <button className="admin-btn" type="submit">
-            Filter
-          </button>
-          {(q || status) && (
-            <Link className="admin-btn admin-btn--ghost" href="/admin/content" prefetch={false}>
-              Clear
-            </Link>
-          )}
-        </form>
+        <AdminSearchBar
+          basePath="/admin/content"
+          q={q}
+          placeholder="Search title"
+          ariaLabel="Search posts"
+          status={{
+            value: status ?? "",
+            ariaLabel: "Filter by status",
+            options: [
+              { value: "", label: "All" },
+              { value: "DRAFT", label: "Draft" },
+              { value: "PUBLISHED", label: "Published" },
+            ],
+          }}
+        />
 
         {posts.length === 0 ? (
           <p className="admin-empty">No posts yet. Create the first Journal article.</p>
