@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -54,6 +54,8 @@ function Tile({ item, onRemove }: { item: MediaItem; onRemove: (id: string) => v
 // Writes straight to the shared `watches.photoUrls` string array (order =
 // array order) — no separate images table, matching the existing schema.
 export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
+  // Stable across server + client render, so dnd-kit's aria ids hydrate cleanly.
+  const dndId = useId();
   const [items, setItems] = useState<MediaItem[]>(
     initialUrls.map((url, i) => ({ id: `${i}-${url}`, url }))
   );
@@ -101,7 +103,7 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
       {items.map((item) => (
         <input key={item.id} type="hidden" name="photoUrls" value={item.url} />
       ))}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
           <div className="admin-media-grid">
             {items.map((item) => (

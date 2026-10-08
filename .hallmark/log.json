@@ -176,5 +176,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "none",
     "brief": "Shopify-style /watches/[id]: lead photo + 2-up grid, zoom lightbox (<dialog>), sticky info column, More from <brand> row. New tokens: --radius-media, --color-scrim, --color-on-scrim"
+  },
+  {
+    "date": "2026-10-08",
+    "component": "storefront: brand mega-dropdown, horizontal shop row, New/Reduced badges, collection page",
+    "theme": "custom (locked tokens)",
+    "enrichment": "none",
+    "brief": "Bigger header links; Watches opens brands → /collections/[slug]; homepage row sorted by price (scroll-snap + arrows); New (≤30d created) and Reduced (≤30d reduction, original struck through) badges; admin Reduced-price toggle"
   }
 ]

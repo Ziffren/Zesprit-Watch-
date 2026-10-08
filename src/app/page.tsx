@@ -1,130 +1,37 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { getFeaturedPieces } from "@/lib/storefront";
-import { ProductCard } from "@/components/product-card";
+import { getShopRow } from "@/lib/storefront";
+import { SiteHeader } from "@/components/site-header";
+import { ShopRow } from "@/components/shop-row";
+import { ShopRowCard } from "@/components/product-card";
+
+// "New" / "Reduced" badges are date-based, so refresh at least hourly even
+// when no product is saved (saving revalidates immediately).
+export const revalidate = 3600;
 
 export default async function Home() {
-  const pieces = await getFeaturedPieces();
+  const { pieces, total } = await getShopRow();
 
   return (
     <>
-      <header className="nav-centered">
-        <div className="nav-centered__row">
-          <div className="nav-centered__menu">
-            <nav className="nav-centered__links nav-centered__links--desktop" aria-label="Primary">
-              <a href="#top">Home</a>
-              <a href="#collection">Watches</a>
-              <a href="#collection" className="is-active" aria-current="page">
-                Shop
-              </a>
-              <a href="#footer">Social</a>
-              <a href="#heritage">About</a>
-            </nav>
-            <details className="nav-centered__disclosure">
-              <summary className="nav-centered__menu-toggle">Menu</summary>
-              <nav className="nav-centered__links nav-centered__links--mobile" aria-label="Primary">
-                <a href="#top">Home</a>
-                <a href="#collection">Watches</a>
-                <a href="#collection" className="is-active" aria-current="page">
-                  Shop
-                </a>
-                <a href="#footer">Social</a>
-                <a href="#heritage">About</a>
-              </nav>
-            </details>
-          </div>
-
-          <a className="nav-centered__brand" href="#top" aria-label="Z’esprit Watch — home">
-            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              <path
-                d="M7 23a13 13 0 0 1 26 0"
-                stroke="var(--color-ink)"
-                strokeWidth="1.5"
-              />
-              <line
-                x1="6"
-                y1="23"
-                x2="34"
-                y2="23"
-                stroke="var(--color-ink)"
-                strokeWidth="1.5"
-              />
-              <line
-                x1="20"
-                y1="23"
-                x2="20"
-                y2="12"
-                stroke="var(--color-accent-2)"
-                strokeWidth="1.5"
-              />
-              <circle cx="20" cy="23" r="2" fill="var(--color-ink)" />
-            </svg>
-            <span className="nav-centered__wordmark">Z&rsquo;esprit Watch</span>
-          </a>
-
-          <div className="nav-centered__actions">
-            <a
-              className="icon-link icon-link--social"
-              href="#"
-              aria-label="Z’esprit Watch on Instagram"
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.6" />
-                <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.6" />
-                <circle cx="17.3" cy="6.7" r="1" fill="currentColor" />
-              </svg>
-            </a>
-            <a
-              className="icon-link icon-link--social"
-              href="#"
-              aria-label="Z’esprit Watch on Facebook"
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M14.5 8.2h2.2V5h-2.4C11.9 5 10.4 6.6 10.4 9v2H8v3.2h2.4V21h3.2v-6.8h2.4l.4-3.2h-2.8V9c0-.5.2-.8.9-.8Z"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-            <a className="icon-link cart-link" href="#" aria-label="View cart, 0 items">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M4 8h16l-1.4 9.5a2 2 0 0 1-2 1.7H7.4a2 2 0 0 1-2-1.7L4 8Z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinejoin="round"
-                />
-                <path d="M8 8V6a4 4 0 0 1 8 0v2" stroke="currentColor" strokeWidth="1.6" />
-              </svg>
-              <span className="cart-count">0</span>
-            </a>
-            <a className="cta-solid" href="#collection">
-              Let&rsquo;s Connect
-            </a>
-          </div>
-        </div>
-      </header>
+      <SiteHeader active="home" />
 
       <main id="top">
         <section className="hero-marquee reveal" style={{ "--i": 0 } as CSSProperties}>
           <h1 className="display-xl">Time, worn well.</h1>
         </section>
-        <hr className="rule-thick" />
 
-        <header className="head-hang">
-          <h2 className="head-hang__title">Selected pieces</h2>
-          <p className="head-hang__lede">
-            Each watch is sourced, hand-inspected, and serviced before it
-            reaches you — the marks it carries are its own.
-          </p>
-        </header>
-
-        <section className="product-grid" id="collection" aria-label="Selected pieces">
-          {pieces.map((p) => (
-            <ProductCard key={p.id} piece={p} />
-          ))}
+        <section className="shop-section" id="collection" aria-labelledby="shop-title">
+          <h2 className="visually-hidden" id="shop-title">
+            In the collection — {total} watches, highest price first
+          </h2>
+          <ShopRow label="Watches in stock, highest price first" viewAllHref="/collections/all">
+            {pieces.map((p) => (
+              <li className="shop-row__item" key={p.id}>
+                <ShopRowCard piece={p} />
+              </li>
+            ))}
+          </ShopRow>
         </section>
 
         <section className="heritage" id="heritage">
@@ -188,9 +95,9 @@ export default async function Home() {
         </section>
 
         <section className="cta-final">
-          <a className="link" href="#collection">
+          <Link className="link" href="/collections/all">
             View the full collection →
-          </a>
+          </Link>
         </section>
       </main>
 

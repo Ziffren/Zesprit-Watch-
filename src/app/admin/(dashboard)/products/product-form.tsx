@@ -6,6 +6,7 @@ import { MediaGrid } from "./media-grid";
 import { TagsField } from "./tags-field";
 import { CollectionsField } from "./collections-field";
 import { StatusField } from "./status-field";
+import { PriceField } from "./price-field";
 import { deleteProduct, saveProduct } from "./actions";
 
 export async function ProductForm({ product }: { product: ProductWithRelations | null }) {
@@ -39,17 +40,7 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
 
         <div className="admin-panel">
           <h2>Price</h2>
-          <label className="admin-field">
-            <span>Price (USD)</span>
-            <input
-              type="number"
-              name="price"
-              step="0.01"
-              min="0"
-              placeholder="Leave blank for &ldquo;Price on request&rdquo;"
-              defaultValue={product?.priceCents != null ? (product.priceCents / 100).toFixed(2) : ""}
-            />
-          </label>
+          <PriceField priceCents={product?.priceCents ?? null} compareAtCents={product?.compareAtCents ?? null} />
         </div>
       </div>
 

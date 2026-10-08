@@ -24,6 +24,17 @@ export async function saveProduct(formData: FormData) {
 
   if (!productName) throw new Error("Title is required.");
   if (!brandCollectionId) throw new Error("Choose a brand collection.");
+  // Sale pricing: "Reduced price" on → price is the sale price and
+  // compare_at the original. Off (or not actually lower) → no reduction.
+  const onSale = formData.get("on_sale") === "on";
+  const compareAtInput = String(formData.get("compare_at") ?? "").trim();
+  const compareAtCents = onSale && compareAtInput ? Math.round(parseFloat(compareAtInput) * 100) : null;
+  if (onSale) {
+    if (compareAtCents == null || Number.isNaN(compareAtCents) || priceCents == null || Number.isNaN(priceCents)) {
+      throw new Error("Enter both the original and the sale price.");
+    }
+    if (priceCents >= compareAtCents) throw new Error("The sale price must be lower than the original price.");
+  }
   if (soldAt && !/^\d{4}-\d{2}-\d{2}$/.test(soldAt)) throw new Error("Enter a valid sold date.");
   if (priceInput && (Number.isNaN(priceCents) || priceCents! < 0)) {
     throw new Error("Enter a valid price.");
@@ -40,7 +51,35 @@ export async function saveProduct(formData: FormData) {
   if (brandError || !brandCollection) throw new Error("That brand collection no longer exists.");
   const brand = brandCollection.name;
 
-  const payload = { productName, brand, status, priceCents, soldAt, descriptionHtml, tags, photoUrls };
+  // reducedAt drives the 30-day "Reduced" badge: keep it while the same
+  // reduction stands, restamp when the reduction is new or its prices change.
+  let reducedAt: string | null = null;
+  if (onSale) {
+    reducedAt = new Date().toISOString();
+    if (id) {
+      const { data: prev } = await supabase
+        .from("products")
+        .select("priceCents, compareAtCents, reducedAt")
+        .eq("id", id)
+        .maybeSingle();
+      if (prev?.reducedAt && prev.compareAtCents === compareAtCents && prev.priceCents === priceCents) {
+        reducedAt = prev.reducedAt;
+      }
+    }
+  }
+
+  const payload = {
+    productName,
+    brand,
+    status,
+    priceCents,
+    compareAtCents,
+    reducedAt,
+    soldAt,
+    descriptionHtml,
+    tags,
+    photoUrls,
+  };
   let productId = id;
 
   if (id) {
@@ -60,6 +99,7 @@ export async function saveProduct(formData: FormData) {
 
   revalidatePath("/admin/products");
   revalidatePath("/");
+  revalidatePath("/collections/[slug]", "page");
   redirect("/admin/products");
 }
 

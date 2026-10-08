@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getRelatedPieces, getWatchDetail } from "@/lib/storefront";
 import { formatPrice } from "@/lib/admin/types";
-import { ProductCard } from "@/components/product-card";
+import { PieceBadges, PiecePrice, ProductCard } from "@/components/product-card";
+import { SiteHeader } from "@/components/site-header";
 import { OrderForm } from "./order-form";
 import { SaveButton } from "./save-button";
 import { ProductGallery } from "./product-gallery";
@@ -21,11 +22,7 @@ export default async function WatchDetailPage({
 
   return (
     <>
-      <header className="detail-header">
-        <Link className="detail-header__back" href="/">
-          ← Z&rsquo;esprit Watch
-        </Link>
-      </header>
+      <SiteHeader active="watches" />
 
       <main>
         <section className="watch-detail">
@@ -34,12 +31,16 @@ export default async function WatchDetailPage({
           </div>
 
           <div className="watch-detail__info">
+            <PieceBadges isNew={watch.isNew} isReduced={watch.isReduced} />
             <p className="watch-detail__brand">{watch.brand}</p>
             <h1 className="watch-detail__title">{watch.name}</h1>
             <div className="watch-detail__price-row">
-              <p className="watch-detail__price" data-set={watch.priceCents != null}>
-                {formatPrice(watch.priceCents)}
-              </p>
+              <PiecePrice
+                className="watch-detail__price"
+                price={formatPrice(watch.priceCents)}
+                priceSet={watch.priceCents != null}
+                compareAt={watch.compareAt}
+              />
               <SaveButton watchId={watch.id} />
             </div>
 

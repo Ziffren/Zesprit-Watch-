@@ -1827,3 +1827,37 @@
 .coll-picker__search::-webkit-search-cancel-button {
   appearance: none;
 }
+
+/* ---------- Product price: reduced-price toggle ---------- */
+
+.admin-toggle {
+  cursor: pointer;
+  width: fit-content;
+}
+
+.admin-field.admin-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  accent-color: var(--color-ink);
+  box-shadow: none;
+}
+
+.price-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.price-grid--sale {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-hint--error {
+  color: var(--color-accent-2);
+}
+
+@media (max-width: 40rem) {
+  .price-grid--sale {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
