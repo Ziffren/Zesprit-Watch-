@@ -822,172 +822,242 @@
   accent-color: var(--color-accent-2);
 }
 
-/* ---------- Rich text editor (Tiptap) ---------- */
+/* ---------- Rich text editor (Tiptap) — Shopify-style ---------- */
+/* Hallmark · component: rich text editor · genre: editorial · theme: custom (brass/ivory/oxblood)
+ * states: default · hover · focus (ring on the whole editor) · active (pressed tool) · disabled · open menu
+ */
 
-.admin-editor {
+.rte {
   border: var(--rule-hair) solid var(--admin-input-border);
-  border-radius: var(--admin-radius);
+  border-radius: var(--admin-card-radius);
+  background: var(--color-paper-light);
+  overflow: clip;
+  transition: box-shadow var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
 }
 
-.admin-editor__toolbar {
+.rte:focus-within {
+  border-color: color-mix(in oklch, var(--color-ink) 35%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-focus) 45%, transparent);
+}
+
+.rte__toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2xs);
-  padding: var(--space-xs);
+  gap: 1px;
+  padding: var(--space-2xs) var(--space-xs);
   background: var(--admin-head-bg);
   border-bottom: var(--rule-hair) solid var(--admin-line);
-  border-radius: var(--admin-radius) var(--admin-radius) 0 0;
 }
 
-.admin-editor__toolbar button {
+.rte__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 28px;
+  height: 30px;
+  padding: 0 var(--space-3xs);
   font: inherit;
   font-size: var(--text-sm);
-  width: 1.75rem;
-  height: 1.75rem;
-  display: grid;
-  place-items: center;
-  background: none;
-  border: var(--rule-hair) solid transparent;
-  border-radius: calc(var(--admin-radius) - 2px);
-  cursor: pointer;
   color: var(--color-ink);
-}
-
-.admin-editor__toolbar button:hover {
-  background: color-mix(in oklch, var(--color-ink) 6%, transparent);
-}
-
-.admin-editor__toolbar button[data-active="true"] {
-  border-color: var(--admin-input-border);
-  background: var(--color-paper-2);
-}
-
-.admin-editor__toolbar button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.admin-editor__format,
-.admin-field .admin-editor__format {
-  width: auto;
-  box-shadow: none;
-  line-height: inherit;
-  font: inherit;
-  font-size: var(--text-xs);
-  color: var(--color-ink);
-  background: var(--color-paper);
-  border: var(--rule-hair) solid transparent;
-  border-radius: calc(var(--admin-radius) - 2px);
-  padding: var(--space-2xs) var(--space-xs);
+  background: transparent;
+  border: 0;
+  border-radius: var(--admin-radius);
   cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
 }
 
-.admin-editor__format:hover,
-.admin-field .admin-editor__format:hover {
-  background: var(--color-paper-2);
+.rte__btn:hover:not(:disabled),
+.rte__btn[aria-expanded="true"] {
+  background: color-mix(in oklch, var(--color-ink) 7%, transparent);
 }
 
-.admin-editor__sep {
+.rte__btn:active:not(:disabled) {
+  background: color-mix(in oklch, var(--color-ink) 12%, transparent);
+}
+
+.rte__btn[data-active] {
+  background: color-mix(in oklch, var(--color-ink) 10%, transparent);
+}
+
+.rte__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.rte__btn:disabled {
+  color: color-mix(in oklch, var(--color-ink) 30%, transparent);
+  cursor: default;
+}
+
+.rte__btn--caret {
+  padding: 0 var(--space-3xs) 0 var(--space-2xs);
+}
+
+.rte__btn--wide {
+  justify-content: space-between;
+  min-width: 7rem;
+  padding: 0 var(--space-2xs) 0 var(--space-xs);
+  gap: var(--space-sm);
+}
+
+.rte__block-label {
+  white-space: nowrap;
+}
+
+.rte__sep {
   width: 1px;
-  align-self: stretch;
-  margin: var(--space-2xs) var(--space-2xs);
+  height: 18px;
+  margin: 0 var(--space-3xs);
   background: var(--admin-line);
 }
 
-.admin-editor__dropdown {
+.rte__spacer {
+  flex: 1;
+}
+
+.rte__dropdown {
   position: relative;
 }
 
-.admin-editor__menu {
+.rte__menu {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  z-index: 5;
-  display: flex;
-  gap: var(--space-2xs);
-  padding: var(--space-xs);
-  background: var(--color-paper);
-  border: var(--rule-hair) solid var(--admin-input-border);
+  z-index: var(--z-dropdown);
+  min-width: 11rem;
+  display: grid;
+  padding: var(--space-2xs);
+  background: var(--color-paper-light);
   border-radius: var(--admin-radius);
-  box-shadow: 0 4px 12px color-mix(in oklch, var(--color-ink) 15%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 8%, transparent),
+    0 8px 24px -6px color-mix(in oklch, var(--color-ink) 25%, transparent);
+  animation: rte-menu-in var(--dur-short) var(--ease-out);
 }
 
-.admin-editor__swatch {
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  border: var(--rule-hair) solid var(--admin-input-border);
+@keyframes rte-menu-in {
+  from { opacity: 0; translate: 0 -4px; }
+}
+
+.rte__menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--color-ink);
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--admin-radius) - 2px);
   cursor: pointer;
-  padding: 0;
 }
 
-.admin-editor__swatch--none {
-  background: var(--color-paper);
-  position: relative;
+.rte__menu-item:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--color-ink) 6%, transparent);
 }
 
-.admin-editor__swatch--none::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--color-accent-2), transparent calc(50% + 1px));
-  border-radius: inherit;
+.rte__menu-item[data-active] {
+  background: color-mix(in oklch, var(--color-accent) 16%, transparent);
 }
 
-.admin-editor .tiptap {
+.rte__menu-item:disabled {
+  color: color-mix(in oklch, var(--color-ink) 30%, transparent);
+  cursor: default;
+}
+
+/* The block menu previews each style, like Shopify's. */
+.rte__menu-block--1 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); }
+.rte__menu-block--2 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-md); }
+.rte__menu-block--3 { font-family: var(--font-display); font-weight: 600; font-size: var(--text-base); }
+.rte__menu-block--4 { font-family: var(--font-display); font-weight: 600; font-size: var(--text-sm); }
+.rte__menu-block--quote { padding-left: var(--space-xs); border-left: 2px solid var(--color-rule-2); color: var(--color-ink-2); }
+
+.rte__swatches {
+  display: grid;
+}
+
+.rte__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--admin-input-border);
+  flex: none;
+}
+
+.rte__swatch--none {
+  background: linear-gradient(135deg, transparent 45%, var(--color-accent-2) 45% 55%, transparent 55%);
+}
+
+/* Writing area */
+.rte__content .tiptap {
+  min-height: 12rem;
   padding: var(--space-md);
-  min-height: 10rem;
-  font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: 1.6;
-}
-
-.admin-editor .tiptap:focus {
-  outline: none;
-}
-
-.admin-editor .tiptap p {
-  max-width: none;
-  margin: 0 0 var(--space-sm);
-}
-
-.admin-editor .tiptap h2,
-.admin-editor .tiptap h3,
-.admin-editor .tiptap h4 {
-  font-family: var(--font-display);
-  margin: var(--space-md) 0 var(--space-sm);
-}
-
-.admin-editor .tiptap ul,
-.admin-editor .tiptap ol {
-  padding-left: 1.4em;
-  margin: 0 0 var(--space-sm);
-}
-
-.admin-editor .tiptap a {
-  color: var(--color-accent-2);
-  text-decoration: underline;
-}
-
-.admin-editor .tiptap img {
-  max-width: 100%;
-  height: auto;
-}
-
-.admin-editor__source {
-  width: 100%;
-  min-height: 10rem;
-  padding: var(--space-md);
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: var(--text-xs);
   color: var(--color-ink);
-  background: var(--color-paper-2);
-  border: none;
-  resize: vertical;
+  outline: none;
+  cursor: text;
 }
 
-.admin-editor__source:focus-visible {
+.rte__content .tiptap > :first-child { margin-top: 0; }
+.rte__content .tiptap p { margin: 0 0 var(--space-sm); max-width: none; }
+.rte__content .tiptap h1,
+.rte__content .tiptap h2,
+.rte__content .tiptap h3,
+.rte__content .tiptap h4 { margin: var(--space-md) 0 var(--space-xs); line-height: 1.2; }
+.rte__content .tiptap h1 { font-size: var(--text-2xl); }
+.rte__content .tiptap h2 { font-size: var(--text-xl); }
+.rte__content .tiptap h3 { font-size: var(--text-lg); }
+.rte__content .tiptap h4 { font-size: var(--text-md); }
+.rte__content .tiptap ul,
+.rte__content .tiptap ol { padding-left: 1.4em; margin: 0 0 var(--space-sm); }
+.rte__content .tiptap blockquote {
+  margin: 0 0 var(--space-sm);
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--color-rule-2);
+  color: var(--color-ink-2);
+}
+.rte__content .tiptap a { color: var(--color-accent-2); text-decoration: underline; }
+.rte__content .tiptap img { max-width: 100%; height: auto; border-radius: 6px; }
+.rte__content .tiptap img.ProseMirror-selectednode { outline: 2px solid var(--color-focus); }
+.rte__content .tiptap div[data-youtube-video] { margin: 0 0 var(--space-sm); }
+.rte__content .tiptap iframe { max-width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: 6px; }
+.rte__content .tiptap table { border-collapse: collapse; width: 100%; margin: 0 0 var(--space-sm); table-layout: fixed; }
+.rte__content .tiptap th,
+.rte__content .tiptap td {
+  border: var(--rule-hair) solid var(--admin-input-border);
+  padding: var(--space-2xs) var(--space-xs);
+  vertical-align: top;
+  position: relative;
+}
+.rte__content .tiptap th { background: var(--admin-head-bg); font-weight: 500; text-align: left; }
+.rte__content .tiptap .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--color-focus) 18%, transparent);
+  pointer-events: none;
+}
+.rte__content .tiptap th p,
+.rte__content .tiptap td p { margin: 0; }
+
+.rte .rte__source {
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  padding: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-ink);
+  background: var(--color-paper-light);
+  border: 0;
+  resize: vertical;
   outline: none;
 }
 

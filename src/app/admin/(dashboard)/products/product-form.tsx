@@ -28,10 +28,7 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
             <span>Title</span>
             <input name="productName" defaultValue={product?.productName} required />
           </label>
-          <label className="admin-field">
-            <span>Description</span>
-            <RichTextEditor name="descriptionHtml" initialHtml={product?.descriptionHtml ?? null} />
-          </label>
+          <RichTextEditor name="descriptionHtml" label="Description" initialHtml={product?.descriptionHtml ?? null} />
         </div>
 
         <div className="admin-panel">

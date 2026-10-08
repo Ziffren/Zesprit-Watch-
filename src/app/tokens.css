@@ -24,6 +24,7 @@
   /* Fonts — 2 families, canonical pairing.
    * --font-display / --font-body are injected by next/font in layout.tsx
    * (Bodoni Moda + EB Garamond) with fallback-metric matching; not redeclared here. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace; /* system stack — admin HTML view only */
 
   /* Type scale — major third (1.25) */
   --text-xs:   0.64rem;

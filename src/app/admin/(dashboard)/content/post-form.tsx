@@ -28,10 +28,7 @@ export function PostForm({ post }: { post: Post | null }) {
               placeholder="Shown on the Journal list page."
             />
           </label>
-          <label className="admin-field">
-            <span>Body</span>
-            <RichTextEditor name="bodyHtml" initialHtml={post?.bodyHtml ?? null} />
-          </label>
+          <RichTextEditor name="bodyHtml" label="Body" initialHtml={post?.bodyHtml ?? null} />
         </div>
       </div>
 

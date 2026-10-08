@@ -31,10 +31,7 @@ export async function CollectionForm({ collection }: { collection: Collection | 
           <span>Slug</span>
           <input name="slug" defaultValue={collection?.slug} placeholder="auto-generated from title" />
         </label>
-        <label className="admin-field">
-          <span>Description</span>
-          <RichTextEditor name="description" initialHtml={collection?.description ?? null} />
-        </label>
+        <RichTextEditor name="description" label="Description" initialHtml={collection?.description ?? null} />
       </div>
     </div>
   );
