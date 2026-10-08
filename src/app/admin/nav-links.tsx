@@ -15,6 +15,8 @@ const salesLinks = [
 
 const contentLinks = [{ href: "/admin/content", label: "Journal" }];
 
+const storeLinks = [{ href: "/admin/site-images", label: "Website images" }];
+
 const insightsLinks = [{ href: "/admin/analytics", label: "Analytics" }];
 
 const inboxLinks = [{ href: "/admin/messages", label: "Messages" }];
@@ -50,6 +52,18 @@ export function AdminNav({ unreadMessageCount = 0 }: { unreadMessageCount?: numb
 
       <p className="admin-nav__group-label">Content</p>
       {contentLinks.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className="admin-nav__link"
+          data-active={pathname.startsWith(link.href)}
+        >
+          {link.label}
+        </Link>
+      ))}
+
+      <p className="admin-nav__group-label">Online store</p>
+      {storeLinks.map((link) => (
         <Link
           key={link.href}
           href={link.href}

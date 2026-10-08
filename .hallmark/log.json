@@ -183,5 +183,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "none",
     "brief": "Bigger header links; Watches opens brands → /collections/[slug]; homepage row sorted by price (scroll-snap + arrows); New (≤30d created) and Reduced (≤30d reduction, original struck through) badges; admin Reduced-price toggle"
+  },
+  {
+    "date": "2026-10-08",
+    "component": "homepage hero banner + showcase mosaic (5 admin-managed image slots) + admin Website images module",
+    "theme": "custom (locked tokens)",
+    "enrichment": "owner photography via site_images slots",
+    "brief": "Slot 1 hero photo with headline over scrim; slots 2-5 feature/promo/promo/wide mosaic that re-spans when slots are empty; admin slot cards with mini homepage map"
   }
 ]

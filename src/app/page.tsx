@@ -4,22 +4,28 @@ import { getShopRow } from "@/lib/storefront";
 import { SiteHeader } from "@/components/site-header";
 import { ShopRow } from "@/components/shop-row";
 import { ShopRowCard } from "@/components/product-card";
+import { HeroBanner, Showcase } from "@/components/site-showcase";
+import { getSiteImages } from "@/lib/site-images";
 
 // "New" / "Reduced" badges are date-based, so refresh at least hourly even
 // when no product is saved (saving revalidates immediately).
 export const revalidate = 3600;
 
 export default async function Home() {
-  const { pieces, total } = await getShopRow();
+  const [{ pieces, total }, siteImages] = await Promise.all([getShopRow(), getSiteImages()]);
 
   return (
     <>
       <SiteHeader active="home" />
 
       <main id="top">
-        <section className="hero-marquee reveal" style={{ "--i": 0 } as CSSProperties}>
-          <h1 className="display-xl">Time, worn well.</h1>
-        </section>
+        {siteImages[1].imageUrl ? (
+          <HeroBanner image={siteImages[1]} />
+        ) : (
+          <section className="hero-marquee reveal" style={{ "--i": 0 } as CSSProperties}>
+            <h1 className="display-xl">Time, worn well.</h1>
+          </section>
+        )}
 
         <section className="shop-section" id="collection" aria-labelledby="shop-title">
           <h2 className="visually-hidden" id="shop-title">
@@ -33,6 +39,8 @@ export default async function Home() {
             ))}
           </ShopRow>
         </section>
+
+        <Showcase images={{ 2: siteImages[2], 3: siteImages[3], 4: siteImages[4], 5: siteImages[5] }} />
 
         <section className="heritage" id="heritage">
           <div className="heritage__copy">

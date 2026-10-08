@@ -1986,3 +1986,186 @@ html:has(.lightbox[open]) {
     animation: none;
   }
 }
+
+/* ---------- Homepage images from admin "Website images" ---------- */
+/* Hallmark · component: hero banner + showcase mosaic · genre: editorial · theme: custom (brass/ivory/oxblood)
+ * states: default · hover (photo eases in) · focus · empty slot (not rendered) · reduced-motion
+ */
+
+.hero-banner {
+  position: relative;
+  height: min(82dvh, 60vw);
+  min-height: 22rem;
+  overflow: hidden;
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.hero-banner__img {
+  object-fit: cover;
+}
+
+/* Legibility scrim, bottom-left where the headline sits. */
+.hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklch, var(--color-ink) 72%, transparent) 0%,
+    color-mix(in oklch, var(--color-ink) 20%, transparent) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.hero-banner__copy {
+  position: absolute;
+  z-index: var(--z-base);
+  left: var(--page-gutter);
+  right: var(--page-gutter);
+  bottom: var(--space-2xl);
+  display: grid;
+  justify-items: start;
+  gap: var(--space-sm);
+}
+
+.hero-banner__title {
+  font-size: var(--text-display);
+  line-height: 0.98;
+  max-width: 14ch;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.hero-banner__caption {
+  max-width: 48ch;
+  font-size: var(--text-md);
+  color: color-mix(in oklch, var(--color-paper) 85%, transparent);
+}
+
+.hero-banner__cta {
+  margin-top: var(--space-xs);
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 var(--space-xl);
+  border: var(--rule-hair) solid var(--color-paper);
+  border-radius: var(--radius-media);
+  color: var(--color-paper);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+}
+
+.hero-banner__cta:hover {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.hero-banner__cta:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* Showcase: feature (2) tall on the left, promos (3, 4) stacked right,
+   wide banner (5) across the bottom. */
+.showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--space-md);
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--page-gutter);
+}
+
+.showcase__tile {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-media);
+  background: var(--color-paper-2);
+  color: var(--color-paper);
+  text-decoration: none;
+  isolation: isolate;
+}
+
+.showcase__tile img {
+  object-fit: cover;
+  transition: transform var(--dur-long) var(--ease-out);
+}
+
+a.showcase__tile:hover img {
+  transform: scale(1.03);
+}
+
+a.showcase__tile:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.showcase__tile--feature { grid-row: span 2; }
+.showcase__tile--top,
+.showcase__tile--bottom { aspect-ratio: 3 / 2; }
+.showcase__tile--wide { grid-column: 1 / -1; aspect-ratio: 3 / 1; }
+
+/* Re-spans when some slots are empty. */
+.showcase__tile--lead { aspect-ratio: 4 / 5; }
+.showcase__tile--tall { grid-row: span 2; aspect-ratio: auto; }
+.showcase__tile--full { grid-column: 1 / -1; aspect-ratio: 5 / 2; }
+.showcase__tile--solo { grid-column: 1 / -1; grid-row: auto; aspect-ratio: 2 / 1; }
+
+.showcase__copy {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-3xs);
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+  background: linear-gradient(to top, color-mix(in oklch, var(--color-ink) 70%, transparent), transparent);
+}
+
+.showcase__heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.showcase__tile--feature .showcase__heading,
+.showcase__tile--wide .showcase__heading {
+  font-size: var(--text-2xl);
+}
+
+.showcase__caption {
+  font-size: var(--text-base);
+  color: color-mix(in oklch, var(--color-paper) 85%, transparent);
+}
+
+@media (max-width: 60rem) {
+  .showcase {
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: var(--space-2xl);
+  }
+  .showcase__tile--feature,
+  .showcase__tile--lead,
+  .showcase__tile--tall {
+    grid-row: auto;
+    aspect-ratio: 4 / 5;
+  }
+  .showcase__tile--wide,
+  .showcase__tile--full,
+  .showcase__tile--solo {
+    aspect-ratio: 2 / 1;
+  }
+  .hero-banner {
+    height: 78dvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase__tile img {
+    transition: none;
+  }
+}
