@@ -7,6 +7,14 @@
   /* Shopify-reference radius for buttons/inputs/controls in this admin
      shell only — the public storefront keeps its sharper --radius-sm. */
   --admin-radius: 8px;
+  /* Shopify-style frame: the page content is a rounded card floating on
+     the ink sidebar colour, with a soft lift. */
+  --admin-frame-gap: var(--space-xs);
+  --admin-frame-radius: 14px;
+  --admin-frame-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 8%, transparent),
+    0 2px 4px color-mix(in oklch, var(--color-ink) 10%, transparent),
+    0 12px 32px -12px color-mix(in oklch, var(--color-ink) 35%, transparent);
   font-family: var(--font-body);
   color: var(--color-ink);
   background: var(--color-paper-2);
@@ -169,17 +177,19 @@
 
 .admin-shell {
   display: grid;
-  grid-template-columns: var(--admin-sidebar-w) 1fr;
-  min-height: 100dvh;
+  grid-template-columns: var(--admin-sidebar-w) minmax(0, 1fr);
+  height: 100dvh;
+  background: var(--color-ink);
 }
 
 .admin-sidebar {
-  background: var(--color-ink);
   color: var(--color-paper);
   padding: var(--space-lg) var(--space-md);
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .admin-sidebar__brand {
@@ -266,10 +276,18 @@
   white-space: nowrap;
 }
 
+/* The content card: its own scroll container, so the sidebar and the
+   frame stay put while the page scrolls inside the rounded corners. */
 .admin-main {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  margin: var(--admin-frame-gap) var(--admin-frame-gap) var(--admin-frame-gap) 0;
+  background: var(--color-paper-2);
+  border-radius: var(--admin-frame-radius);
+  box-shadow: var(--admin-frame-shadow);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .admin-topbar {
@@ -318,7 +336,16 @@
 
 @media (max-width: 60rem) {
   .admin-shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    height: auto;
+    min-height: 100dvh;
+  }
+  /* Phones: page scrolls normally; the card keeps its corners but no longer
+     needs to be its own scroll container. */
+  .admin-main {
+    margin: 0 var(--admin-frame-gap) var(--admin-frame-gap);
+    overflow: clip; /* still rounds the topbar's corners, without a scroll box */
   }
   .admin-sidebar {
     flex-direction: row;
@@ -328,9 +355,11 @@
   }
   .admin-sidebar__brand {
     padding: 0 var(--space-sm) 0 0;
+    white-space: nowrap;
   }
   .admin-nav {
     display: flex;
+    flex-direction: row;
     flex: none;
   }
   .admin-nav__group-label {
