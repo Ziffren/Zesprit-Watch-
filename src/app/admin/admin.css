@@ -1632,3 +1632,198 @@
     animation: admin-fade var(--dur-micro) linear both;
   }
 }
+
+/* ---------- Product → Organization → Collections dropdown ---------- */
+/* Hallmark · component: collections picker · states: default · hover · focus · open · selected · invalid · empty */
+
+.coll-picker {
+  position: relative;
+}
+
+.coll-picker__box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-height: 2.5rem;
+  padding: var(--space-2xs);
+  background: var(--color-paper-light);
+  border: var(--rule-hair) solid var(--admin-input-border);
+  border-radius: var(--admin-radius);
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--color-ink) 4%, transparent);
+}
+
+.coll-picker[data-invalid] .coll-picker__box {
+  border-color: var(--color-accent-2);
+}
+
+.coll-chip,
+.coll-picker__add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.2;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: calc(var(--admin-radius) - 2px);
+  background: color-mix(in oklch, var(--color-ink) 7%, transparent);
+  color: var(--color-ink);
+  border: 0;
+  white-space: nowrap;
+}
+
+.coll-chip button {
+  font: inherit;
+  line-height: 1;
+  background: none;
+  border: 0;
+  padding: 0 0 0 var(--space-3xs);
+  color: var(--color-ink-2);
+  cursor: pointer;
+}
+
+.coll-chip button:hover {
+  color: var(--color-accent-2);
+}
+
+.coll-chip__tag {
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent-2);
+}
+
+.coll-chip--brand {
+  background: color-mix(in oklch, var(--color-accent) 16%, transparent);
+}
+
+.coll-picker__add {
+  color: var(--color-ink-2);
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.coll-picker__add:hover,
+.coll-picker__add[aria-expanded="true"] {
+  background: color-mix(in oklch, var(--color-ink) 12%, transparent);
+  color: var(--color-ink);
+}
+
+.coll-picker__add:focus-visible,
+.coll-chip button:focus-visible,
+.coll-picker__option:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.coll-picker__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  background: var(--color-paper-light);
+  border-radius: var(--admin-radius);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 8%, transparent),
+    0 10px 28px -8px color-mix(in oklch, var(--color-ink) 28%, transparent);
+  animation: rte-menu-in var(--dur-short) var(--ease-out);
+  overflow: hidden;
+}
+
+.admin-field .coll-picker__search {
+  border: 0;
+  border-bottom: var(--rule-hair) solid var(--admin-line);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  font-size: var(--text-sm);
+  padding: var(--space-sm);
+}
+
+.admin-field .coll-picker__search:focus-visible {
+  outline: none;
+  background: var(--admin-hover-bg);
+}
+
+.coll-picker__list {
+  max-height: 18rem;
+  overflow-y: auto;
+  padding: var(--space-2xs);
+}
+
+.coll-picker__group {
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding: var(--space-xs) var(--space-xs) var(--space-2xs);
+}
+
+.coll-picker__empty {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  padding: var(--space-2xs) var(--space-xs) var(--space-xs);
+}
+
+.coll-picker__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--color-ink);
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--admin-radius) - 2px);
+  padding: var(--space-xs);
+  cursor: pointer;
+}
+
+.coll-picker__option:hover {
+  background: color-mix(in oklch, var(--color-ink) 6%, transparent);
+}
+
+.coll-picker__mark {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--admin-input-border);
+  background: var(--color-paper-light);
+  display: grid;
+  place-items: center;
+}
+
+.coll-picker__mark--radio { border-radius: 50%; }
+.coll-picker__mark--check { border-radius: 4px; }
+
+.coll-picker__option[aria-selected="true"] .coll-picker__mark {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+}
+
+.coll-picker__option[aria-selected="true"] .coll-picker__mark--radio {
+  background: var(--color-paper-light);
+  box-shadow: inset 0 0 0 3.5px var(--color-ink);
+}
+
+.coll-picker__option[aria-selected="true"] .coll-picker__mark--check::after {
+  content: "";
+  width: 8px;
+  height: 4.5px;
+  border-left: 1.75px solid var(--color-paper-light);
+  border-bottom: 1.75px solid var(--color-paper-light);
+  transform: translateY(-1px) rotate(-45deg);
+}
+
+.coll-picker__error {
+  font-size: var(--text-xs);
+  color: var(--color-accent-2);
+}
+
+.coll-picker__search::-webkit-search-cancel-button {
+  appearance: none;
+}

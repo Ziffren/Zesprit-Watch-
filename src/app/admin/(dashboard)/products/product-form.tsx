@@ -4,6 +4,7 @@ import type { ProductWithRelations } from "@/lib/admin/types";
 import { RichTextEditor } from "./rich-text-editor";
 import { MediaGrid } from "./media-grid";
 import { TagsField } from "./tags-field";
+import { CollectionsField } from "./collections-field";
 import { deleteProduct, saveProduct } from "./actions";
 
 export async function ProductForm({ product }: { product: ProductWithRelations | null }) {
@@ -65,44 +66,12 @@ export async function ProductForm({ product }: { product: ProductWithRelations |
 
         <div className="admin-panel">
           <h2>Organization</h2>
-          <div className="admin-field">
-            <span>Brand collection (choose one)</span>
-            <div className="admin-chip-select">
-              {brands.length === 0 && (
-                <p className="admin-hint">No brand collections yet — create one in Collections.</p>
-              )}
-              {brands.map((c) => (
-                <label key={c.id}>
-                  <input
-                    type="radio"
-                    name="brand_collection_id"
-                    value={c.id}
-                    defaultChecked={c.id === currentBrandId}
-                    required
-                  />
-                  {c.name}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="admin-field">
-            <span>Other collections</span>
-            <div className="admin-chip-select">
-              {themes.length === 0 && <p className="admin-hint">No themed collections yet.</p>}
-              {themes.map((c) => (
-                <label key={c.id}>
-                  <input
-                    type="checkbox"
-                    name="collection_ids"
-                    value={c.id}
-                    defaultChecked={assigned.has(c.id)}
-                  />
-                  {c.name}
-                </label>
-              ))}
-            </div>
-          </div>
+          <CollectionsField
+            brands={brands.map(({ id, name }) => ({ id, name }))}
+            themes={themes.map(({ id, name }) => ({ id, name }))}
+            initialBrandId={currentBrandId ?? null}
+            initialThemeIds={themes.filter((t) => assigned.has(t.id)).map((t) => t.id)}
+          />
 
           {product && (
             <div className="admin-field">
