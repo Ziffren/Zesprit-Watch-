@@ -266,19 +266,6 @@
   white-space: nowrap;
 }
 
-.admin-sidebar__footer {
-  display: grid;
-  gap: var(--space-xs);
-  padding-top: var(--space-md);
-  border-top: var(--rule-hair) solid color-mix(in oklch, var(--color-paper) 18%, transparent);
-  font-size: var(--text-xs);
-}
-
-.admin-sidebar__email {
-  color: color-mix(in oklch, var(--color-paper) 70%, transparent);
-  overflow-wrap: anywhere;
-}
-
 .admin-main {
   display: flex;
   flex-direction: column;
@@ -351,9 +338,6 @@
   }
   .admin-nav__link {
     white-space: nowrap;
-  }
-  .admin-sidebar__footer {
-    display: none;
   }
   .admin-content {
     padding: var(--space-lg);
