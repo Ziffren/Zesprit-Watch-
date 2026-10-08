@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPostBySlug } from "@/lib/storefront";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -24,8 +25,16 @@ export default async function JournalPostPage({
       <main>
         <article className="journal-post">
           {post.coverImageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="journal-post__cover" src={post.coverImageUrl} alt={post.title} />
+            <Image
+              className="journal-post__cover"
+              src={post.coverImageUrl}
+              alt={post.title}
+              width={1600}
+              height={900}
+              quality={90}
+              priority
+              sizes="(max-width: 960px) 100vw, 60rem"
+            />
           )}
           <div className="journal-post__body">
             {post.publishedAt && (

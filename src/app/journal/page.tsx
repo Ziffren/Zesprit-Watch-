@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/storefront";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -30,8 +31,7 @@ export default async function JournalPage() {
               <article className="product" key={p.id}>
                 <div className="product__media">
                   {p.coverImageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.coverImageUrl} alt={p.title} />
+                    <Image src={p.coverImageUrl} alt={p.title} fill quality={85} sizes="(max-width: 960px) 50vw, 33vw" />
                   ) : (
                     <div className="journal-card__placeholder" aria-hidden="true">
                       <span>{p.title.charAt(0)}</span>

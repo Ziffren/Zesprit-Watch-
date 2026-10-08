@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent, type MouseEvent } from "react";
+import Image from "next/image";
 import { WatchIcon } from "@/components/product-card";
 
 const ZOOM = 2.25;
@@ -25,6 +26,9 @@ export function ProductGallery({
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  // Mount the full-size original only while the lightbox is open, so a page
+  // view never downloads it just because the (closed) dialog is in the DOM.
+  const [isOpen, setIsOpen] = useState(false);
   const [origin, setOrigin] = useState({ x: 50, y: 50 });
   const [broken, setBroken] = useState<Set<number>>(() => new Set());
   const swipe = useRef<{ x: number; moved: boolean } | null>(null);
@@ -42,6 +46,7 @@ export function ProductGallery({
   function open(i: number) {
     setIndex(i);
     setZoomed(false);
+    setIsOpen(true);
     dialogRef.current?.showModal();
   }
 
@@ -54,7 +59,10 @@ export function ProductGallery({
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    const onClose = () => setZoomed(false);
+    const onClose = () => {
+      setZoomed(false);
+      setIsOpen(false);
+    };
     dialog.addEventListener("close", onClose);
     return () => dialog.removeEventListener("close", onClose);
   }, []);
@@ -127,11 +135,13 @@ export function ProductGallery({
             {broken.has(i) ? (
               <WatchIcon hour={hour} min={min} />
             ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={src}
                 alt={i === 0 ? name : `${name} — photo ${i + 1}`}
-                loading={i < 3 ? "eager" : "lazy"}
+                fill
+                quality={90}
+                priority={i === 0}
+                sizes={i === 0 ? "(max-width: 960px) 100vw, 55vw" : "(max-width: 960px) 100vw, 28vw"}
                 onError={() => setBroken((prev) => new Set(prev).add(i))}
               />
             )}
@@ -161,18 +171,22 @@ export function ProductGallery({
           onPointerUp={onStagePointerUp}
           onClick={onStageClick}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            key={index}
-            className="lightbox__img"
-            src={photos[index]}
-            alt={index === 0 ? name : `${name} — photo ${index + 1}`}
-            data-zoomed={zoomed}
-            style={{ transformOrigin: `${origin.x}% ${origin.y}%`, ["--zoom" as string]: ZOOM }}
-            onClick={onImageClick}
-            onPointerMove={(e) => zoomed && zoomAt(e)}
-            draggable={false}
-          />
+          {/* Lightbox shows the untouched original — full resolution for zoom,
+              fetched only when a visitor opens it. */}
+          {isOpen && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={index}
+              className="lightbox__img"
+              src={photos[index]}
+              alt={index === 0 ? name : `${name} — photo ${index + 1}`}
+              data-zoomed={zoomed}
+              style={{ transformOrigin: `${origin.x}% ${origin.y}%`, ["--zoom" as string]: ZOOM }}
+              onClick={onImageClick}
+              onPointerMove={(e) => zoomed && zoomAt(e)}
+              draggable={false}
+            />
+          )}
         </div>
 
         <button type="button" className="lightbox__btn lightbox__close" onClick={close} aria-label="Close">

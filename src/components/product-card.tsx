@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { StorefrontPiece } from "@/lib/storefront";
 
 export function WatchIcon({ hour, min, large = false }: { hour: number; min: number; large?: boolean }) {
@@ -62,8 +63,13 @@ export function ShopRowCard({ piece }: { piece: StorefrontPiece }) {
     <Link className="row-card" href={`/watches/${piece.id}`}>
       <span className="row-card__media">
         {piece.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={piece.imageUrl} alt="" loading="lazy" />
+          <Image
+            src={piece.imageUrl}
+            alt=""
+            fill
+            quality={85}
+            sizes="(max-width: 640px) 64vw, (max-width: 960px) 42vw, 18rem"
+          />
         ) : (
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}
@@ -82,8 +88,13 @@ export function ProductCard({ piece, headingLevel = 3 }: { piece: StorefrontPiec
     <article className="product">
       <div className="product__media">
         {piece.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={piece.imageUrl} alt={piece.name} loading="lazy" />
+          <Image
+            src={piece.imageUrl}
+            alt={piece.name}
+            fill
+            quality={85}
+            sizes="(max-width: 960px) 50vw, 25vw"
+          />
         ) : (
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}

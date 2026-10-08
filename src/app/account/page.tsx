@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCustomerAccount } from "@/lib/account";
 import { signOutCustomer } from "./actions";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -37,8 +38,13 @@ export default async function AccountPage() {
                   <article className="product" key={s.watches.id}>
                     <div className="product__media">
                       {s.watches.photoUrls[0] ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={s.watches.photoUrls[0]} alt={s.watches.productName} />
+                        <Image
+                          src={s.watches.photoUrls[0]}
+                          alt={s.watches.productName}
+                          fill
+                          quality={85}
+                          sizes="(max-width: 960px) 50vw, 25vw"
+                        />
                       ) : (
                         <div className="watch-icon" aria-hidden="true">
                           <span className="watch-icon__hand watch-icon__hand--hour" />
