@@ -9,7 +9,7 @@ import Color from "@tiptap/extension-color";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
 import Youtube from "@tiptap/extension-youtube";
-import { createClient } from "@/lib/supabase/client";
+import { uploadPhoto } from "@/lib/upload-photo";
 
 // A constrained palette, not a full color picker — arbitrary text color in
 // a brand-locked catalogue/journal risks breaking the Hallmark palette the
@@ -195,7 +195,9 @@ export function RichTextEditor({
   const labelId = useId();
   const [html, setHtml] = useState(initialHtml ?? "");
   const [sourceMode, setSourceMode] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  // null = idle; a number = upload in progress (percent).
+  const [uploading, setUploading] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
@@ -268,18 +270,15 @@ export function RichTextEditor({
   }
 
   async function handleImageFile(file: File) {
-    setUploading(true);
+    setUploading(0);
+    setUploadError(null);
     try {
-      const supabase = createClient();
-      const path = `editor/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-      const { error } = await supabase.storage.from("watch-photos").upload(path, file, { upsert: false });
-      if (error) throw error;
-      const { data } = supabase.storage.from("watch-photos").getPublicUrl(path);
-      editor?.chain().focus().setImage({ src: data.publicUrl }).run();
-    } catch {
-      // Best-effort — the editor just won't gain an image if this fails.
+      const url = await uploadPhoto(file, "editor", (p) => setUploading(p));
+      editor?.chain().focus().setImage({ src: url }).run();
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
-      setUploading(false);
+      setUploading(null);
     }
   }
 
@@ -386,7 +385,7 @@ export function RichTextEditor({
               <path d="M9.25 6.75a2.75 2.75 0 0 0-3.9-.1l-2 2a2.76 2.76 0 0 0 3.9 3.9l.75-.75" />
             </Icon>
           </ToolButton>
-          <ToolButton label="Insert image" disabled={off || uploading} onClick={() => imageInputRef.current?.click()}>
+          <ToolButton label={uploading != null ? `Uploading image ${uploading}%` : "Insert image"} disabled={off || uploading != null} onClick={() => imageInputRef.current?.click()}>
             <Icon>
               <rect x="2.25" y="2.25" width="11.5" height="11.5" rx="2.5" />
               <circle cx="6" cy="6" r="1.1" />
@@ -500,6 +499,12 @@ export function RichTextEditor({
         )}
       </div>
 
+      {uploading != null && <p className="admin-hint" aria-live="polite">Uploading image… {uploading}%</p>}
+      {uploadError && (
+        <p className="admin-hint admin-hint--error" role="alert">
+          {uploadError}
+        </p>
+      )}
       <input type="hidden" name={name} value={html} readOnly />
     </div>
   );

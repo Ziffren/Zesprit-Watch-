@@ -2,7 +2,7 @@
 
 import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { createClient } from "@/lib/supabase/client";
+import { uploadPhoto } from "@/lib/upload-photo";
 import type { SiteImage } from "@/lib/site-images";
 import { saveSiteImage, type SaveSiteImageState } from "./actions";
 
@@ -44,7 +44,7 @@ export function SlotForm({
 }) {
   const [state, action] = useActionState<SaveSiteImageState, FormData>(saveSiteImage, { error: null, savedAt: null });
   const [url, setUrl] = useState(image.imageUrl);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
@@ -57,19 +57,15 @@ export function SlotForm({
   }
 
   async function upload(file: File) {
-    setBusy(true);
+    setBusy(0);
     setUploadError(null);
     try {
-      const supabase = createClient();
-      const path = `site/slot-${image.slot}/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-      const { error } = await supabase.storage.from("watch-photos").upload(path, file, { upsert: false });
-      if (error) throw error;
-      setUrl(supabase.storage.from("watch-photos").getPublicUrl(path).data.publicUrl);
+      setUrl(await uploadPhoto(file, `site/slot-${image.slot}`, (p) => setBusy(p)));
       setDirty(true);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
@@ -98,14 +94,14 @@ export function SlotForm({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt="" />
           ) : (
-            <button type="button" className="slot-form__drop" onClick={() => fileRef.current?.click()} disabled={busy}>
-              {busy ? "Uploading…" : "+ Upload image"}
+            <button type="button" className="slot-form__drop" onClick={() => fileRef.current?.click()} disabled={busy != null}>
+              {busy != null ? `Uploading… ${busy}%` : "+ Upload image"}
             </button>
           )}
           {url && (
             <div className="slot-form__preview-actions">
-              <button type="button" className="admin-btn" onClick={() => fileRef.current?.click()} disabled={busy}>
-                {busy ? "Uploading…" : "Replace"}
+              <button type="button" className="admin-btn" onClick={() => fileRef.current?.click()} disabled={busy != null}>
+                {busy != null ? `Uploading… ${busy}%` : "Replace"}
               </button>
               <button
                 type="button"

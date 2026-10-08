@@ -1994,3 +1994,81 @@
     justify-self: start;
   }
 }
+
+/* ---------- Product media: per-photo upload progress ---------- */
+/* states: uploading (dimmed preview + ring + %) · error (oxblood veil + Retry) · done */
+
+.admin-media-tile {
+  position: relative;
+}
+
+.admin-media-tile[data-status="uploading"] img {
+  filter: saturate(0.4) brightness(0.85);
+}
+
+.media-tile__overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-2xs);
+  background: color-mix(in oklch, var(--color-ink) 35%, transparent);
+  color: var(--color-paper);
+  pointer-events: none;
+}
+
+.media-progress {
+  width: 44px;
+  height: 44px;
+  transform: rotate(-90deg);
+}
+
+.media-progress__track {
+  fill: none;
+  stroke: color-mix(in oklch, var(--color-paper) 30%, transparent);
+  stroke-width: 3;
+}
+
+.media-progress__bar {
+  fill: none;
+  stroke: var(--color-paper);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur-short) var(--ease-out);
+}
+
+.media-tile__pct {
+  position: absolute;
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.media-tile__overlay--error {
+  background: color-mix(in oklch, var(--color-accent-2) 70%, transparent);
+  font-size: var(--text-sm);
+  pointer-events: auto;
+}
+
+.media-tile__retry {
+  font: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 0;
+  border-radius: 999px;
+  padding: var(--space-3xs) var(--space-sm);
+  cursor: pointer;
+}
+
+.media-tile__retry:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-progress__bar {
+    transition: none;
+  }
+}

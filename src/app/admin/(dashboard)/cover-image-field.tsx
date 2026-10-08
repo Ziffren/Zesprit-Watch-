@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { uploadPhoto } from "@/lib/upload-photo";
 
 export function CoverImageField({
   initialUrl,
@@ -11,26 +11,19 @@ export function CoverImageField({
   pathPrefix?: string;
 }) {
   const [url, setUrl] = useState(initialUrl);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(file: File) {
-    setBusy(true);
+    setBusy(0);
     setError(null);
     try {
-      const supabase = createClient();
-      const path = `${pathPrefix}/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-      const { error: uploadError } = await supabase.storage
-        .from("watch-photos")
-        .upload(path, file, { upsert: false });
-      if (uploadError) throw uploadError;
-      const { data } = supabase.storage.from("watch-photos").getPublicUrl(path);
-      setUrl(data.publicUrl);
+      setUrl(await uploadPhoto(file, pathPrefix, (p) => setBusy(p)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
@@ -48,7 +41,7 @@ export function CoverImageField({
           <img src={url} alt="" />
         ) : (
           <span className="admin-media-add" style={{ border: "none" }}>
-            {busy ? "…" : "+"}
+            {busy != null ? `${busy}%` : "+"}
           </span>
         )}
       </div>
