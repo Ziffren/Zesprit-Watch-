@@ -63,6 +63,12 @@
   --rule-hair: 1px;
   --radius-sm: 2px;
   --radius-media: 6px; /* product photography — softened like a dial, not a card */
+  --radius-card: 14px; /* soft panels (sign-in, account forms) — matches the admin surfaces */
+  --radius-control: 8px; /* inputs and buttons inside soft panels */
+  --shadow-card:
+    0 0 0 1px color-mix(in oklch, var(--color-ink) 7%, transparent),
+    0 2px 4px color-mix(in oklch, var(--color-ink) 5%, transparent),
+    0 18px 40px -18px color-mix(in oklch, var(--color-ink) 22%, transparent);
   --nav-h: 119px; /* measured nav-centered__row height above the 40rem breakpoint */
 
   /* Z-index */

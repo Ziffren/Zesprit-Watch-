@@ -2454,3 +2454,107 @@ a.showcase__tile:focus-visible {
   color: var(--color-muted);
   margin-bottom: var(--space-xs);
 }
+
+/* ---------- Soft panels: sign-in / sign-up / details / contact ---------- */
+/* Same surface language as the admin: rounded card, hairline + soft lift,
+   rounded controls. Scoped to .auth-card so product-page forms are unchanged. */
+
+.auth-page {
+  background:
+    radial-gradient(60rem 30rem at 50% -10%, color-mix(in oklch, var(--color-accent) 7%, transparent), transparent 70%),
+    var(--color-paper);
+}
+
+.auth-card.order-form,
+.auth-card.order-form__success,
+.auth-card:not(.order-form):not(.order-form__success) {
+  max-width: 28rem;
+  padding: var(--space-xl);
+  background: var(--color-paper-light);
+  border: 0;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.auth-card .order-form__title {
+  font-size: var(--text-xl);
+}
+
+.auth-card .order-form__field input,
+.auth-card .order-form__field textarea {
+  border-radius: var(--radius-control);
+  border-color: color-mix(in oklch, var(--color-ink) 18%, transparent);
+  background: var(--color-paper-light);
+  padding: var(--space-sm) var(--space-md);
+  transition: border-color var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
+}
+
+.auth-card .order-form__field input:hover,
+.auth-card .order-form__field textarea:hover {
+  border-color: color-mix(in oklch, var(--color-ink) 32%, transparent);
+}
+
+.auth-card .order-form__field input:focus-visible,
+.auth-card .order-form__field textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-focus) 28%, transparent);
+}
+
+.auth-card .order-form__field input:disabled {
+  color: var(--color-muted);
+  background: var(--color-paper-2);
+}
+
+.auth-card .cta-solid {
+  width: 100%;
+  min-height: 46px;
+  justify-content: center;
+  border-radius: var(--radius-control);
+  text-align: center;
+}
+
+.auth-card .social-auth__btn {
+  border-radius: var(--radius-control);
+  border-color: color-mix(in oklch, var(--color-ink) 18%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--color-ink) 6%, transparent);
+}
+
+.auth-card .order-form__error,
+.auth-card .auth-success {
+  border-radius: var(--radius-control);
+}
+
+.auth-card .signed-in-as {
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+}
+
+.auth-card .account-gate {
+  border-radius: var(--radius-control);
+}
+
+@media (max-width: 40rem) {
+  .auth-card.order-form,
+  .auth-card.order-form__success,
+  .auth-card:not(.order-form):not(.order-form__success) {
+    padding: var(--space-lg);
+  }
+}
+
+.auth-card a.cta-solid {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Inside a soft panel the gate is just content, not a box within a box. */
+.auth-card .account-gate {
+  margin-top: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.social-auth__or {
+  max-width: none;
+}
