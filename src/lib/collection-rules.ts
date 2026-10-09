@@ -9,7 +9,7 @@ export type Rule = { field: RuleField; op: string; value: string };
 export type RuleProduct = {
   productName: string;
   brand: string;
-  status: "AVAILABLE" | "SOLD";
+  status: "AVAILABLE" | "HOLD" | "SOLD";
   priceCents: number | null;
   tags: string[];
   createdAt: string;

@@ -18,10 +18,11 @@ export function WatchIcon({ hour, min, large = false }: { hour: number; min: num
 }
 
 // "New" / "Reduced" chips, pinned to the photo's corner.
-export function PieceBadges({ isNew, isReduced }: { isNew: boolean; isReduced: boolean }) {
-  if (!isNew && !isReduced) return null;
+export function PieceBadges({ isNew, isReduced, onHold = false }: { isNew: boolean; isReduced: boolean; onHold?: boolean }) {
+  if (!isNew && !isReduced && !onHold) return null;
   return (
     <span className="piece-badges">
+      {onHold && <span className="piece-badge piece-badge--hold">On hold</span>}
       {isReduced && <span className="piece-badge piece-badge--reduced">Reduced</span>}
       {isNew && <span className="piece-badge piece-badge--new">New</span>}
     </span>
@@ -73,7 +74,7 @@ export function ShopRowCard({ piece }: { piece: StorefrontPiece }) {
         ) : (
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}
-        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} />
+        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} />
       </span>
       <span className="row-card__title">{piece.name}</span>
       <span className="row-card__brand">{piece.brand}</span>
@@ -98,7 +99,7 @@ export function ProductCard({ piece, headingLevel = 3 }: { piece: StorefrontPiec
         ) : (
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}
-        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} />
+        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} />
       </div>
       <div className="product__meta">
         <Heading className="product__name">{piece.name}</Heading>

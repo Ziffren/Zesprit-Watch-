@@ -17,6 +17,8 @@ export type StorefrontPiece = {
   compareAt: string | null;
   isNew: boolean;
   isReduced: boolean;
+  /** A deposit has been received — still listed, not purchasable. */
+  onHold: boolean;
   imageUrl: string | null;
   hour: number;
   min: number;
@@ -25,7 +27,7 @@ export type StorefrontPiece = {
 // Shown until the owner publishes real products in /admin/products.
 const placeholder = (id: string, name: string, detail: string, hour: number, min: number): StorefrontPiece => ({
   id, name, detail, hour, min, brand: "Z’esprit Watch",
-  price: "Price on request", priceSet: false, compareAt: null, isNew: false, isReduced: false, imageUrl: null,
+  price: "Price on request", priceSet: false, compareAt: null, isNew: false, isReduced: false, onHold: false, imageUrl: null,
 });
 const placeholderPieces: StorefrontPiece[] = [
   placeholder("meridian", "The Meridian", "Hand-wound · steel case", 35, 210),
@@ -45,7 +47,7 @@ type PieceRow = {
   brand: string;
   tags: string[] | null;
   photoUrls: string[] | null;
-  status: "AVAILABLE" | "SOLD";
+  status: "AVAILABLE" | "HOLD" | "SOLD";
   priceCents: number | null;
   compareAtCents: number | null;
   reducedAt: string | null;
@@ -82,6 +84,7 @@ function toPiece(p: PieceRow, now: number): StorefrontPiece {
     price: formatPrice(p.priceCents),
     priceSet: p.priceCents != null,
     imageUrl: p.photoUrls?.[0] ?? null,
+    onHold: p.status === "HOLD",
     hour,
     min,
     ...priceBadges(p, now),
@@ -92,7 +95,7 @@ export type WatchDetail = {
   id: string;
   name: string;
   brand: string;
-  status: "AVAILABLE" | "SOLD";
+  status: "AVAILABLE" | "HOLD" | "SOLD";
   priceCents: number | null;
   descriptionHtml: string | null;
   tags: string[];
@@ -203,7 +206,7 @@ export async function getShopRow(limit = 24): Promise<{ pieces: StorefrontPiece[
     const { data, error, count } = await supabase
       .from("products")
       .select(PIECE_COLUMNS, { count: "exact" })
-      .eq("status", "AVAILABLE")
+      .in("status", ["AVAILABLE", "HOLD"])
       .order("priceCents", { ascending: false, nullsFirst: false })
       .order("createdAt", { ascending: false })
       .limit(limit);
@@ -231,7 +234,7 @@ export async function getRelatedPieces(
       supabase
         .from("products")
         .select(PIECE_COLUMNS)
-        .eq("status", "AVAILABLE")
+        .in("status", ["AVAILABLE", "HOLD"])
         .neq("id", excludeId)
         .order("createdAt", { ascending: false })
         .limit(limit);
@@ -260,7 +263,7 @@ export async function getBrandMenu(): Promise<BrandLink[]> {
     const supabase = createPublicClient();
     const [{ data: brands }, { data: products }] = await Promise.all([
       supabase.from("collections").select("name, slug").eq("isBrand", true).order("name"),
-      supabase.from("products").select("brand").eq("status", "AVAILABLE"),
+      supabase.from("products").select("brand").in("status", ["AVAILABLE", "HOLD"]),
     ]);
     const counts = new Map<string, number>();
     for (const p of products ?? []) counts.set(p.brand, (counts.get(p.brand) ?? 0) + 1);
@@ -299,7 +302,7 @@ export async function getCollectionPage(slug: string, page: number): Promise<Col
       const { data } = await supabase
         .from("products")
         .select(PIECE_COLUMNS)
-        .eq("status", "AVAILABLE")
+        .in("status", ["AVAILABLE", "HOLD"])
         .order("priceCents", { ascending: false, nullsFirst: false })
         .order("createdAt", { ascending: false });
       return (data ?? []) as PieceRow[];
@@ -337,7 +340,7 @@ export async function getCollectionPage(slug: string, page: number): Promise<Col
             .from("products")
             .select(PIECE_COLUMNS)
             .in("id", ids)
-            .eq("status", "AVAILABLE")
+            .in("status", ["AVAILABLE", "HOLD"])
             .order("priceCents", { ascending: false, nullsFirst: false })
             .order("createdAt", { ascending: false });
           rows = (data ?? []) as PieceRow[];

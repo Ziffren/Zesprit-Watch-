@@ -35,6 +35,7 @@ export function StatusField({
           }}
         >
           <option value="AVAILABLE">Available</option>
+          <option value="HOLD">On hold (deposit received)</option>
           <option value="SOLD">Sold</option>
         </select>
       </label>

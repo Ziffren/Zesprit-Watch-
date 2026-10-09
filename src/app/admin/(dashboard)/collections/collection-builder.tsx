@@ -232,7 +232,7 @@ export function CollectionBuilder({
                   </div>
                   <p className="collection-grid__name">{p.productName}</p>
                   <p className="admin-hint">
-                    {formatPrice(p.priceCents)} · {p.status === "AVAILABLE" ? "Available" : "Sold"}
+                    {formatPrice(p.priceCents)} · {p.status === "AVAILABLE" ? "Available" : p.status === "HOLD" ? "On hold" : "Sold"}
                   </p>
                 </li>
               ))}
@@ -372,6 +372,7 @@ function RuleList({ rules, onChange }: { rules: Rule[]; onChange: (r: Rule[]) =>
               (spec.input === "status" ? (
                 <select value={r.value} aria-label="Value" onChange={(e) => update(i, { value: e.target.value })}>
                   <option value="AVAILABLE">Available</option>
+                  <option value="HOLD">On hold</option>
                   <option value="SOLD">Sold</option>
                 </select>
               ) : (

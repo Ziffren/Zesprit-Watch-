@@ -25,7 +25,7 @@ export default async function EditProductPage({
             <p className="admin-topbar__title">{product.productName}</p>
             <span
               className="admin-badge"
-              data-tone={product.status === "AVAILABLE" ? "active" : "draft"}
+              data-tone={product.status === "AVAILABLE" ? "active" : product.status === "HOLD" ? "hold" : "draft"}
             >
               {product.status}
             </span>

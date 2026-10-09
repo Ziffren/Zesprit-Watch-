@@ -131,3 +131,86 @@ export async function sendSourcingNotification(params: {
     console.error("Failed to send sourcing notification email:", err);
   }
 }
+
+const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+// To the owner: someone wants to hold a watch with a deposit.
+export async function sendDepositNotification(params: {
+  id: string;
+  watchTitle: string;
+  amountCents: number;
+  percent: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  message: string | null;
+}) {
+  if (!resend || !notificationEmail) {
+    console.warn("Resend isn't configured — skipping deposit notification email.");
+    return;
+  }
+  const lines = [
+    `Deposit request: ${params.watchTitle}`,
+    "",
+    `Deposit: ${money(params.amountCents)} (${params.percent}% of the price)`,
+    `Customer: ${params.customerName} <${params.customerEmail}>`,
+    params.customerPhone ? `Phone: ${params.customerPhone}` : null,
+    params.message ? `\nMessage:\n${params.message}` : null,
+    "",
+    "The watch stays Available until you confirm the deposit has arrived.",
+    `Confirm in admin: https://zesprit-watch.vercel.app/admin/deposits/${params.id}`,
+  ].filter((l): l is string => l !== null);
+  try {
+    await resend.emails.send({
+      from: "Z’esprit Watch <no-reply@zespritwatch.com>",
+      to: notificationEmail,
+      replyTo: params.customerEmail,
+      subject: `Deposit request — ${params.watchTitle}`,
+      text: lines.join("\n"),
+    });
+  } catch (err) {
+    console.error("Failed to send deposit notification email:", err);
+  }
+}
+
+// To the customer: how to pay the deposit.
+export async function sendDepositInstructions(params: {
+  to: string;
+  customerName: string;
+  watchTitle: string;
+  amountCents: number;
+  holdDays: number;
+  paymentInstructions: string | null;
+}) {
+  if (!resend) {
+    console.warn("Resend isn't configured — skipping deposit instructions email.");
+    return;
+  }
+  const lines = [
+    `Hi ${params.customerName},`,
+    "",
+    `Thank you for your deposit request for the ${params.watchTitle}.`,
+    "",
+    `Deposit amount: ${money(params.amountCents)}`,
+    "",
+    params.paymentInstructions
+      ? `How to pay:\n${params.paymentInstructions}`
+      : "We'll reply shortly with payment details.",
+    "",
+    `As soon as your deposit arrives we'll put the watch on hold for you for ${params.holdDays} days and let you know.`,
+    "You can follow the status on your account: https://zesprit-watch.vercel.app/account",
+    "",
+    "— Z’esprit Watch",
+  ];
+  try {
+    await resend.emails.send({
+      from: "Z’esprit Watch <no-reply@zespritwatch.com>",
+      to: params.to,
+      replyTo: notificationEmail ?? undefined,
+      subject: `Your deposit for the ${params.watchTitle}`,
+      text: lines.join("\n"),
+    });
+  } catch (err) {
+    console.error("Failed to send deposit instructions email:", err);
+  }
+}

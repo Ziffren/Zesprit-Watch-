@@ -7,6 +7,9 @@ import { SiteHeader } from "@/components/site-header";
 import { AccountGate } from "@/components/account-gate";
 import { getCustomer } from "@/lib/customer";
 import { OrderForm } from "./order-form";
+import { DepositForm } from "./deposit-form";
+import { PurchasePanel } from "./purchase-panel";
+import { getShopSettings } from "@/lib/deposits";
 import { SaveButton } from "./save-button";
 import { ProductGallery } from "./product-gallery";
 
@@ -20,7 +23,11 @@ export default async function WatchDetailPage({
 
   if (!watch) notFound();
 
-  const [related, customer] = await Promise.all([getRelatedPieces(watch.brand, watch.id), getCustomer()]);
+  const [related, customer, settings] = await Promise.all([
+    getRelatedPieces(watch.brand, watch.id),
+    getCustomer(),
+    getShopSettings(),
+  ]);
 
   return (
     <>
@@ -33,7 +40,7 @@ export default async function WatchDetailPage({
           </div>
 
           <div className="watch-detail__info">
-            <PieceBadges isNew={watch.isNew} isReduced={watch.isReduced} />
+            <PieceBadges isNew={watch.isNew} isReduced={watch.isReduced} onHold={watch.status === "HOLD"} />
             <p className="watch-detail__brand">{watch.brand}</p>
             <h1 className="watch-detail__title">{watch.name}</h1>
             <div className="watch-detail__price-row">
@@ -46,11 +53,32 @@ export default async function WatchDetailPage({
               <SaveButton watchId={watch.id} />
             </div>
 
-            {watch.status === "AVAILABLE" ? (
+            {watch.status === "HOLD" ? (
+              <div className="order-form__success hold-notice">
+                <p className="order-form__success-title">On hold for another customer.</p>
+                <p>
+                  A deposit has been placed on this piece. If the sale doesn&rsquo;t go ahead it will be available
+                  again — save it to your wishlist to keep an eye on it, or{" "}
+                  <Link href="/sourcing">ask us to find you a similar one</Link>.
+                </p>
+              </div>
+            ) : watch.status === "AVAILABLE" ? (
               customer.status === "ready" ? (
-                <OrderForm watchId={watch.id} profile={customer.profile} />
+                <PurchasePanel
+                  request={<OrderForm watchId={watch.id} profile={customer.profile} />}
+                  deposit={
+                    watch.priceCents != null ? (
+                      <DepositForm
+                        watchId={watch.id}
+                        priceCents={watch.priceCents}
+                        settings={settings}
+                        profile={customer.profile}
+                      />
+                    ) : null
+                  }
+                />
               ) : (
-                <AccountGate customer={customer} next={`/watches/${watch.id}`} action="request this piece" />
+                <AccountGate customer={customer} next={`/watches/${watch.id}`} action="buy or hold this piece" />
               )
             ) : (
               <div className="order-form__success">

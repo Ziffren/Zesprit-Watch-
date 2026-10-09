@@ -111,7 +111,7 @@ export default async function ProductsPage({
                       <td>
                         <span
                           className="admin-badge"
-                          data-tone={p.status === "AVAILABLE" ? "active" : "draft"}
+                          data-tone={p.status === "AVAILABLE" ? "active" : p.status === "HOLD" ? "hold" : "draft"}
                         >
                           {p.status}
                         </span>

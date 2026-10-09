@@ -3,6 +3,8 @@ import { getCustomerAccount } from "@/lib/account";
 import { signOutCustomer } from "./actions";
 import Image from "next/image";
 import { SOURCING_STATUSES, labelOf } from "@/lib/sourcing";
+import { depositStatusLabel } from "@/lib/deposits";
+import { formatCents } from "@/lib/admin/types";
 
 export const dynamic = "force-dynamic";
 
@@ -118,6 +120,24 @@ export default async function AccountPage() {
           </ul>
         )}
       </section>
+      {account.deposits.length > 0 && (
+        <section className="account-page__section">
+          <h2>Deposits</h2>
+          <ul className="account-page__orders">
+            {account.deposits.map((d) => (
+              <li key={d.id}>
+                <Link href={d.watches ? `/watches/${d.watches.id}` : "#"}>{d.watches?.productName ?? "Watch"}</Link>
+                <span className="account-page__order-status">{depositStatusLabel(d.status)}</span>
+                <span className="account-page__muted">
+                  {formatCents(d.amountCents)}
+                  {d.status === "CONFIRMED" && d.holdUntil ? ` · held until ${new Date(d.holdUntil).toLocaleDateString()}` : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="account-page__section">
         <div className="account-details__head">
           <h2>Watch sourcing</h2>

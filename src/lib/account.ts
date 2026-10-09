@@ -7,7 +7,7 @@ export type SavedWatchEntry = {
     productName: string;
     brand: string;
     photoUrls: string[];
-    status: "AVAILABLE" | "SOLD";
+    status: "AVAILABLE" | "HOLD" | "SOLD";
   } | null;
 };
 
@@ -26,6 +26,15 @@ export type CustomerSourcingEntry = {
   createdAt: string;
 };
 
+export type CustomerDepositEntry = {
+  id: string;
+  amountCents: number;
+  status: string;
+  holdUntil: string | null;
+  createdAt: string;
+  watches: { id: string; productName: string } | null;
+};
+
 export type CustomerAccount = {
   userId: string;
   email: string;
@@ -35,6 +44,7 @@ export type CustomerAccount = {
   saved: SavedWatchEntry[];
   orders: CustomerOrderEntry[];
   sourcing: CustomerSourcingEntry[];
+  deposits: CustomerDepositEntry[];
 };
 
 export async function getCustomerAccount(): Promise<CustomerAccount | null> {
@@ -44,7 +54,7 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: profile }, { data: saved }, { data: orders }, { data: sourcing }] = await Promise.all([
+  const [{ data: profile }, { data: saved }, { data: orders }, { data: sourcing }, { data: deposits }] = await Promise.all([
     supabase.from("customer_profiles").select("*").eq("userId", user.id).maybeSingle(),
     supabase
       .from("saved_watches")
@@ -61,6 +71,11 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
       .select("id, brand, model, status, createdAt")
       .eq("userId", user.id)
       .order("createdAt", { ascending: false }),
+    supabase
+      .from("deposit_requests")
+      .select("id, amountCents, status, holdUntil, createdAt, watches:products(id, productName)")
+      .eq("userId", user.id)
+      .order("createdAt", { ascending: false }),
   ]);
 
   return {
@@ -72,5 +87,6 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
     saved: (saved ?? []) as unknown as SavedWatchEntry[],
     orders: (orders ?? []) as unknown as CustomerOrderEntry[],
     sourcing: (sourcing ?? []) as CustomerSourcingEntry[],
+    deposits: (deposits ?? []) as unknown as CustomerDepositEntry[],
   };
 }

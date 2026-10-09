@@ -2169,3 +2169,17 @@
   color: var(--color-accent-2);
   overflow-wrap: anywhere;
 }
+
+.admin-badge[data-tone="hold"] {
+  color: var(--color-ink);
+  background: color-mix(in oklch, var(--color-accent) 24%, transparent);
+}
+
+.admin-badge[data-tone="warn"] {
+  color: var(--color-paper);
+  background: var(--color-accent-2);
+}
+
+.admin-dl__warn {
+  color: var(--color-accent-2);
+}

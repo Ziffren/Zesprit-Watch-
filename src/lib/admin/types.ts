@@ -10,7 +10,8 @@
 
 import type { Rule } from "@/lib/collection-rules";
 
-export type WatchStatus = "AVAILABLE" | "SOLD";
+// HOLD = a deposit has been received (see /admin/deposits).
+export type WatchStatus = "AVAILABLE" | "HOLD" | "SOLD";
 
 export type Collection = {
   id: string;

@@ -2807,3 +2807,107 @@ a.showcase__tile:focus-visible {
     padding: var(--space-lg);
   }
 }
+
+.piece-badge--hold {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* ---------- Product page: Request to buy | Deposit & hold ---------- */
+/* Hallmark · component: purchase tabs + deposit form · states: default · hover · focus · selected · pending · error · success · on hold */
+
+.purchase-panel {
+  margin-top: var(--space-md);
+}
+
+.purchase-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-control);
+}
+
+.purchase-tabs__tab {
+  font: inherit;
+  font-size: var(--text-sm);
+  letter-spacing: 0.02em;
+  min-height: 40px;
+  border: 0;
+  border-radius: calc(var(--radius-control) - 2px);
+  background: transparent;
+  color: var(--color-ink-2);
+  cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+}
+
+.purchase-tabs__tab:hover {
+  color: var(--color-ink);
+}
+
+.purchase-tabs__tab[aria-selected="true"] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  box-shadow: 0 1px 3px color-mix(in oklch, var(--color-ink) 20%, transparent);
+}
+
+.purchase-tabs__tab:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.purchase-panel .order-form,
+.purchase-panel .order-form__success {
+  margin-top: var(--space-sm);
+}
+
+.deposit-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-paper);
+  border-left: 2px solid var(--color-accent);
+}
+
+.deposit-summary > div {
+  display: grid;
+  gap: var(--space-3xs);
+}
+
+.deposit-summary__label {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.deposit-summary__amount {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.deposit-steps {
+  margin: 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: var(--space-2xs);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.deposit-instructions {
+  white-space: pre-line;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-paper);
+  border: var(--rule-hair) solid var(--color-rule);
+  font-size: var(--text-sm);
+}
+
+.hold-notice {
+  border-left: 3px solid var(--color-accent);
+}

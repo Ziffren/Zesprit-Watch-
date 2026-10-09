@@ -11,6 +11,7 @@ const catalogueLinks = [
 const salesLinks = [
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/customers", label: "Customers" },
+  { href: "/admin/deposits", label: "Deposits" },
   { href: "/admin/sourcing", label: "Sourcing" },
 ];
 
