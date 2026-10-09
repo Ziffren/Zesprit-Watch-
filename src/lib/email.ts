@@ -34,7 +34,7 @@ export async function sendOrderNotification(params: {
 
   try {
     await resend.emails.send({
-      from: "Zesprit Watch <onboarding@resend.dev>",
+      from: "Z’esprit Watch <no-reply@zespritwatch.com>",
       to: notificationEmail,
       subject: `New order request — ${params.watchTitle}`,
       text: lines.join("\n"),
@@ -72,7 +72,7 @@ export async function sendMessageNotification(params: {
 
   try {
     await resend.emails.send({
-      from: "Zesprit Watch <onboarding@resend.dev>",
+      from: "Z’esprit Watch <no-reply@zespritwatch.com>",
       to: notificationEmail,
       subject: `New message — ${params.name}`,
       text: lines.join("\n"),

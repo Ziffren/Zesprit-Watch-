@@ -72,7 +72,10 @@ export async function updateSession(request: NextRequest) {
       url.searchParams.set("next", path);
       return NextResponse.redirect(url);
     }
-    if (isAccountAuthRoute && user) {
+    // Signed-in visitors skip /account/login — except when arriving from an
+    // email-confirmation link (?confirmed=1): that may be a different account
+    // than the one this browser is signed into, so show the notice.
+    if (isAccountAuthRoute && user && !request.nextUrl.searchParams.has("confirmed")) {
       const url = request.nextUrl.clone();
       url.pathname = "/account";
       return NextResponse.redirect(url);
