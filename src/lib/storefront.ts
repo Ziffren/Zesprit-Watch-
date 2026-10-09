@@ -357,3 +357,16 @@ export async function getCollectionPage(slug: string, page: number): Promise<Col
     return null;
   }
 }
+
+// Every brand collection name (in stock or not) — suggestions for the
+// Watch Sourcing brand field.
+export async function getAllBrandNames(): Promise<string[]> {
+  if (!isSupabaseConfigured) return [];
+  try {
+    const supabase = createPublicClient();
+    const { data } = await supabase.from("collections").select("name").eq("isBrand", true).order("name");
+    return (data ?? []).map((b) => b.name);
+  } catch {
+    return [];
+  }
+}

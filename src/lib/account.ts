@@ -18,6 +18,14 @@ export type CustomerOrderEntry = {
   watches: { id: string; productName: string; brand: string } | null;
 };
 
+export type CustomerSourcingEntry = {
+  id: string;
+  brand: string;
+  model: string | null;
+  status: string;
+  createdAt: string;
+};
+
 export type CustomerAccount = {
   userId: string;
   email: string;
@@ -26,6 +34,7 @@ export type CustomerAccount = {
   address: string | null;
   saved: SavedWatchEntry[];
   orders: CustomerOrderEntry[];
+  sourcing: CustomerSourcingEntry[];
 };
 
 export async function getCustomerAccount(): Promise<CustomerAccount | null> {
@@ -35,7 +44,7 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: profile }, { data: saved }, { data: orders }] = await Promise.all([
+  const [{ data: profile }, { data: saved }, { data: orders }, { data: sourcing }] = await Promise.all([
     supabase.from("customer_profiles").select("*").eq("userId", user.id).maybeSingle(),
     supabase
       .from("saved_watches")
@@ -45,6 +54,11 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
     supabase
       .from("orders")
       .select("id, status, createdAt, watches:products(id, productName, brand)")
+      .eq("userId", user.id)
+      .order("createdAt", { ascending: false }),
+    supabase
+      .from("sourcing_requests")
+      .select("id, brand, model, status, createdAt")
       .eq("userId", user.id)
       .order("createdAt", { ascending: false }),
   ]);
@@ -57,5 +71,6 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
     address: profile?.address ?? null,
     saved: (saved ?? []) as unknown as SavedWatchEntry[],
     orders: (orders ?? []) as unknown as CustomerOrderEntry[],
+    sourcing: (sourcing ?? []) as CustomerSourcingEntry[],
   };
 }

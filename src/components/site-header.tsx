@@ -3,7 +3,7 @@ import { getBrandMenu } from "@/lib/storefront";
 import { WatchesMenu } from "./watches-menu";
 import { AccountLink } from "./account-link";
 
-type Section = "home" | "watches" | "shop" | null;
+type Section = "home" | "watches" | "shop" | "sourcing" | null;
 
 // Storefront header (centred lockup): Home · Watches ▾ · Shop · Social ·
 // About on the left, wordmark centred, social/cart/CTA on the right.
@@ -23,6 +23,9 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
             <WatchesMenu brands={brands} active={active === "watches"} />
             <Link href="/collections/all" {...current("shop")}>
               Shop
+            </Link>
+            <Link href="/sourcing" {...current("sourcing")}>
+              Watch Sourcing
             </Link>
             <Link href="/#footer">Social</Link>
             <Link href="/#heritage">About</Link>
@@ -47,6 +50,7 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
                 </ul>
               </details>
               <Link href="/collections/all">Shop</Link>
+              <Link href="/sourcing">Watch Sourcing</Link>
               <Link href="/#footer">Social</Link>
               <Link href="/#heritage">About</Link>
             </nav>

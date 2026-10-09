@@ -2130,3 +2130,42 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+
+/* ---------- Sourcing detail ---------- */
+
+.admin-dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-xs) var(--space-lg);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.admin-dl dt {
+  color: var(--color-muted);
+}
+
+.admin-dl dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-dl__sub {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  font-weight: 500;
+  margin-top: var(--space-sm);
+}
+
+.admin-links {
+  margin: 0;
+  padding-left: 1.1em;
+  display: grid;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+}
+
+.admin-links a {
+  color: var(--color-accent-2);
+  overflow-wrap: anywhere;
+}

@@ -82,3 +82,52 @@ export async function sendMessageNotification(params: {
     console.error("Failed to send message notification email:", err);
   }
 }
+
+export async function sendSourcingNotification(params: {
+  id: string;
+  brand: string;
+  model: string | null;
+  budget: string;
+  condition: string;
+  boxPapers: string;
+  details: string | null;
+  referenceLinks: string[];
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string | null;
+  contactMethod: string;
+}) {
+  if (!resend || !notificationEmail) {
+    console.warn("Resend isn't configured — skipping sourcing notification email.");
+    return;
+  }
+
+  const watch = [params.brand, params.model].filter(Boolean).join(" ");
+  const lines = [
+    `New sourcing request: ${watch}`,
+    "",
+    `Budget: ${params.budget}`,
+    `Condition: ${params.condition}`,
+    `Box & papers: ${params.boxPapers}`,
+    params.details ? `\nDetails:\n${params.details}` : null,
+    params.referenceLinks.length ? `\nReferences:\n${params.referenceLinks.join("\n")}` : null,
+    "",
+    `From: ${params.contactName} <${params.contactEmail}>`,
+    params.contactPhone ? `Phone: ${params.contactPhone}` : null,
+    `Prefers: ${params.contactMethod}`,
+    "",
+    `View in admin: https://zesprit-watch.vercel.app/admin/sourcing/${params.id}`,
+  ].filter((line): line is string => line !== null);
+
+  try {
+    await resend.emails.send({
+      from: "Z’esprit Watch <no-reply@zespritwatch.com>",
+      to: notificationEmail,
+      replyTo: params.contactEmail,
+      subject: `Sourcing request — ${watch}`,
+      text: lines.join("\n"),
+    });
+  } catch (err) {
+    console.error("Failed to send sourcing notification email:", err);
+  }
+}

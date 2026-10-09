@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCustomerAccount } from "@/lib/account";
 import { signOutCustomer } from "./actions";
 import Image from "next/image";
+import { SOURCING_STATUSES, labelOf } from "@/lib/sourcing";
 
 export const dynamic = "force-dynamic";
 
@@ -112,6 +113,29 @@ export default async function AccountPage() {
                 <span className="account-page__muted">
                   {new Date(o.createdAt).toLocaleDateString()}
                 </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      <section className="account-page__section">
+        <div className="account-details__head">
+          <h2>Watch sourcing</h2>
+          <Link href="/sourcing">New request</Link>
+        </div>
+        {account.sourcing.length === 0 ? (
+          <p className="account-page__muted">
+            Looking for something specific? <Link href="/sourcing">Ask us to find it</Link>.
+          </p>
+        ) : (
+          <ul className="account-page__orders">
+            {account.sourcing.map((r) => (
+              <li key={r.id}>
+                <span>
+                  {r.brand} {r.model}
+                </span>
+                <span className="account-page__order-status">{labelOf(SOURCING_STATUSES, r.status)}</span>
+                <span className="account-page__muted">{new Date(r.createdAt).toLocaleDateString()}</span>
               </li>
             ))}
           </ul>

@@ -4,6 +4,7 @@ import { use, useActionState } from "react";
 import Link from "next/link";
 import { resendConfirmation, signUpCustomer, type AuthState } from "../actions";
 import { SocialButtons } from "../social-buttons";
+import { useKeepForm } from "@/lib/use-keep-form";
 
 function CheckEmail({ email, next }: { email: string; next: string }) {
   const [state, action, pending] = useActionState(resendConfirmation, { error: null } as AuthState);
@@ -44,6 +45,7 @@ export default function AccountSignupPage({ searchParams }: { searchParams: Prom
   const { next: nextParam } = use(searchParams);
   const next = nextParam?.startsWith("/") ? nextParam : "/account";
   const [state, formAction, pending] = useActionState(signUpCustomer, { error: null } as AuthState);
+  const keep = useKeepForm(formAction);
 
   if (state.message === "confirm" && state.email) return <CheckEmail email={state.email} next={next} />;
 
@@ -58,7 +60,7 @@ export default function AccountSignupPage({ searchParams }: { searchParams: Prom
 
         <SocialButtons next={next} />
 
-        <form className="auth-form" action={formAction}>
+        <form className="auth-form" action={formAction} onSubmit={keep}>
           <input type="hidden" name="next" value={next} />
           <label className="order-form__field">
             <span>Full name</span>

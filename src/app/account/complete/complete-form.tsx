@@ -3,13 +3,15 @@
 import { useActionState } from "react";
 import type { CustomerProfile } from "@/lib/customer";
 import { completeProfile, type AuthState } from "../actions";
+import { useKeepForm } from "@/lib/use-keep-form";
 
 export function CompleteForm({ profile, next, editing }: { profile: CustomerProfile; next: string; editing: boolean }) {
   const [state, action, pending] = useActionState(completeProfile, { error: null } as AuthState);
+  const keep = useKeepForm(action);
 
   return (
     <div className="auth-page">
-      <form className="order-form auth-card" action={action}>
+      <form className="order-form auth-card" action={action} onSubmit={keep}>
         <h1 className="order-form__title">{editing ? "Your details" : "One last step"}</h1>
         <p className="order-form__lede">
           {editing

@@ -240,13 +240,25 @@ button {
   transform: translateY(0);
 }
 
-@media (max-width: 60rem) {
+/* The desktop link row (6 items) needs room beside the centred wordmark:
+   full size from 1440px, tighter below, and folded into "Menu" under 72rem. */
+@media (max-width: 89.9rem) {
+  .nav-centered__links--desktop {
+    font-size: var(--text-base);
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 72rem) {
   .nav-centered__links--desktop {
     display: none;
   }
   .nav-centered__disclosure {
     display: block;
   }
+}
+
+@media (max-width: 60rem) {
   .nav-centered__links--mobile {
     position: absolute;
     top: calc(100% + var(--space-2xs));
@@ -2557,4 +2569,241 @@ a.showcase__tile:focus-visible {
 
 .social-auth__or {
   max-width: none;
+}
+
+/* ---------- Watch Sourcing (/sourcing) ---------- */
+/* Hallmark · component: sourcing request page · genre: editorial · theme: custom (brass/ivory/oxblood)
+ * states: default · hover · focus · active · disabled/pending · error · success · signed-out gate
+ */
+
+.sourcing-page {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--space-3xl);
+  align-items: start;
+  max-width: 82rem;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--page-gutter) var(--space-3xl);
+}
+
+.sourcing-intro {
+  position: sticky;
+  top: var(--space-xl);
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.sourcing-intro__title {
+  font-size: var(--text-display-s);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.sourcing-intro__lede {
+  font-size: var(--text-md);
+  color: var(--color-ink-2);
+  max-width: 34ch;
+}
+
+.sourcing-steps {
+  list-style: none;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.sourcing-steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.sourcing-steps__num {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: var(--rule-hair) solid var(--color-accent);
+  color: var(--color-accent-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.sourcing-steps__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  margin-bottom: var(--space-3xs);
+}
+
+.sourcing-steps p:not(.sourcing-steps__title) {
+  color: var(--color-ink-2);
+}
+
+.sourcing-card {
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--color-paper-light);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.sourcing-card .account-gate {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.sourcing-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0 0 var(--space-lg);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.sourcing-fieldset legend {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  padding: 0;
+  margin-bottom: var(--space-sm);
+}
+
+.sourcing-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.sourcing-card .order-form__field input,
+.sourcing-card .order-form__field textarea,
+.sourcing-card .order-form__field select,
+.sourcing-link-input {
+  width: 100%;
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--color-ink);
+  background: var(--color-paper-light);
+  border: var(--rule-hair) solid color-mix(in oklch, var(--color-ink) 18%, transparent);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm) var(--space-md);
+  transition: border-color var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
+}
+
+.sourcing-card .order-form__field input:hover,
+.sourcing-card .order-form__field textarea:hover,
+.sourcing-card .order-form__field select:hover,
+.sourcing-link-input:hover {
+  border-color: color-mix(in oklch, var(--color-ink) 32%, transparent);
+}
+
+.sourcing-card .order-form__field input:focus-visible,
+.sourcing-card .order-form__field textarea:focus-visible,
+.sourcing-card .order-form__field select:focus-visible,
+.sourcing-link-input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-focus) 28%, transparent);
+}
+
+.sourcing-link-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.sourcing-remove {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-control);
+  border: var(--rule-hair) solid color-mix(in oklch, var(--color-ink) 18%, transparent);
+  background: transparent;
+  color: var(--color-ink-2);
+  font-size: var(--text-md);
+  cursor: pointer;
+}
+
+.sourcing-remove:hover {
+  color: var(--color-accent-2);
+  border-color: var(--color-accent-2);
+}
+
+.sourcing-remove:focus-visible,
+.sourcing-link-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.sourcing-link-btn {
+  justify-self: start;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-accent-2);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.sourcing-hint {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.sourcing-card .order-form__error {
+  border-radius: var(--radius-control);
+}
+
+.sourcing-submit {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.sourcing-submit:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.sourcing-card--done {
+  gap: var(--space-sm);
+}
+
+.sourcing-card__done-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
+}
+
+@media (max-width: 60rem) {
+  .sourcing-page {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+  .sourcing-intro {
+    position: static;
+  }
+}
+
+@media (max-width: 40rem) {
+  .sourcing-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sourcing-card {
+    padding: var(--space-lg);
+  }
 }

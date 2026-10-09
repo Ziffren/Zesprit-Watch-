@@ -4,11 +4,13 @@ import { useActionState } from "react";
 import { SignedInAs } from "@/components/account-gate";
 import type { CustomerProfile } from "@/lib/customer";
 import { submitOrder, type SubmitOrderState } from "./actions";
+import { useKeepForm } from "@/lib/use-keep-form";
 
 // Shown only to signed-in customers with complete details (see page.tsx).
 export function OrderForm({ watchId, profile }: { watchId: string; profile: CustomerProfile }) {
   const action = submitOrder.bind(null, watchId);
   const [state, formAction, pending] = useActionState(action, { status: "idle" } as SubmitOrderState);
+  const keep = useKeepForm(formAction);
 
   if (state.status === "success") {
     return (
@@ -23,7 +25,7 @@ export function OrderForm({ watchId, profile }: { watchId: string; profile: Cust
   }
 
   return (
-    <form className="order-form" action={formAction}>
+    <form className="order-form" action={formAction} onSubmit={keep}>
       <h2 className="order-form__title">Request this piece</h2>
       <p className="order-form__lede">We&rsquo;ll follow up directly — no payment is taken here.</p>
       <SignedInAs name={profile.name} email={profile.email} phone={profile.phone} />
