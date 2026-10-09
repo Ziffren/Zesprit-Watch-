@@ -2911,3 +2911,366 @@ a.showcase__tile:focus-visible {
 .hold-notice {
   border-left: 3px solid var(--color-accent);
 }
+
+/* ---------- Product page v2 — Shopify-style layout ---------- */
+/* Hallmark · component: product detail (gallery + buy + accordions) · genre: editorial · theme: custom (brass/ivory/oxblood)
+ * states: default · hover · focus · active · disabled/pending · error · success · on hold · sold · signed-out
+ */
+
+.watch-detail {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--space-2xl);
+  max-width: 82rem;
+  padding-top: var(--space-xl);
+}
+
+/* Gallery: landscape 3:2 photos, lead full width, then a 2-up grid. */
+.gallery {
+  gap: var(--space-md);
+}
+
+.gallery__item,
+.gallery__item:first-child,
+.gallery__item:nth-child(n + 2):last-child:nth-child(even) {
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-control);
+}
+
+.watch-detail__info {
+  gap: var(--space-md);
+  padding-top: 0;
+}
+
+.watch-detail__title {
+  font-size: clamp(2rem, 1.2rem + 1.6vw, 3rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.watch-detail__price {
+  font-size: var(--text-md);
+  letter-spacing: 0.04em;
+  margin-top: calc(var(--space-2xs) * -1);
+}
+
+/* Buy buttons */
+.buy-buttons {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.buy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 var(--space-lg);
+  font: inherit;
+  font-size: var(--text-base);
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+  color: var(--color-ink);
+  background: transparent;
+  border: var(--rule-hair) solid var(--color-ink);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out),
+    transform var(--dur-micro) var(--ease-out);
+}
+
+.buy-btn:hover {
+  background: color-mix(in oklch, var(--color-ink) 6%, transparent);
+}
+
+.buy-btn:active {
+  transform: translateY(1px);
+}
+
+.buy-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.buy-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.buy-btn--primary {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.buy-btn--primary:hover {
+  background: var(--color-accent-2);
+  border-color: var(--color-accent-2);
+}
+
+.buy-btn--small {
+  min-height: 40px;
+  justify-self: start;
+  font-size: var(--text-sm);
+}
+
+.buy-note {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.buy-note a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Status (on hold / sold) */
+.status-notice {
+  margin-top: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-paper-2);
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  display: grid;
+  gap: var(--space-2xs);
+  color: var(--color-ink-2);
+}
+
+.status-notice__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  color: var(--color-ink);
+}
+
+.status-notice a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Accordions */
+.accordions {
+  margin-top: var(--space-md);
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.accordion {
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+
+.accordion summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+  font-size: var(--text-base);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  list-style: none;
+}
+
+.accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion summary::after {
+  content: "";
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  border-right: 1.3px solid currentColor;
+  border-bottom: 1.3px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--dur-short) var(--ease-out);
+}
+
+.accordion[open] summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.accordion summary:hover {
+  color: var(--color-accent-2);
+}
+
+.accordion summary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.accordion__icon {
+  flex: none;
+  color: var(--color-ink-2);
+}
+
+.accordion__body {
+  padding: 0 0 var(--space-lg) calc(20px + var(--space-sm));
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.accordion__list {
+  margin: 0;
+  padding-left: 1.1em;
+  display: grid;
+  gap: var(--space-xs);
+  color: var(--color-ink-2);
+}
+
+.accordion-note {
+  color: var(--color-ink-2);
+}
+
+.accordion-note a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.piece-message {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.piece-message textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--color-ink);
+  background: var(--color-paper-light);
+  border: var(--rule-hair) solid color-mix(in oklch, var(--color-ink) 18%, transparent);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.piece-message textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-focus) 28%, transparent);
+}
+
+/* Share + save row */
+.watch-detail__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+  background: none;
+  border: 0;
+  padding: var(--space-2xs) 0;
+  cursor: pointer;
+}
+
+.share-btn:hover {
+  color: var(--color-accent-2);
+}
+
+.share-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Buy / deposit dialog */
+.buy-dialog {
+  /* The site-wide reset zeroes margins; a modal <dialog> centres with auto. */
+  margin: auto;
+  width: min(32rem, calc(100vw - 2 * var(--page-gutter)));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--color-paper-light);
+  box-shadow: var(--shadow-card);
+  color: var(--color-ink);
+}
+
+.buy-dialog[open] {
+  animation: buy-dialog-in var(--dur-short) var(--ease-out);
+}
+
+.buy-dialog::backdrop {
+  background: color-mix(in oklch, var(--color-ink) 45%, transparent);
+}
+
+@keyframes buy-dialog-in {
+  from { opacity: 0; translate: 0 8px; }
+}
+
+.buy-dialog__body {
+  position: relative;
+  padding: var(--space-lg);
+}
+
+.buy-dialog__body .order-form,
+.buy-dialog__body .order-form__success {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.buy-dialog__body .order-form .cta-solid {
+  width: 100%;
+  min-height: 48px;
+  border-radius: var(--radius-control);
+}
+
+.buy-dialog__body .order-form__field textarea {
+  border-radius: var(--radius-control);
+}
+
+.buy-dialog__close {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  font-size: var(--text-lg);
+  line-height: 1;
+  color: var(--color-ink-2);
+  cursor: pointer;
+}
+
+.buy-dialog__close:hover {
+  background: var(--color-paper-2);
+}
+
+.buy-dialog__close:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+@media (max-width: 60rem) {
+  /* Must follow the v2 desktop rule above, or it would keep two columns. */
+  .watch-detail {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+  }
+  .gallery__item,
+  .gallery__item:first-child,
+  .gallery__item:nth-child(n + 2):last-child:nth-child(even) {
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buy-dialog[open] {
+    animation: none;
+  }
+  .accordion summary::after {
+    transition: none;
+  }
+}

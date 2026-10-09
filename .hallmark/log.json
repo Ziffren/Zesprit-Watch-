@@ -190,5 +190,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "owner photography via site_images slots",
     "brief": "Slot 1 hero photo with headline over scrim; slots 2-5 feature/promo/promo/wide mosaic that re-spans when slots are empty; admin slot cards with mini homepage map"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "product detail v2 — Shopify-style: 3:2 gallery, title/price, Buy + Deposit buttons with dialogs, icon accordions (Description, Quality promise, Message, Shipping), share/save",
+    "theme": "custom (locked tokens)",
+    "enrichment": "none",
+    "brief": "Replace the long request form with buttons; sign-in required to buy"
   }
 ]

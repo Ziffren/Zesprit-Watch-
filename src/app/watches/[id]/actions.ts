@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCustomer } from "@/lib/customer";
 import { revalidatePath } from "next/cache";
-import { sendDepositInstructions, sendDepositNotification, sendOrderNotification } from "@/lib/email";
+import { sendDepositInstructions, sendDepositNotification, sendMessageNotification, sendOrderNotification } from "@/lib/email";
 import { getShopSettings } from "@/lib/deposits";
 
 export type SubmitOrderState = {
@@ -149,4 +149,40 @@ export async function submitDeposit(
     holdDays: settings.holdDays,
     paymentInstructions: settings.paymentInstructions,
   };
+}
+
+export type PieceMessageState = { status: "idle" | "success" | "error"; message?: string };
+
+// "Message" panel on a product page: a question about this specific piece,
+// delivered to the admin inbox (messages) with the watch referenced.
+export async function sendPieceMessage(
+  watchId: string,
+  _prev: PieceMessageState,
+  formData: FormData,
+): Promise<PieceMessageState> {
+  const customer = await getCustomer();
+  if (customer.status === "signed-out") return { status: "error", message: "Please sign in to send a message." };
+  if (customer.status === "incomplete") return { status: "error", message: "Please add your phone and address first." };
+  const { profile } = customer;
+  const text = String(formData.get("message") ?? "").trim();
+  if (!text) return { status: "error", message: "Write your question first." };
+
+  const supabase = await createClient();
+  const { data: watch } = await supabase.from("products").select("productName").eq("id", watchId).maybeSingle();
+  const title = watch?.productName ?? "a watch";
+  const body = `About: ${title}\nhttps://zesprit-watch.vercel.app/watches/${watchId}\n\n${text}`;
+
+  const messageId = crypto.randomUUID();
+  const { error } = await supabase.from("messages").insert({
+    id: messageId,
+    userId: profile.userId,
+    name: profile.name,
+    email: profile.email,
+    phone: profile.phone,
+    message: body,
+  });
+  if (error) return { status: "error", message: "Something went wrong — please try again." };
+
+  await sendMessageNotification({ name: profile.name!, email: profile.email, phone: profile.phone, message: body, messageId });
+  return { status: "success" };
 }

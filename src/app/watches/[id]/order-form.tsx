@@ -15,7 +15,7 @@ export function OrderForm({ watchId, profile }: { watchId: string; profile: Cust
   if (state.status === "success") {
     return (
       <div className="order-form__success">
-        <p className="order-form__success-title">Request sent.</p>
+        <p className="order-form__success-title">Purchase request sent.</p>
         <p>
           Thank you — we&rsquo;ll be in touch within one business day to talk through the piece and next steps.
           You can follow it under <a href="/account">your account</a>.
@@ -26,8 +26,10 @@ export function OrderForm({ watchId, profile }: { watchId: string; profile: Cust
 
   return (
     <form className="order-form" action={formAction} onSubmit={keep}>
-      <h2 className="order-form__title">Request this piece</h2>
-      <p className="order-form__lede">We&rsquo;ll follow up directly — no payment is taken here.</p>
+      <h2 className="order-form__title">Buy this watch</h2>
+      <p className="order-form__lede">
+        Send us your purchase request — we&rsquo;ll contact you to confirm payment and shipping. No payment is taken here.
+      </p>
       <SignedInAs name={profile.name} email={profile.email} phone={profile.phone} />
 
       <label className="order-form__field">
@@ -42,7 +44,7 @@ export function OrderForm({ watchId, profile }: { watchId: string; profile: Cust
       )}
 
       <button className="cta-solid" type="submit" disabled={pending}>
-        {pending ? "Sending…" : "Send request"}
+        {pending ? "Sending…" : "Send purchase request"}
       </button>
     </form>
   );
