@@ -2406,3 +2406,51 @@ a.showcase__tile:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- Legal pages (/privacy) ---------- */
+
+.legal-page {
+  padding: var(--space-2xl) var(--page-gutter) var(--space-3xl);
+}
+
+.legal-page__body {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.legal-page__body h1 {
+  font-size: var(--text-display-s);
+  line-height: 1.05;
+  margin-bottom: var(--space-lg);
+  overflow-wrap: anywhere;
+}
+
+.legal-page__body h2 {
+  font-size: var(--text-xl);
+  margin: var(--space-xl) 0 var(--space-sm);
+  scroll-margin-top: var(--space-xl);
+}
+
+.legal-page__body p,
+.legal-page__body li {
+  color: var(--color-ink-2);
+  max-width: none;
+}
+
+.legal-page__body ul {
+  padding-left: 1.2em;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.legal-page__body a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+}
+
+.legal-page__updated {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  margin-bottom: var(--space-xs);
+}

@@ -33,7 +33,7 @@ export default async function ContactPage() {
         <p className="tagline muted">Vintage watches, restored to keep time again.</p>
         <p className="links muted">
           <Link href="/journal">Journal</Link> · Care Guide ·{" "}
-          <Link href="/contact">Contact</Link>
+          <Link href="/contact">Contact</Link> · <Link href="/privacy">Privacy</Link>
         </p>
       </footer>
     </>
