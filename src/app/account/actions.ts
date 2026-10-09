@@ -139,8 +139,20 @@ export async function completeProfile(_prev: AuthState, formData: FormData): Pro
   } = await supabase.auth.getUser();
   if (!user) redirect(`/account/login?next=${encodeURIComponent(next)}`);
 
-  const { error } = await supabase.from("customer_profiles").update(details).eq("userId", user.id);
+  // Update the profile row; older accounts may not have one yet, so create
+  // it if the update matched nothing — never report success for a no-op.
+  const { data: updated, error } = await supabase
+    .from("customer_profiles")
+    .update(details)
+    .eq("userId", user.id)
+    .select("userId");
   if (error) return { error: "Couldn't save your details — please try again." };
+  if (!updated || updated.length === 0) {
+    const { error: insertError } = await supabase
+      .from("customer_profiles")
+      .insert({ userId: user.id, email: user.email ?? "", ...details });
+    if (insertError) return { error: "Couldn't save your details — please try again." };
+  }
 
   revalidatePath("/account");
   redirect(next);
