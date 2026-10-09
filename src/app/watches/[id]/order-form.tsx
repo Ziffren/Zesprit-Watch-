@@ -1,20 +1,22 @@
 "use client";
 
 import { useActionState } from "react";
+import { SignedInAs } from "@/components/account-gate";
+import type { CustomerProfile } from "@/lib/customer";
 import { submitOrder, type SubmitOrderState } from "./actions";
 
-export function OrderForm({ watchId }: { watchId: string }) {
+// Shown only to signed-in customers with complete details (see page.tsx).
+export function OrderForm({ watchId, profile }: { watchId: string; profile: CustomerProfile }) {
   const action = submitOrder.bind(null, watchId);
-  const initialState: SubmitOrderState = { status: "idle" };
-  const [state, formAction, pending] = useActionState(action, initialState);
+  const [state, formAction, pending] = useActionState(action, { status: "idle" } as SubmitOrderState);
 
   if (state.status === "success") {
     return (
       <div className="order-form__success">
         <p className="order-form__success-title">Request sent.</p>
         <p>
-          Thank you — we&rsquo;ve received your request and will be in touch within one
-          business day to talk through the piece and next steps.
+          Thank you — we&rsquo;ll be in touch within one business day to talk through the piece and next steps.
+          You can follow it under <a href="/account">your account</a>.
         </p>
       </div>
     );
@@ -23,39 +25,13 @@ export function OrderForm({ watchId }: { watchId: string }) {
   return (
     <form className="order-form" action={formAction}>
       <h2 className="order-form__title">Request this piece</h2>
-      <p className="order-form__lede">
-        Tell us a little about you and we&rsquo;ll follow up directly — no payment is taken
-        here.
-      </p>
-
-      <label className="order-form__field">
-        <span>Name</span>
-        <input type="text" name="customerName" autoComplete="name" required />
-      </label>
-
-      <label className="order-form__field">
-        <span>Email</span>
-        <input type="email" name="customerEmail" autoComplete="email" required />
-      </label>
-
-      <label className="order-form__field">
-        <span>Phone (optional)</span>
-        <input type="tel" name="customerPhone" autoComplete="tel" />
-      </label>
+      <p className="order-form__lede">We&rsquo;ll follow up directly — no payment is taken here.</p>
+      <SignedInAs name={profile.name} email={profile.email} phone={profile.phone} />
 
       <label className="order-form__field">
         <span>Message (optional)</span>
         <textarea name="message" rows={3} placeholder="Anything we should know?" />
       </label>
-
-      {/* Honeypot — hidden from real visitors via CSS, not `type="hidden"`,
-          so basic bots that only skip hidden inputs still fill it. */}
-      <div className="order-form__honeypot" aria-hidden="true">
-        <label>
-          Company
-          <input type="text" name="company" tabIndex={-1} autoComplete="off" />
-        </label>
-      </div>
 
       {state.status === "error" && (
         <p className="order-form__error" role="alert">

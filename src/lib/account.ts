@@ -23,6 +23,7 @@ export type CustomerAccount = {
   email: string;
   name: string | null;
   phone: string | null;
+  address: string | null;
   saved: SavedWatchEntry[];
   orders: CustomerOrderEntry[];
 };
@@ -53,6 +54,7 @@ export async function getCustomerAccount(): Promise<CustomerAccount | null> {
     email: profile?.email ?? user.email ?? "",
     name: profile?.name ?? null,
     phone: profile?.phone ?? null,
+    address: profile?.address ?? null,
     saved: (saved ?? []) as unknown as SavedWatchEntry[],
     orders: (orders ?? []) as unknown as CustomerOrderEntry[],
   };

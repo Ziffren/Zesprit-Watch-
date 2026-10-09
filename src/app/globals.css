@@ -2169,3 +2169,240 @@ a.showcase__tile:focus-visible {
     transition: none;
   }
 }
+
+/* ---------- Customer accounts: sign-in options, gates, details ---------- */
+/* Hallmark · component: auth + account gate · genre: editorial · theme: custom (brass/ivory/oxblood)
+ * states: default · hover · focus · active · disabled/pending · error · success (confirmed / resent)
+ * Note: the Google/Facebook marks keep their official brand colours (provider logo guidelines).
+ */
+
+.auth-form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.social-auth {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.social-auth__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: 46px;
+  padding: 0 var(--space-md);
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--color-ink);
+  background: var(--color-paper-light);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
+}
+
+.social-auth__btn:hover:not(:disabled) {
+  background: var(--color-paper);
+  border-color: var(--color-ink);
+}
+
+.social-auth__btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.social-auth__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.social-auth__btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.social-auth__or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-xs) 0;
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.social-auth__or::before,
+.social-auth__or::after {
+  content: "";
+  flex: 1;
+  border-top: var(--rule-hair) solid var(--color-rule);
+}
+
+.auth-note {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.auth-note__error {
+  color: var(--color-accent-2);
+}
+
+.auth-field-hint {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+.auth-link-btn {
+  font: inherit;
+  color: var(--color-accent-2);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.auth-link-btn:disabled {
+  color: var(--color-muted);
+  cursor: progress;
+}
+
+.auth-success {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: color-mix(in oklch, var(--color-accent) 14%, var(--color-paper));
+  border: var(--rule-hair) solid color-mix(in oklch, var(--color-accent) 55%, transparent);
+  font-size: var(--text-sm);
+}
+
+.auth-card--center {
+  text-align: center;
+  justify-items: center;
+}
+
+.auth-mail-icon {
+  width: 52px;
+  height: 52px;
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+/* Replaces a form that needs an account. */
+.account-gate {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+}
+
+.account-gate__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+}
+
+.account-gate p {
+  color: var(--color-ink-2);
+}
+
+.account-gate__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.account-gate .cta-solid {
+  justify-self: start;
+}
+
+.account-gate__secondary {
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule-2);
+  text-underline-offset: 3px;
+}
+
+.account-gate__secondary:hover {
+  text-decoration-color: var(--color-accent-2);
+}
+
+.signed-in-as {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-paper);
+  border-left: 2px solid var(--color-accent);
+  overflow-wrap: anywhere;
+}
+
+/* Account page — details block */
+.account-details__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-md);
+}
+
+.account-details__warn {
+  margin-bottom: var(--space-md);
+}
+
+.account-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md) var(--space-xl);
+  margin: 0;
+}
+
+.account-details dt {
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: var(--space-2xs);
+}
+
+.account-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.account-details__address {
+  white-space: pre-line;
+}
+
+/* Header account entry */
+.account-link {
+  align-items: center;
+  gap: var(--space-2xs);
+  text-decoration: none;
+}
+
+.account-link__label {
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 60rem) {
+  .account-link__label {
+    display: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .account-details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

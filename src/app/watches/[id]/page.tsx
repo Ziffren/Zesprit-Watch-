@@ -4,6 +4,8 @@ import { getRelatedPieces, getWatchDetail } from "@/lib/storefront";
 import { formatPrice } from "@/lib/admin/types";
 import { PieceBadges, PiecePrice, ProductCard } from "@/components/product-card";
 import { SiteHeader } from "@/components/site-header";
+import { AccountGate } from "@/components/account-gate";
+import { getCustomer } from "@/lib/customer";
 import { OrderForm } from "./order-form";
 import { SaveButton } from "./save-button";
 import { ProductGallery } from "./product-gallery";
@@ -18,7 +20,7 @@ export default async function WatchDetailPage({
 
   if (!watch) notFound();
 
-  const related = await getRelatedPieces(watch.brand, watch.id);
+  const [related, customer] = await Promise.all([getRelatedPieces(watch.brand, watch.id), getCustomer()]);
 
   return (
     <>
@@ -45,7 +47,11 @@ export default async function WatchDetailPage({
             </div>
 
             {watch.status === "AVAILABLE" ? (
-              <OrderForm watchId={watch.id} />
+              customer.status === "ready" ? (
+                <OrderForm watchId={watch.id} profile={customer.profile} />
+              ) : (
+                <AccountGate customer={customer} next={`/watches/${watch.id}`} action="request this piece" />
+              )
             ) : (
               <div className="order-form__success">
                 <p className="order-form__success-title">This piece has found its home.</p>

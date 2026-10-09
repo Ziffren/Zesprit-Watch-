@@ -25,6 +25,33 @@ export default async function AccountPage() {
       </header>
 
       <section className="account-page__section">
+        <div className="account-details__head">
+          <h2>Your details</h2>
+          <Link href="/account/complete?edit=1">Edit details</Link>
+        </div>
+        {!account.phone || !account.address ? (
+          <p className="auth-success account-details__warn">
+            Your phone or address is missing — <Link href="/account/complete">add them</Link> to request pieces or
+            message us.
+          </p>
+        ) : null}
+        <dl className="account-details">
+          <div>
+            <dt>Name</dt>
+            <dd>{account.name ?? "—"}</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd>{account.phone ?? "—"}</dd>
+          </div>
+          <div>
+            <dt>Address</dt>
+            <dd className="account-details__address">{account.address ?? "—"}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="account-page__section">
         <h2>Saved pieces</h2>
         {account.saved.length === 0 ? (
           <p className="account-page__muted">

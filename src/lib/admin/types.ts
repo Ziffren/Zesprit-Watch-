@@ -71,6 +71,7 @@ export type Customer = {
   email: string;
   name: string | null;
   phone: string | null;
+  address: string | null;
   createdAt: string;
 };
 

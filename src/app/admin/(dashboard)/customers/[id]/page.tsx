@@ -90,6 +90,11 @@ export default async function CustomerDetailPage({
               </p>
               <p className="admin-hint">{customer.email}</p>
               {customer.phone && <p className="admin-hint">{customer.phone}</p>}
+              {customer.address && (
+                <p className="admin-hint" style={{ whiteSpace: "pre-line" }}>
+                  {customer.address}
+                </p>
+              )}
               <p className="admin-hint">
                 Joined {new Date(customer.createdAt).toLocaleDateString()}
               </p>

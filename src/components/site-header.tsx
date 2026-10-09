@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getBrandMenu } from "@/lib/storefront";
 import { WatchesMenu } from "./watches-menu";
+import { AccountLink } from "./account-link";
 
 type Section = "home" | "watches" | "shop" | null;
 
@@ -80,6 +81,7 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
               />
             </svg>
           </a>
+          <AccountLink />
           <a className="icon-link cart-link" href="#" aria-label="View cart, 0 items">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
