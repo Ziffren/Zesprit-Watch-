@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { BRAND_LIST_SLOT, SITE_IMAGE_COLUMNS, SITE_IMAGE_SLOTS, bySlot, type SiteImage } from "@/lib/site-images";
+import { BRAND_LIST_SLOT, LOGO_SLOT, SITE_IMAGE_COLUMNS, SITE_IMAGE_SLOTS, bySlot, type SiteImage } from "@/lib/site-images";
 import { BrandListForm, type LinkOption } from "./brand-list-form";
+import { LogoForm } from "./logo-form";
 import { SlotForm } from "./slot-form";
 
 export default async function SiteImagesPage() {
@@ -26,8 +27,8 @@ export default async function SiteImagesPage() {
       </header>
       <div className="admin-content">
         <p className="admin-hint" style={{ marginBottom: "var(--space-lg)", maxWidth: "62ch" }}>
-          The five image areas on the homepage, in the order they appear. Each can hold several photos — more
-          than one plays as a slideshow. Each saves on its own; an empty area simply isn&rsquo;t shown. {live}/5 showing.
+          The image areas of the site, in the order they appear. Each can hold several photos — more
+          than one plays as a slideshow. Each saves on its own; an empty area simply isn&rsquo;t shown. {live}/{SITE_IMAGE_SLOTS.length} in use.
         </p>
         {error && (
           <p className="admin-form__error" role="alert">
@@ -36,7 +37,9 @@ export default async function SiteImagesPage() {
         )}
         <div className="slot-list">
           {SITE_IMAGE_SLOTS.map((s) => (
-            s.slot === BRAND_LIST_SLOT ? (
+            s.slot === LOGO_SLOT ? (
+              <LogoForm key={s.slot} image={images[s.slot]} where={s.where} ratio={s.ratio} />
+            ) : s.slot === BRAND_LIST_SLOT ? (
               <BrandListForm key={s.slot} image={images[s.slot]} options={options} where={s.where} ratio={s.ratio} />
             ) : (
               <SlotForm key={s.slot} image={images[s.slot]} label={s.label} where={s.where} ratio={s.ratio} />

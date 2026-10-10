@@ -4888,3 +4888,25 @@ a.brand-tile:focus-visible {
     transition: none;
   }
 }
+
+/* Header logo (Admin → Website images → Logo), replacing the wordmark. */
+.nav-centered__logo {
+  display: block;
+  height: 3.25rem;
+  width: auto;
+  max-width: min(16rem, 40vw);
+  object-fit: contain;
+}
+
+@media (max-width: 78rem) {
+  .nav-centered__logo {
+    height: 2.75rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .nav-centered__logo {
+    height: 2.25rem;
+    max-width: 8.5rem;
+  }
+}

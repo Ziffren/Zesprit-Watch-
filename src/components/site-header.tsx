@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getBrandMenu } from "@/lib/storefront";
+import { getSiteLogo } from "@/lib/site-images";
 import { WatchesMenu } from "./watches-menu";
 import { AccountLink } from "./account-link";
 import { MessageMe } from "./message-me";
@@ -12,7 +13,7 @@ type Section = "home" | "watches" | "shop" | "sourcing" | "reviews" | null;
 // About on the left, wordmark centred, social/cart/CTA on the right.
 // "Watches" opens the brand menu; on phones everything folds into "Menu".
 export async function SiteHeader({ active = null }: { active?: Section }) {
-  const brands = await getBrandMenu();
+  const [brands, logo] = await Promise.all([getBrandMenu(), getSiteLogo()]);
   const current = (s: Section) => (s === active ? { className: "is-active", "aria-current": "page" as const } : {});
 
   return (
@@ -60,14 +61,22 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
 
         <div className="nav-centered__center">
           <Sticker kind="sourcing" active={active === "sourcing"} />
-          <Link className="nav-centered__brand" href="/" aria-label="Z’esprit Watch — home">
-          <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-            <path d="M7 23a13 13 0 0 1 26 0" stroke="var(--color-ink)" strokeWidth="1.5" />
-            <line x1="6" y1="23" x2="34" y2="23" stroke="var(--color-ink)" strokeWidth="1.5" />
-            <line x1="20" y1="23" x2="20" y2="12" stroke="var(--color-accent-2)" strokeWidth="1.5" />
-            <circle cx="20" cy="23" r="2" fill="var(--color-ink)" />
-          </svg>
-          <span className="nav-centered__wordmark">Z&rsquo;esprit Watch</span>
+          <Link className={logo ? "nav-centered__brand nav-centered__brand--logo" : "nav-centered__brand"} href="/" aria-label="Z’esprit Watch — home">
+            {logo ? (
+              // Uploaded in Admin → Website images → Logo. Plain <img> so SVG logos work too.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="nav-centered__logo" src={logo.url} alt={logo.alt} />
+            ) : (
+              <>
+                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                  <path d="M7 23a13 13 0 0 1 26 0" stroke="var(--color-ink)" strokeWidth="1.5" />
+                  <line x1="6" y1="23" x2="34" y2="23" stroke="var(--color-ink)" strokeWidth="1.5" />
+                  <line x1="20" y1="23" x2="20" y2="12" stroke="var(--color-accent-2)" strokeWidth="1.5" />
+                  <circle cx="20" cy="23" r="2" fill="var(--color-ink)" />
+                </svg>
+                <span className="nav-centered__wordmark">Z&rsquo;esprit Watch</span>
+              </>
+            )}
           </Link>
           <Sticker kind="reviews" active={active === "reviews"} />
         </div>

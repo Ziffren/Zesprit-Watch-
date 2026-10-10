@@ -34,7 +34,15 @@ export const SITE_IMAGE_SLOTS = [
     where: "Full-width banner after the Brand List.",
     ratio: "3:1 panoramic · 2700 × 900 px or larger",
   },
+  {
+    slot: 6,
+    label: "Logo",
+    where: "Site logo in the header (centre), in place of the text wordmark.",
+    ratio: "PNG with transparent background or SVG · about 600 × 200 px",
+  },
 ] as const;
+
+export const LOGO_SLOT = 6;
 
 export type BrandTile = { url: string; label: string; href: string };
 
@@ -93,5 +101,17 @@ export async function getSiteImages(): Promise<Record<SiteImageSlot, SiteImage>>
     return bySlot(data as Partial<SiteImage>[] | null);
   } catch {
     return bySlot([]);
+  }
+}
+
+// Header logo (slot 6) — just the URL + alt, null when none is uploaded.
+export async function getSiteLogo(): Promise<{ url: string; alt: string } | null> {
+  if (!isSupabaseConfigured) return null;
+  try {
+    const supabase = createPublicClient();
+    const { data } = await supabase.from("site_images").select("imageUrl, alt").eq("slot", LOGO_SLOT).maybeSingle();
+    return data?.imageUrl ? { url: data.imageUrl, alt: data.alt || "Z’esprit Watch" } : null;
+  } catch {
+    return null;
   }
 }

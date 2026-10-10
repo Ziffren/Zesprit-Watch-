@@ -2480,3 +2480,39 @@
     width: 3.5rem;
   }
 }
+
+/* Website images → Logo (block 6) */
+.logo-form__body {
+  display: grid;
+  gap: var(--space-md);
+  max-width: 34rem;
+}
+
+.logo-form__preview {
+  display: grid;
+  place-items: center;
+  min-height: 7rem;
+  padding: var(--space-lg);
+  background: var(--color-paper);
+  border: 1px dashed var(--admin-input-border);
+  border-radius: var(--admin-card-radius);
+}
+
+.logo-form__preview img {
+  height: 3.25rem;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.logo-form__placeholder {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-muted);
+}
+
+.logo-form__actions {
+  display: flex;
+  gap: var(--space-xs);
+}
