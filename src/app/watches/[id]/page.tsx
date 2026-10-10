@@ -64,6 +64,7 @@ export default async function WatchDetailPage({
 
             {watch.status === "AVAILABLE" ? (
               <BuyButtons
+                watchId={watch.id}
                 gate={{ kind: customer.status === "ready" ? "ready" : customer.status }}
                 next={`/watches/${watch.id}`}
                 buyForm={customer.status === "ready" ? <OrderForm watchId={watch.id} profile={customer.profile} /> : null}
@@ -94,6 +95,8 @@ export default async function WatchDetailPage({
                 profile={customer.status === "ready" ? customer.profile : null}
               />
             )}
+
+            <SaveButton watchId={watch.id} />
 
             <div className="accordions">
               {watch.descriptionHtml && (
@@ -163,7 +166,6 @@ export default async function WatchDetailPage({
 
             <div className="watch-detail__actions">
               <ShareButton title={watch.name} />
-              <SaveButton watchId={watch.id} />
             </div>
           </div>
         </section>

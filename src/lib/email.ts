@@ -214,3 +214,38 @@ export async function sendDepositInstructions(params: {
     console.error("Failed to send deposit instructions email:", err);
   }
 }
+
+// One notification for a whole-cart purchase request.
+export async function sendCartNotification(params: {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  note: string | null;
+  items: { orderId: string; title: string; price: string }[];
+}) {
+  if (!resend || !notificationEmail) {
+    console.warn("Resend isn't configured — skipping cart notification email.");
+    return;
+  }
+  const lines = [
+    `New purchase request — ${params.items.length} watch${params.items.length > 1 ? "es" : ""} from the cart`,
+    "",
+    ...params.items.map((i) => `• ${i.title} — ${i.price}\n  https://zesprit-watch.vercel.app/admin/orders/${i.orderId}`),
+    "",
+    `Name: ${params.customerName}`,
+    `Email: ${params.customerEmail}`,
+    params.customerPhone ? `Phone: ${params.customerPhone}` : null,
+    params.note ? `\nNote:\n${params.note}` : null,
+  ].filter((l): l is string => l !== null);
+  try {
+    await resend.emails.send({
+      from: "Z’esprit Watch <no-reply@zespritwatch.com>",
+      to: notificationEmail,
+      replyTo: params.customerEmail,
+      subject: `Purchase request — ${params.items.length} watch${params.items.length > 1 ? "es" : ""}`,
+      text: lines.join("\n"),
+    });
+  } catch (err) {
+    console.error("Failed to send cart notification email:", err);
+  }
+}

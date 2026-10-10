@@ -3,6 +3,7 @@ import { getBrandMenu } from "@/lib/storefront";
 import { WatchesMenu } from "./watches-menu";
 import { AccountLink } from "./account-link";
 import { MessageMe } from "./message-me";
+import { HeaderCounts } from "./header-counts";
 import { SOCIAL_LINKS } from "@/lib/site-links";
 
 type Section = "home" | "watches" | "shop" | "sourcing" | null;
@@ -100,18 +101,7 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
             </svg>
           </a>
           <AccountLink />
-          <a className="icon-link cart-link" href="#" aria-label="View cart, 0 items">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M4 8h16l-1.4 9.5a2 2 0 0 1-2 1.7H7.4a2 2 0 0 1-2-1.7L4 8Z"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-              />
-              <path d="M8 8V6a4 4 0 0 1 8 0v2" stroke="currentColor" strokeWidth="1.6" />
-            </svg>
-            <span className="cart-count">0</span>
-          </a>
+          <HeaderCounts />
           <MessageMe />
         </div>
       </div>

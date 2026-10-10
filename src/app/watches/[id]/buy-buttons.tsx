@@ -2,6 +2,7 @@
 
 import { useRef, type ReactNode } from "react";
 import Link from "next/link";
+import { CartButton } from "./cart-button";
 
 type Gate = { kind: "ready" } | { kind: "signed-out" } | { kind: "incomplete" };
 
@@ -9,12 +10,14 @@ type Gate = { kind: "ready" } | { kind: "signed-out" } | { kind: "incomplete" };
 // dialog to confirm (the request / deposit forms live there); everyone else
 // is sent to sign in (or finish their details) and brought straight back.
 export function BuyButtons({
+  watchId,
   gate,
   next,
   buyForm,
   depositForm,
   depositLabel,
 }: {
+  watchId: string;
   gate: Gate;
   next: string;
   buyForm: ReactNode;
@@ -52,8 +55,9 @@ export function BuyButtons({
 
   return (
     <div className="buy-buttons">
-      <button type="button" className="buy-btn buy-btn--primary" onClick={() => buyRef.current?.showModal()}>
-        Buy this watch
+      <CartButton watchId={watchId} />
+      <button type="button" className="buy-btn" onClick={() => buyRef.current?.showModal()}>
+        Buy it now
       </button>
       {depositForm && depositLabel && (
         <button type="button" className="buy-btn" onClick={() => depRef.current?.showModal()}>
@@ -62,7 +66,7 @@ export function BuyButtons({
       )}
       <p className="buy-note">No payment is taken online — we confirm everything with you first.</p>
 
-      <BuyDialog dialogRef={buyRef} title="Buy this watch">
+      <BuyDialog dialogRef={buyRef} title="Buy it now">
         {buyForm}
       </BuyDialog>
       {depositForm && (

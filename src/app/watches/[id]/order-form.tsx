@@ -26,7 +26,7 @@ export function OrderForm({ watchId, profile }: { watchId: string; profile: Cust
 
   return (
     <form className="order-form" action={formAction} onSubmit={keep}>
-      <h2 className="order-form__title">Buy this watch</h2>
+      <h2 className="order-form__title">Buy it now</h2>
       <p className="order-form__lede">
         Send us your purchase request — we&rsquo;ll contact you to confirm payment and shipping. No payment is taken here.
       </p>
