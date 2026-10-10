@@ -54,11 +54,13 @@ function ProgressRing({ percent }: { percent: number }) {
 function Tile({
   item,
   position,
+  firstLabel,
   onRemove,
   onRetry,
 }: {
   item: MediaItem;
   position: number;
+  firstLabel: string;
   onRemove: (id: string) => void;
   onRetry: (id: string) => void;
 }) {
@@ -75,13 +77,13 @@ function Tile({
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
-      aria-label={`Photo ${position}${position === 1 ? " (cover)" : ""} — press Space, then arrow keys to move`}
+      aria-label={`Photo ${position}${position === 1 ? ` (${firstLabel.toLowerCase()})` : ""} — press Space, then arrow keys to move`}
     >
       {/* draggable=false: stops the browser's native image drag from hijacking the reorder */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={item.url} alt="" draggable={false} />
       <span className="media-tile__pos" aria-hidden="true">
-        {position === 1 ? "Cover" : position}
+        {position === 1 ? firstLabel : position}
       </span>
 
       {item.status === "uploading" && (
@@ -124,10 +126,29 @@ function Tile({
   );
 }
 
-// Product photos, written to products.photoUrls in tile order (first = cover).
-// Each picked file shows instantly as a local preview with its own progress
-// ring; uploads run 3 at a time and failed ones can be retried in place.
-export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
+// Sortable photo grid — product photos (products.photoUrls, first = cover)
+// and the homepage image blocks. Writes one hidden input per uploaded photo,
+// in tile order. Each picked file shows instantly as a local preview with
+// its own progress ring; uploads run 3 at a time and failed ones can be
+// retried in place.
+export function MediaGrid({
+  initialUrls,
+  name = "photoUrls",
+  prefix = "products",
+  label = "Media",
+  firstLabel = "Cover",
+  hint = "Drag photos to change their order — the first one is the cover. You can also drop new photos here.",
+  onChange,
+}: {
+  initialUrls: string[];
+  name?: string;
+  prefix?: string;
+  label?: string;
+  firstLabel?: string;
+  hint?: string;
+  /** Called whenever the set or order of photos changes (e.g. to mark a form dirty). */
+  onChange?: () => void;
+}) {
   // Stable across server + client render, so dnd-kit's aria ids hydrate cleanly.
   const dndId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -157,10 +178,11 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
       if (!item?.file) continue;
       running.current += 1;
       const file = item.file;
-      uploadPhoto(file, "products", (progress) => patch(id, { progress }))
+      uploadPhoto(file, prefix, (progress) => patch(id, { progress }))
         .then((publicUrl) => {
           URL.revokeObjectURL(item.url);
           patch(id, { url: publicUrl, status: "done", progress: 100, file: undefined });
+          onChange?.();
         })
         .catch((err: unknown) => {
           patch(id, { status: "error", error: err instanceof Error ? err.message : "Upload failed." });
@@ -203,6 +225,7 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
       if (gone?.url.startsWith("blob:")) URL.revokeObjectURL(gone.url);
       return prev.filter((i) => i.id !== id);
     });
+    onChange?.();
     queue.current = queue.current.filter((q) => q !== id);
   }
 
@@ -234,6 +257,7 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
       const newIndex = prev.findIndex((i) => i.id === over.id);
       return arrayMove(prev, oldIndex, newIndex);
     });
+    onChange?.();
   }
 
   const doneCount = items.filter((i) => i.status === "done").length;
@@ -241,11 +265,11 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
 
   return (
     <div className="admin-field" ref={rootRef}>
-      <span>Media</span>
+      <span>{label}</span>
       {items
         .filter((i) => i.status === "done")
         .map((item) => (
-          <input key={item.id} type="hidden" name="photoUrls" value={item.url} />
+          <input key={item.id} type="hidden" name={name} value={item.url} />
         ))}
       <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
@@ -258,7 +282,7 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
             }}
           >
             {items.map((item, i) => (
-              <Tile key={item.id} item={item} position={i + 1} onRemove={remove} onRetry={retry} />
+              <Tile key={item.id} item={item} position={i + 1} firstLabel={firstLabel} onRemove={remove} onRetry={retry} />
             ))}
             <label className="admin-media-add">
               +
@@ -281,7 +305,7 @@ export function MediaGrid({ initialUrls }: { initialUrls: string[] }) {
           ? `Uploading ${busyCount} photo${busyCount > 1 ? "s" : ""}… ${doneCount} ready.`
           : failed
             ? "Some photos failed — Retry them or remove them before saving."
-            : "Drag photos to change their order — the first one is the cover. You can also drop new photos here."}
+            : hint}
       </p>
       {notice && (
         <p className="admin-hint admin-hint--error" role="alert">

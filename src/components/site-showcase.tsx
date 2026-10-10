@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Slides } from "./slides";
 import type { ReactNode } from "react";
 import type { SiteImage } from "@/lib/site-images";
 
@@ -17,21 +17,14 @@ function MaybeLink({ href, className, children }: { href: string | null; classNa
   );
 }
 
-// Slot 1 — full-width hero photograph with the headline set over it.
-// Without an image the homepage keeps its typographic hero instead.
+// Slot 1 — full-width hero photograph(s) with the headline set over it;
+// several photos crossfade. Without an image the homepage keeps its
+// typographic hero instead.
 export function HeroBanner({ image }: { image: SiteImage }) {
   if (!image.imageUrl) return null;
   return (
     <section className="hero-banner" aria-label="Featured">
-      <Image
-        className="hero-banner__img"
-        src={image.imageUrl}
-        alt={image.alt ?? ""}
-        fill
-        priority
-        quality={90}
-        sizes="100vw"
-      />
+      <Slides className="hero-banner__img" urls={image.imageUrls} alt={image.alt ?? ""} sizes="100vw" priority />
       <div className="hero-banner__copy">
         <h1 className="hero-banner__title">{image.heading ?? "Time, worn well."}</h1>
         {image.caption && <p className="hero-banner__caption">{image.caption}</p>}
@@ -60,19 +53,20 @@ function Tile({
     kind === "wide" || span === "full" || span === "solo"
       ? "(max-width: 960px) 100vw, 90rem"
       : "(max-width: 960px) 100vw, 50vw";
+  // The link is a layer over the photos (not a wrapper) so the slideshow
+  // dots can sit above it as their own buttons.
   return (
-    <MaybeLink
-      href={image.linkUrl}
-      className={`showcase__tile showcase__tile--${kind}${span ? ` showcase__tile--${span}` : ""}`}
-    >
-      <Image src={image.imageUrl!} alt={image.alt ?? ""} fill quality={90} sizes={sizes} />
-      {(image.heading || image.caption) && (
-        <span className="showcase__copy">
-          {image.heading && <span className="showcase__heading">{image.heading}</span>}
-          {image.caption && <span className="showcase__caption">{image.caption}</span>}
-        </span>
-      )}
-    </MaybeLink>
+    <div className={`showcase__tile showcase__tile--${kind}${span ? ` showcase__tile--${span}` : ""}`}>
+      <Slides urls={image.imageUrls} alt={image.alt ?? ""} sizes={sizes} />
+      <MaybeLink href={image.linkUrl} className="showcase__link">
+        {(image.heading || image.caption) && (
+          <span className="showcase__copy">
+            {image.heading && <span className="showcase__heading">{image.heading}</span>}
+            {image.caption && <span className="showcase__caption">{image.caption}</span>}
+          </span>
+        )}
+      </MaybeLink>
+    </div>
   );
 }
 

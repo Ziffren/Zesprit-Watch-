@@ -6,35 +6,30 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 export const SITE_IMAGE_SLOTS = [
   {
     slot: 1,
-    aspect: 2,
     label: "Hero banner",
     where: "Full-width banner at the very top of the homepage, under the menu.",
     ratio: "2:1 landscape · 2400 × 1200 px or larger",
   },
   {
     slot: 2,
-    aspect: 0.8,
     label: "Feature",
     where: "Large tile on the left of the showcase, below the watch row.",
     ratio: "4:5 portrait · 1600 × 2000 px or larger",
   },
   {
     slot: 3,
-    aspect: 1.5,
     label: "Promo top",
     where: "Upper tile on the right of the showcase.",
     ratio: "3:2 landscape · 1800 × 1200 px or larger",
   },
   {
     slot: 4,
-    aspect: 1.5,
     label: "Promo bottom",
     where: "Lower tile on the right of the showcase.",
     ratio: "3:2 landscape · 1800 × 1200 px or larger",
   },
   {
     slot: 5,
-    aspect: 3,
     label: "Wide banner",
     where: "Long banner closing the showcase, full width.",
     ratio: "3:1 panoramic · 2700 × 900 px or larger",
@@ -45,7 +40,10 @@ export type SiteImageSlot = (typeof SITE_IMAGE_SLOTS)[number]["slot"];
 
 export type SiteImage = {
   slot: SiteImageSlot;
+  /** First photo (= imageUrls[0]), or null when the block is empty. */
   imageUrl: string | null;
+  /** All photos in order; more than one shows as a slideshow. */
+  imageUrls: string[];
   alt: string | null;
   heading: string | null;
   caption: string | null;
@@ -53,10 +51,10 @@ export type SiteImage = {
   updatedAt: string | null;
 };
 
-export const SITE_IMAGE_COLUMNS = 'slot, imageUrl, alt, heading, caption, linkUrl, updatedAt';
+export const SITE_IMAGE_COLUMNS = 'slot, imageUrl, imageUrls, alt, heading, caption, linkUrl, updatedAt';
 
 export function emptySiteImage(slot: SiteImageSlot): SiteImage {
-  return { slot, imageUrl: null, alt: null, heading: null, caption: null, linkUrl: null, updatedAt: null };
+  return { slot, imageUrl: null, imageUrls: [], alt: null, heading: null, caption: null, linkUrl: null, updatedAt: null };
 }
 
 // Rows keyed by slot, every slot present (empty when not set).
@@ -66,7 +64,9 @@ export function bySlot(rows: Partial<SiteImage>[] | null): Record<SiteImageSlot,
     SiteImage
   >;
   for (const r of rows ?? []) {
-    if (r.slot && r.slot in out) out[r.slot as SiteImageSlot] = { ...out[r.slot as SiteImageSlot], ...r } as SiteImage;
+    if (!r.slot || !(r.slot in out)) continue;
+    const urls = r.imageUrls?.length ? r.imageUrls : r.imageUrl ? [r.imageUrl] : [];
+    out[r.slot as SiteImageSlot] = { ...out[r.slot as SiteImageSlot], ...r, imageUrls: urls, imageUrl: urls[0] ?? null } as SiteImage;
   }
   return out;
 }

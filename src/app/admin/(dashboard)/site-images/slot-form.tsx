@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { uploadPhoto } from "@/lib/upload-photo";
 import type { SiteImage } from "@/lib/site-images";
+import { MediaGrid } from "../products/media-grid";
 import { saveSiteImage, type SaveSiteImageState } from "./actions";
 
 function SaveButton({ dirty }: { dirty: boolean }) {
@@ -43,12 +43,9 @@ export function SlotForm({
   ratio: string;
 }) {
   const [state, action] = useActionState<SaveSiteImageState, FormData>(saveSiteImage, { error: null, savedAt: null });
-  const [url, setUrl] = useState(image.imageUrl);
-  const [busy, setBusy] = useState<number | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const count = image.imageUrls.length;
 
   // A successful save clears the dirty flag (state change, not an effect).
   if (state.savedAt && state.savedAt !== lastSaved) {
@@ -56,23 +53,9 @@ export function SlotForm({
     setDirty(false);
   }
 
-  async function upload(file: File) {
-    setBusy(0);
-    setUploadError(null);
-    try {
-      setUrl(await uploadPhoto(file, `site/slot-${image.slot}`, (p) => setBusy(p)));
-      setDirty(true);
-    } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
   return (
     <form className="admin-panel slot-form" action={action} onChange={() => setDirty(true)}>
       <input type="hidden" name="slot" value={image.slot} />
-      <input type="hidden" name="imageUrl" value={url ?? ""} />
 
       <div className="slot-form__head">
         <SlotMap slot={image.slot} />
@@ -83,48 +66,21 @@ export function SlotForm({
           <p className="admin-hint">{where}</p>
           <p className="admin-hint">Best: {ratio}</p>
         </div>
-        <span className="admin-badge" data-tone={url ? "active" : "draft"}>
-          {url ? "Showing" : "Empty"}
+        <span className="admin-badge" data-tone={count ? "active" : "draft"}>
+          {count === 0 ? "Empty" : count === 1 ? "Showing" : `Slideshow · ${count}`}
         </span>
       </div>
 
       <div className="slot-form__body">
-        <div className={`slot-form__preview slot-form__preview--${image.slot}`}>
-          {url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={url} alt="" />
-          ) : (
-            <button type="button" className="slot-form__drop" onClick={() => fileRef.current?.click()} disabled={busy != null}>
-              {busy != null ? `Uploading… ${busy}%` : "+ Upload image"}
-            </button>
-          )}
-          {url && (
-            <div className="slot-form__preview-actions">
-              <button type="button" className="admin-btn" onClick={() => fileRef.current?.click()} disabled={busy != null}>
-                {busy != null ? `Uploading… ${busy}%` : "Replace"}
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn--danger"
-                onClick={() => {
-                  setUrl(null);
-                  setDirty(true);
-                }}
-              >
-                Remove
-              </button>
-            </div>
-          )}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) upload(f);
-              e.target.value = "";
-            }}
+        <div className="slot-form__photos">
+          <MediaGrid
+            initialUrls={image.imageUrls}
+            name="imageUrls"
+            prefix={`site/slot-${image.slot}`}
+            label="Photos"
+            firstLabel="First"
+            hint="Add as many photos as you like — more than one plays as a slideshow, in this order. Drag to reorder."
+            onChange={() => setDirty(true)}
           />
         </div>
 
@@ -148,9 +104,9 @@ export function SlotForm({
         </div>
       </div>
 
-      {(uploadError || state.error) && (
+      {state.error && (
         <p className="admin-form__error" role="alert">
-          {uploadError ?? state.error}
+          {state.error}
         </p>
       )}
 
