@@ -40,7 +40,9 @@ export async function saveSiteImage(_prev: SaveSiteImageState, formData: FormDat
     .eq("slot", slot);
   if (error) return { error: error.message, savedAt: null };
 
-  revalidatePath("/");
+  revalidatePath("/", "layout"); // header logo + browser-tab icon on every page
+  revalidatePath("/icon");
+  revalidatePath("/apple-icon");
   revalidatePath("/admin/site-images");
   return { error: null, savedAt: Date.now() };
 }
