@@ -96,7 +96,7 @@ export default async function WatchDetailPage({
               />
             )}
 
-            <SaveButton watchId={watch.id} />
+            <SaveButton watchId={watch.id} count={watch.saves} />
 
             <div className="accordions">
               {watch.descriptionHtml && (

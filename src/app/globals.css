@@ -3959,3 +3959,178 @@ a.showcase__tile:focus-visible {
     margin-left: auto;
   }
 }
+
+/* ---------- Product cards: linked photo/title/brand + wishlist heart ---------- */
+/* Hallmark · component: card heart · genre: editorial · theme: custom (brass/ivory/oxblood)
+ * states: default · hover · focus · active · saved · busy
+ */
+
+.product__media {
+  color: inherit;
+}
+
+.product__media img {
+  transition: transform var(--dur-long) var(--ease-out);
+}
+
+.product__media:hover img {
+  transform: scale(1.03);
+}
+
+.product__name a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-short) var(--ease-out);
+}
+
+.product__name a:hover,
+.product__media:hover ~ .product__meta .product__name a {
+  text-decoration-color: currentColor;
+}
+
+.product__brand {
+  justify-self: start;
+  width: fit-content;
+  text-decoration: none;
+}
+
+a.product__brand:hover {
+  color: var(--color-accent-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.product__meta {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.product__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.card-heart {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2.25rem;
+  padding: 0 var(--space-xs);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-2);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out);
+}
+
+.card-heart:hover {
+  color: var(--color-accent-2);
+  background: color-mix(in oklch, var(--color-accent-2) 8%, transparent);
+}
+
+.card-heart:active svg {
+  transform: scale(0.88);
+}
+
+.card-heart svg {
+  transition: transform var(--dur-short) var(--ease-out);
+}
+
+.card-heart[data-saved] {
+  color: var(--color-accent-2);
+}
+
+.card-heart[data-saved] svg {
+  animation: heart-pop 320ms var(--ease-out);
+}
+
+.card-heart[aria-busy] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.card-heart:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@keyframes heart-pop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+.wish-btn__count {
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Homepage row (dark band) */
+.row-card__media,
+.row-card__title,
+.row-card__brand {
+  color: inherit;
+  text-decoration-line: underline;
+}
+
+.row-card__media {
+  text-decoration: none;
+}
+
+.row-card__media:focus-visible,
+.row-card__title:focus-visible,
+.row-card__brand:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.row-card__brand {
+  width: fit-content;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  color: color-mix(in oklch, var(--color-paper) 62%, transparent);
+}
+
+a.row-card__brand:hover {
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
+}
+
+.row-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xs);
+}
+
+.row-card__foot .row-card__price {
+  margin-top: 0;
+}
+
+.row-card .card-heart {
+  color: color-mix(in oklch, var(--color-paper) 72%, transparent);
+}
+
+.row-card .card-heart:hover,
+.row-card .card-heart[data-saved] {
+  color: var(--color-accent);
+  background: color-mix(in oklch, var(--color-paper) 8%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-heart[data-saved] svg {
+    animation: none;
+  }
+  .product__media img {
+    transition: none;
+  }
+}

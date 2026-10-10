@@ -204,5 +204,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "none",
     "brief": "Shared filter on /collections/all, brand and collection pages"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "product cards — linked photo/title, brand → brand collection, wishlist heart with live save count (cards, homepage row, product page)",
+    "theme": "custom (locked tokens)",
+    "enrichment": "none",
+    "brief": "Click photo/title/brand; heart saves to wishlist, one per customer, count shown"
   }
 ]

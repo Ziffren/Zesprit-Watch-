@@ -2,6 +2,18 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { StorefrontPiece } from "@/lib/storefront";
+import { CardHeart } from "./card-heart";
+
+// Brand name → that brand's collection, when one exists.
+function BrandLink({ piece, className }: { piece: StorefrontPiece; className: string }) {
+  return piece.brandSlug ? (
+    <Link className={className} href={`/collections/${piece.brandSlug}`}>
+      {piece.brand}
+    </Link>
+  ) : (
+    <span className={className}>{piece.brand}</span>
+  );
+}
 
 export function WatchIcon({ hour, min, large = false }: { hour: number; min: number; large?: boolean }) {
   return (
@@ -69,11 +81,13 @@ export function PiecePrice({
 }
 
 // Homepage row card: photo in an organic "blob" frame, title, brand, price.
-// The whole card is one link; the blob shape varies per position (CSS).
+// Photo and title open the piece, the brand opens its collection, and the
+// heart saves it; the blob shape varies per position (CSS).
 export function ShopRowCard({ piece }: { piece: StorefrontPiece }) {
+  const href = `/watches/${piece.id}`;
   return (
-    <Link className="row-card" href={`/watches/${piece.id}`}>
-      <span className="row-card__media">
+    <div className="row-card">
+      <Link className="row-card__media" href={href} tabIndex={-1} aria-hidden="true">
         {piece.imageUrl ? (
           <Image
             src={piece.imageUrl}
@@ -86,40 +100,45 @@ export function ShopRowCard({ piece }: { piece: StorefrontPiece }) {
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}
         <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} sold={piece.sold} />
-      </span>
-      <span className="row-card__title">{piece.name}</span>
-      <span className="row-card__brand">{piece.brand}</span>
-      <PiecePrice className="row-card__price" price={piece.price} priceSet={piece.priceSet} compareAt={piece.compareAt} />
-    </Link>
+      </Link>
+      <Link className="row-card__title" href={href}>
+        {piece.name}
+      </Link>
+      <BrandLink piece={piece} className="row-card__brand" />
+      <div className="row-card__foot">
+        <PiecePrice className="row-card__price" price={piece.price} priceSet={piece.priceSet} compareAt={piece.compareAt} />
+        <CardHeart watchId={piece.id} count={piece.saves} name={piece.name} />
+      </div>
+    </div>
   );
 }
 
 export function ProductCard({ piece, headingLevel = 3 }: { piece: StorefrontPiece; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
+  const href = `/watches/${piece.id}`;
   return (
     <article className="product" data-sold={piece.sold || undefined}>
-      <div className="product__media">
+      <Link className="product__media" href={href} tabIndex={-1} aria-hidden="true">
         {piece.imageUrl ? (
-          <Image
-            src={piece.imageUrl}
-            alt={piece.name}
-            fill
-            quality={85}
-            sizes="(max-width: 960px) 50vw, 25vw"
-          />
+          <Image src={piece.imageUrl} alt="" fill quality={85} sizes="(max-width: 960px) 50vw, 25vw" />
         ) : (
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}
         <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} sold={piece.sold} />
-      </div>
+      </Link>
       <div className="product__meta">
-        <Heading className="product__name">{piece.name}</Heading>
-        <p className="product__detail">{piece.detail}</p>
+        <Heading className="product__name">
+          <Link href={href}>{piece.name}</Link>
+        </Heading>
+        <BrandLink piece={piece} className="product__detail product__brand" />
         <PiecePrice className="product__price" price={piece.price} priceSet={piece.priceSet} compareAt={piece.compareAt} />
       </div>
-      <Link className="product__view" href={`/watches/${piece.id}`}>
-        View piece →
-      </Link>
+      <div className="product__foot">
+        <Link className="product__view" href={href}>
+          View piece →
+        </Link>
+        <CardHeart watchId={piece.id} count={piece.saves} name={piece.name} />
+      </div>
     </article>
   );
 }

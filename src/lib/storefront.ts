@@ -22,6 +22,10 @@ export type StorefrontPiece = {
   onHold: boolean;
   /** Sold pieces only appear when a listing is filtered to show them. */
   sold: boolean;
+  /** Brand collection to link the brand name to, when one exists. */
+  brandSlug: string | null;
+  /** How many customers have this piece in their wishlist. */
+  saves: number;
   imageUrl: string | null;
   hour: number;
   min: number;
@@ -30,7 +34,7 @@ export type StorefrontPiece = {
 // Shown until the owner publishes real products in /admin/products.
 const placeholder = (id: string, name: string, detail: string, hour: number, min: number): StorefrontPiece => ({
   id, name, detail, hour, min, brand: "Z’esprit Watch",
-  price: "Price on request", priceSet: false, compareAt: null, isNew: false, isReduced: false, onHold: false, sold: false, imageUrl: null,
+  price: "Price on request", priceSet: false, compareAt: null, isNew: false, isReduced: false, onHold: false, sold: false, brandSlug: null, saves: 0, imageUrl: null,
 });
 const placeholderPieces: StorefrontPiece[] = [
   placeholder("meridian", "The Meridian", "Hand-wound · steel case", 35, 210),
@@ -93,6 +97,8 @@ function toPiece(p: PieceRow, now: number): StorefrontPiece {
       isReduced: false,
       onHold: false,
       sold: true,
+      brandSlug: null,
+      saves: 0,
       imageUrl: p.photoUrls?.[0] ?? null,
       hour,
       min,
@@ -108,6 +114,8 @@ function toPiece(p: PieceRow, now: number): StorefrontPiece {
     imageUrl: p.photoUrls?.[0] ?? null,
     onHold: p.status === "HOLD",
     sold: false,
+    brandSlug: null,
+    saves: 0,
     hour,
     min,
     ...priceBadges(p, now),
@@ -125,6 +133,7 @@ export type WatchDetail = {
   photoUrls: string[];
   hour: number;
   min: number;
+  saves: number;
 } & PriceBadges;
 
 export async function getWatchDetail(id: string): Promise<WatchDetail | null> {
@@ -143,8 +152,10 @@ export async function getWatchDetail(id: string): Promise<WatchDetail | null> {
     if (error || !data) return null;
 
     const { hour, min } = anglesFromId(data.id);
+    const saves = (await saveCounts(supabase)).get(data.id) ?? 0;
     return {
       id: data.id,
+      saves,
       name: data.productName,
       brand: data.brand,
       status: data.status,
@@ -220,6 +231,24 @@ export async function getPostBySlug(slug: string): Promise<JournalPost | null> {
 }
 
 
+type PublicClient = ReturnType<typeof createPublicClient>;
+
+async function saveCounts(supabase: PublicClient): Promise<Map<string, number>> {
+  const { data } = await supabase.rpc("product_save_counts");
+  return new Map(((data ?? []) as { watchId: string; saves: number }[]).map((r) => [r.watchId, Number(r.saves)]));
+}
+
+// Card extras: the brand collection link and the wishlist count.
+async function enrich(supabase: PublicClient, pieces: StorefrontPiece[], saves?: Map<string, number>) {
+  if (pieces.length === 0) return pieces;
+  const [{ data: brands }, counts] = await Promise.all([
+    supabase.from("collections").select("name, slug").eq("isBrand", true),
+    saves ? Promise.resolve(saves) : saveCounts(supabase),
+  ]);
+  const slugs = new Map((brands ?? []).map((b) => [b.name, b.slug as string]));
+  return pieces.map((p) => ({ ...p, brandSlug: slugs.get(p.brand) ?? null, saves: counts.get(p.id) ?? 0 }));
+}
+
 // Homepage row: pieces in stock, most valuable first (unpriced last).
 export async function getShopRow(limit = 24): Promise<{ pieces: StorefrontPiece[]; total: number }> {
   if (!isSupabaseConfigured) return { pieces: placeholderPieces, total: placeholderPieces.length };
@@ -236,7 +265,8 @@ export async function getShopRow(limit = 24): Promise<{ pieces: StorefrontPiece[
 
     if (error || !data || data.length === 0) return { pieces: placeholderPieces, total: placeholderPieces.length };
     const now = Date.now();
-    return { pieces: data.map((p) => toPiece(p as PieceRow, now)), total: count ?? data.length };
+    const pieces = await enrich(supabase, data.map((p) => toPiece(p as PieceRow, now)));
+    return { pieces, total: count ?? data.length };
   } catch {
     return { pieces: placeholderPieces, total: placeholderPieces.length };
   }
@@ -265,11 +295,11 @@ export async function getRelatedPieces(
     const now = Date.now();
     const { data: sameBrand } = await base().eq("brand", brand);
     if (sameBrand && sameBrand.length > 0) {
-      return { pieces: sameBrand.map((p) => toPiece(p as PieceRow, now)), sameBrand: true };
+      return { pieces: await enrich(supabase, sameBrand.map((p) => toPiece(p as PieceRow, now))), sameBrand: true };
     }
 
     const { data: latest } = await base();
-    return { pieces: (latest ?? []).map((p) => toPiece(p as PieceRow, now)), sameBrand: false };
+    return { pieces: await enrich(supabase, (latest ?? []).map((p) => toPiece(p as PieceRow, now))), sameBrand: false };
   } catch {
     return { pieces: [], sameBrand: false };
   }
@@ -369,11 +399,7 @@ export async function getCollectionPage(slug: string, q: CollectionQuery): Promi
     let pieces = rows.map((r) => ({ row: r, piece: toPiece(r, now) }));
     if (q.sale) pieces = pieces.filter((x) => x.piece.isReduced);
 
-    let saves = new Map<string, number>();
-    if (q.sort === "popular") {
-      const { data } = await supabase.rpc("product_save_counts");
-      saves = new Map(((data ?? []) as { watchId: string; saves: number }[]).map((r) => [r.watchId, Number(r.saves)]));
-    }
+    const saves = await saveCounts(supabase);
     const price = (r: PieceRow) => r.priceCents;
     const created = (r: PieceRow) => new Date(r.createdAt).getTime();
     pieces.sort((a, b) => {
@@ -401,7 +427,11 @@ export async function getCollectionPage(slug: string, q: CollectionQuery): Promi
     const current = Math.min(q.page, pageCount);
     return {
       ...meta,
-      pieces: pieces.slice((current - 1) * COLLECTION_PAGE_SIZE, current * COLLECTION_PAGE_SIZE).map((x) => x.piece),
+      pieces: await enrich(
+        supabase,
+        pieces.slice((current - 1) * COLLECTION_PAGE_SIZE, current * COLLECTION_PAGE_SIZE).map((x) => x.piece),
+        saves,
+      ),
       total,
       page: current,
       pageCount,
