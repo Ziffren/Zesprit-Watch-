@@ -249,37 +249,3 @@ export async function sendCartNotification(params: {
     console.error("Failed to send cart notification email:", err);
   }
 }
-
-export async function sendReviewNotification(params: {
-  name: string;
-  email: string;
-  ratings: { label: string; value: number }[];
-  comment: string;
-  edited: boolean;
-}) {
-  if (!resend || !notificationEmail) {
-    console.warn("Resend isn't configured (RESEND_API_KEY / ORDER_NOTIFICATION_EMAIL) — skipping review notification email.");
-    return;
-  }
-
-  const stars = (n: number) => "★".repeat(n) + "☆".repeat(5 - n);
-  const lines = [
-    `${params.edited ? "Updated" : "New"} review from ${params.name} (${params.email})`,
-    "",
-    ...params.ratings.map((r) => `${r.label}: ${stars(r.value)} (${r.value}/5)`),
-    params.comment ? `\n${params.comment}` : null,
-    "",
-    "Manage reviews: https://zesprit-watch.vercel.app/admin/reviews",
-  ].filter((line): line is string => line !== null);
-
-  try {
-    await resend.emails.send({
-      from: "Z’esprit Watch <no-reply@zespritwatch.com>",
-      to: notificationEmail,
-      subject: `${params.edited ? "Updated" : "New"} review — ${params.name}`,
-      text: lines.join("\n"),
-    });
-  } catch (err) {
-    console.error("Failed to send review notification email:", err);
-  }
-}

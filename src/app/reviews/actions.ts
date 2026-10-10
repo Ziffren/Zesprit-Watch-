@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCustomer } from "@/lib/customer";
-import { sendReviewNotification } from "@/lib/email";
 import { CRITERIA, publicName } from "@/lib/reviews";
 
 export type ReviewState = { status: "idle" | "success" | "error"; message?: string };
@@ -34,12 +33,5 @@ export async function submitReview(_prev: ReviewState, formData: FormData): Prom
 
   revalidatePath("/reviews");
   revalidatePath("/");
-  await sendReviewNotification({
-    name: p.name || p.email,
-    email: p.email,
-    ratings: CRITERIA.map((c) => ({ label: c.label, value: values[c.key] as number })),
-    comment,
-    edited: Boolean(existing),
-  });
   return { status: "success" };
 }
