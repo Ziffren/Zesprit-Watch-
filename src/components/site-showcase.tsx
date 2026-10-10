@@ -132,38 +132,41 @@ export function BrandList({ image }: { image: SiteImage }) {
   );
 }
 
-// Slot 7 — "Zesprit Info": the owner's policy / information images
-// (shipping, warranty, returns…), each with an optional title and link,
-// shown at their own proportions in the order set in admin.
+// Slot 7 — "Zesprit Info": the owner's policy cards (Guarantee, Buyer,
+// Shipping…) — image, title and description on a soft panel each, in the
+// order set in admin. A card with a link is clickable as a whole.
 export function InfoImages({ image }: { image: SiteImage }) {
   if (image.items.length === 0) return null;
-  const n = image.items.length;
   return (
-    <section className="info-images" aria-label={image.heading ?? "Z’esprit Watch information"}>
-      {image.heading && <h2 className="info-images__title">{image.heading}</h2>}
-      <ul className="info-images__grid" data-count={n > 4 ? "many" : n}>
-        {image.items.map((t, i) => (
-          <li key={`${i}-${t.url}`}>
-            <MaybeLink href={t.href || null} className="info-tile">
-              <Image
-                className="info-tile__img"
-                src={t.url}
-                alt={t.label || image.heading || "Z’esprit Watch information"}
-                width={1200}
-                height={800}
-                quality={85}
-                sizes={n === 1 ? "(max-width: 960px) 100vw, 76rem" : "(max-width: 640px) 100vw, (max-width: 960px) 50vw, 25rem"}
-              />
-              {t.label && (
-                <span className="info-tile__label">
-                  {t.label}
-                  {t.href && <span aria-hidden="true"> →</span>}
+    <section className="info-cards" aria-label={image.heading ?? "Z’esprit Watch policies"}>
+      <div className="info-cards__inner">
+        {image.heading && <h2 className="info-cards__title">{image.heading}</h2>}
+        <ul className="info-cards__grid">
+          {image.items.map((t, i) => (
+            <li key={`${i}-${t.url}`}>
+              <MaybeLink href={t.href || null} className="info-card">
+                <span className="info-card__media">
+                  <Image
+                    src={t.url}
+                    alt={t.label || "Z’esprit Watch"}
+                    width={1200}
+                    height={800}
+                    quality={85}
+                    sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 26rem"
+                  />
                 </span>
-              )}
-            </MaybeLink>
-          </li>
-        ))}
-      </ul>
+                {t.label && (
+                  <span className="info-card__title">
+                    {t.label}
+                    {t.href && <span aria-hidden="true"> →</span>}
+                  </span>
+                )}
+                {t.text && <span className="info-card__text">{t.text}</span>}
+              </MaybeLink>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

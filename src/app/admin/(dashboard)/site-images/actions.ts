@@ -66,7 +66,8 @@ export async function saveBrandList(input: {
     if (!/^https?:\/\//.test(url)) return { error: `Tile ${i + 1}: the photo hasn't finished uploading.` };
     if (!label && nameRequired) return { error: `Tile ${i + 1}: add a name (e.g. Credor).` };
     if (href && !validLink(href)) return { error: `Tile ${i + 1}: link must start with / or https://` };
-    items.push({ url, label, href });
+    const text = nameRequired ? "" : String(t.text ?? "").trim().slice(0, 1200);
+    items.push(nameRequired ? { url, label, href } : { url, label, href, text });
   }
   const linkUrl = input.linkUrl.trim();
   if (linkUrl && !validLink(linkUrl)) return { error: "“View all” link must start with / or https://" };

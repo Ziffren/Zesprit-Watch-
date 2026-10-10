@@ -52,7 +52,8 @@ export const INFO_SLOT = 7;
 
 export const LOGO_SLOT = 6;
 
-export type BrandTile = { url: string; label: string; href: string };
+/** A tile in the Brand List (2) or Zesprit Info (7) block; `text` is the Info card's description. */
+export type BrandTile = { url: string; label: string; href: string; text?: string };
 
 export const BRAND_LIST_SLOT = 2;
 

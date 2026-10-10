@@ -239,5 +239,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "owner images",
     "brief": "Block for policy/information images and a logo block"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "Zesprit Info → policy cards: taupe band, section title, soft cards with inset artwork, title + description (owner's reference layout)",
+    "theme": "custom (locked tokens; band/card mixed from paper-3 + neutral)",
+    "enrichment": "owner's Guarantee/Buyer/Shipping artwork",
+    "brief": "Policy description section laid out like the reference screenshot"
   }
 ]

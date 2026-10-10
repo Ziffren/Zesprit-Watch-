@@ -4918,98 +4918,124 @@ a.brand-tile:focus-visible {
   }
 }
 
-/* ---------- Homepage: Zesprit Info images (Website images block 7) ---------- */
-/* Hallmark · component: info image row · genre: editorial · theme: custom (locked tokens)
- * states: default · hover (lift) · focus · no-link (static)
+/* ---------- Homepage: Zesprit Info cards (Website images block 7) ---------- */
+/* Hallmark · component: policy cards · genre: editorial · theme: custom (locked tokens)
+ * states: default · hover (lift, linked cards) · focus · static (no link)
  */
 
-.info-images {
-  max-width: 76rem;
-  margin: 0 auto;
-  padding: var(--space-2xl) var(--page-gutter);
-  display: grid;
-  gap: var(--space-lg);
+.info-cards {
+  /* Warm taupe matching the owner's card artwork; cards a shade deeper. */
+  --info-band: color-mix(in srgb, var(--color-paper-3) 58%, var(--color-neutral));
+  --info-card: color-mix(in srgb, var(--info-band) 94%, var(--color-ink));
+  background: var(--info-band);
+  padding: var(--space-2xl) var(--page-gutter) var(--space-3xl);
 }
 
-.info-images__title {
-  font-size: var(--text-xl);
-  line-height: 1.15;
-  text-align: center;
+.info-cards__inner {
+  max-width: 90rem;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.info-cards__title {
+  font-size: var(--text-2xl);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
   overflow-wrap: anywhere;
 }
 
-.info-images__grid {
+.info-cards__grid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
-  gap: var(--space-lg) var(--space-md);
-  align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
 }
 
-.info-images__grid[data-count="1"] { --cols: 1; }
-.info-images__grid[data-count="2"] { --cols: 2; }
-.info-images__grid[data-count="3"] { --cols: 3; }
-.info-images__grid[data-count="4"],
-.info-images__grid[data-count="many"] { --cols: 4; }
-
-.info-tile {
+.info-cards__grid > li {
   display: grid;
-  gap: var(--space-xs);
-  color: inherit;
-  text-decoration: none;
 }
 
-.info-tile__img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-control);
-  background: var(--color-paper-2);
+.info-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  background: var(--info-card);
+  border-radius: var(--radius-card);
+  color: var(--color-ink);
+  text-decoration: none;
   transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
 }
 
-.info-tile__label {
-  font-size: var(--text-base);
+.info-card__media {
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+/* One shape for every card so titles line up even if the artwork differs a little. */
+.info-card__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 7 / 5;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.info-card__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: 1.15;
   overflow-wrap: anywhere;
 }
 
-a.info-tile:hover .info-tile__img {
+.info-card__text {
+  font-size: var(--text-base);
+  line-height: 1.75;
+  color: var(--color-ink-2);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+a.info-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-card);
 }
 
-a.info-tile:hover .info-tile__label {
+a.info-card:hover .info-card__title {
   color: var(--color-accent-2);
 }
 
-a.info-tile:active .info-tile__img {
+a.info-card:active {
   transform: translateY(0);
 }
 
-a.info-tile:focus-visible {
+a.info-card:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 4px;
-  border-radius: var(--radius-control);
+  outline-offset: 3px;
 }
 
 @media (max-width: 60rem) {
-  .info-images__grid[data-count="3"],
-  .info-images__grid[data-count="4"],
-  .info-images__grid[data-count="many"] {
-    --cols: 2;
+  .info-cards__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 40rem) {
-  .info-images__grid {
-    --cols: 1 !important;
+  .info-cards__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .info-card {
+    padding: var(--space-lg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .info-tile__img {
+  .info-card {
     transition: none;
   }
 }

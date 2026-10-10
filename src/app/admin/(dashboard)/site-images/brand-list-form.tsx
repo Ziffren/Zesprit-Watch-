@@ -24,6 +24,7 @@ type Row = {
   url: string; // public URL, or blob: preview while uploading
   label: string;
   href: string;
+  text: string;
   status: "done" | "uploading" | "error";
   progress: number;
   error?: string;
@@ -107,9 +108,21 @@ function TileRow({
             value={row.label}
             onChange={(e) => onPatch({ label: e.target.value })}
             maxLength={60}
-            placeholder={nameRequired ? "e.g. Credor" : "e.g. Free worldwide shipping"}
+            placeholder={nameRequired ? "e.g. Credor" : "e.g. Guarantee"}
           />
         </label>
+        {!nameRequired && (
+          <label className="admin-field brand-row__text">
+            <span>Description</span>
+            <textarea
+              rows={3}
+              value={row.text}
+              onChange={(e) => onPatch({ text: e.target.value })}
+              maxLength={1200}
+              placeholder="e.g. All watches handled by Z’esprit are 100% authentic…"
+            />
+          </label>
+        )}
       </div>
 
       <button type="button" className="admin-btn admin-btn--ghost brand-row__remove" onClick={onRemove} aria-label={`Remove tile ${index + 1}`}>
@@ -139,7 +152,15 @@ export function BrandListForm({
   const info = variant === "info";
   const dndId = useId();
   const [rows, setRows] = useState<Row[]>(
-    image.items.map((t, i) => ({ id: `${i}-${t.url}`, url: t.url, label: t.label, href: t.href, status: "done", progress: 100 })),
+    image.items.map((t, i) => ({
+      id: `${i}-${t.url}`,
+      url: t.url,
+      label: t.label,
+      href: t.href,
+      text: t.text ?? "",
+      status: "done",
+      progress: 100,
+    })),
   );
   const [heading, setHeading] = useState(image.heading ?? "");
   const [linkUrl, setLinkUrl] = useState(image.linkUrl ?? "");
@@ -167,12 +188,13 @@ export function BrandListForm({
       url: URL.createObjectURL(file),
       label: "",
       href: "",
+      text: "",
       status: "uploading",
       progress: 0,
       file,
     }));
     if (fresh.length === 0) return;
-    setRows((all) => [...all, ...fresh.map((r) => ({ id: r.id, url: r.url, label: r.label, href: r.href, status: r.status, progress: r.progress }))]);
+    setRows((all) => [...all, ...fresh.map((r) => ({ id: r.id, url: r.url, label: r.label, href: r.href, text: r.text, status: r.status, progress: r.progress }))]);
     setDirty(true);
     const queue = [...fresh];
     const worker = async () => {
@@ -207,7 +229,7 @@ export function BrandListForm({
         slot: image.slot,
         heading,
         linkUrl,
-        items: rows.filter((r) => r.status === "done").map((r) => ({ url: r.url, label: r.label, href: r.href })),
+        items: rows.filter((r) => r.status === "done").map((r) => ({ url: r.url, label: r.label, href: r.href, text: r.text })),
       });
       if (res.error) return setMessage({ kind: "error", text: res.error });
       setDirty(false);
@@ -263,7 +285,7 @@ export function BrandListForm({
               setHeading(e.target.value);
               setDirty(true);
             }}
-            placeholder={info ? "The Z’esprit promise (optional)" : "Shopping Brand List"}
+            placeholder={info ? "e.g. Z’ESPRIT (optional)" : "Shopping Brand List"}
           />
         </label>
         {!info && (
