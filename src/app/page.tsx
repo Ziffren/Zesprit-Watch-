@@ -4,7 +4,7 @@ import { getShopRow } from "@/lib/storefront";
 import { SiteHeader } from "@/components/site-header";
 import { ShopRow } from "@/components/shop-row";
 import { ShopRowCard } from "@/components/product-card";
-import { HeroBanner, Showcase } from "@/components/site-showcase";
+import { BrandList, HeroBanner, Showcase } from "@/components/site-showcase";
 import { getSiteImages } from "@/lib/site-images";
 import { SiteFooter } from "@/components/site-footer";
 import { ReviewCard, ReviewScore } from "@/components/reviews";
@@ -47,7 +47,9 @@ export default async function Home() {
           </ShopRow>
         </section>
 
-        <Showcase images={{ 2: siteImages[2], 3: siteImages[3], 4: siteImages[4], 5: siteImages[5] }} />
+        <Showcase images={{ 3: siteImages[3], 4: siteImages[4] }} />
+        <BrandList image={siteImages[2]} />
+        <Showcase images={{ 5: siteImages[5] }} />
 
         <section className="home-reviews" aria-labelledby="home-reviews-title">
           <div className="home-reviews__head">

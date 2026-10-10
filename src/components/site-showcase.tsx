@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Slides } from "./slides";
 import type { ReactNode } from "react";
@@ -73,10 +74,12 @@ function Tile({
 // Slots 2–5 — the showcase: a large feature tile beside two stacked promo
 // tiles, closed by a wide banner. Tiles without an image are left out and
 // the remaining ones re-span so the grid never shows a hole.
-export function Showcase({ images }: { images: Record<2 | 3 | 4 | 5, SiteImage> }) {
-  const feature = images[2].imageUrl ? images[2] : null;
-  const sides = ([3, 4] as const).filter((s) => images[s].imageUrl).map((s) => ({ slot: s, image: images[s] }));
-  const wide = images[5].imageUrl ? images[5] : null;
+export function Showcase({ images }: { images: Partial<Record<2 | 3 | 4 | 5, SiteImage>> }) {
+  const feature = images[2]?.imageUrl ? images[2] : null;
+  const sides = ([3, 4] as const)
+    .filter((s) => images[s]?.imageUrl)
+    .map((s) => ({ slot: s, image: images[s]! }));
+  const wide = images[5]?.imageUrl ? images[5] : null;
   if (!feature && sides.length === 0 && !wide) return null;
 
   const sideSpan = sides.length === 1 ? (feature ? "tall" : "full") : undefined;
@@ -92,6 +95,39 @@ export function Showcase({ images }: { images: Record<2 | 3 | 4 | 5, SiteImage> 
         <Tile key={slot} image={image} kind={slot === 3 ? "top" : "bottom"} span={sideSpan} />
       ))}
       {wide && <Tile image={wide} kind="wide" />}
+    </section>
+  );
+}
+
+// Slot 2 — "Shopping Brand List": square brand tiles, each linking to its
+// collection, in the order set in Admin → Website images.
+export function BrandList({ image }: { image: SiteImage }) {
+  if (image.items.length === 0) return null;
+  return (
+    <section className="brand-list" aria-labelledby="brand-list-title">
+      <div className="brand-list__inner">
+        <h2 className="brand-list__title" id="brand-list-title">
+          {image.heading ?? "Shopping Brand List"}
+        </h2>
+        <ul className="brand-list__grid">
+          {image.items.map((t, i) => (
+            <li key={`${i}-${t.url}`}>
+              <MaybeLink href={t.href || null} className="brand-tile">
+                <span className="brand-tile__media">
+                  <Image src={t.url} alt="" fill quality={85} sizes="(max-width: 640px) 45vw, (max-width: 960px) 30vw, 15rem" />
+                </span>
+                <span className="brand-tile__label">
+                  {t.label}
+                  {t.href && <span aria-hidden="true"> →</span>}
+                </span>
+              </MaybeLink>
+            </li>
+          ))}
+        </ul>
+        <MaybeLink href={image.linkUrl ?? "/collections/all"} className="brand-list__all">
+          View all
+        </MaybeLink>
+      </div>
     </section>
   );
 }

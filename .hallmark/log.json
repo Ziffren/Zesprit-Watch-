@@ -225,5 +225,12 @@
     "theme": "custom (locked tokens + --font-accent stickers only)",
     "enrichment": "none",
     "brief": "Watch Sourcing styled like Reviews; both symmetric beside the logo"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "homepage Shopping Brand List — dark band, 5-col square brand tiles (name + →, linked to collections), View all; admin Brand List editor (multi-upload, link picker, drag order)",
+    "theme": "custom (locked tokens)",
+    "enrichment": "owner's brand tile photos",
+    "brief": "Website images block 2 Feature → Brand List, shown like the reference; header Watches sorted by stock count"
   }
 ]

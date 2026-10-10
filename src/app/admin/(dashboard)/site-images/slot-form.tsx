@@ -23,10 +23,12 @@ function SlotMap({ slot }: { slot: number }) {
       <rect x="5" y="4" width="50" height="3" rx="1" className="slot-map__nav" />
       <rect x="5" y="9" width="50" height="14" rx="1.5" className={slot === 1 ? "slot-map__on" : "slot-map__off"} />
       <rect x="5" y="25" width="50" height="7" rx="1.5" className="slot-map__row" />
-      <rect x="5" y="34" width="24" height="18" rx="1.5" className={slot === 2 ? "slot-map__on" : "slot-map__off"} />
-      <rect x="31" y="34" width="24" height="8" rx="1.5" className={slot === 3 ? "slot-map__on" : "slot-map__off"} />
-      <rect x="31" y="44" width="24" height="8" rx="1.5" className={slot === 4 ? "slot-map__on" : "slot-map__off"} />
-      <rect x="5" y="54" width="50" height="6" rx="1.5" className={slot === 5 ? "slot-map__on" : "slot-map__off"} />
+      {[0, 1, 2, 3, 4].map((i) => (
+        <rect key={i} x={5 + i * 10.2} y="42" width="8.6" height="8.6" rx="1" className="slot-map__off" />
+      ))}
+      <rect x="5" y="34" width="24" height="6" rx="1.5" className={slot === 3 ? "slot-map__on" : "slot-map__off"} />
+      <rect x="31" y="34" width="24" height="6" rx="1.5" className={slot === 4 ? "slot-map__on" : "slot-map__off"} />
+      <rect x="5" y="53" width="50" height="7" rx="1.5" className={slot === 5 ? "slot-map__on" : "slot-map__off"} />
     </svg>
   );
 }

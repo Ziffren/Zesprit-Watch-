@@ -308,7 +308,8 @@ export async function getRelatedPieces(
 export type BrandLink = { name: string; slug: string; count: number };
 
 // Header "Watches" menu: every brand collection with at least one piece in
-// stock, A→Z. products.brand mirrors the brand collection's name.
+// stock, most pieces first (A→Z on ties). products.brand mirrors the brand
+// collection's name.
 export async function getBrandMenu(): Promise<BrandLink[]> {
   if (!isSupabaseConfigured) return [];
 
@@ -322,7 +323,8 @@ export async function getBrandMenu(): Promise<BrandLink[]> {
     for (const p of products ?? []) counts.set(p.brand, (counts.get(p.brand) ?? 0) + 1);
     return (brands ?? [])
       .map((b) => ({ name: b.name, slug: b.slug, count: counts.get(b.name) ?? 0 }))
-      .filter((b) => b.count > 0);
+      .filter((b) => b.count > 0)
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
   } catch {
     return [];
   }

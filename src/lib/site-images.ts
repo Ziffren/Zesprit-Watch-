@@ -12,29 +12,33 @@ export const SITE_IMAGE_SLOTS = [
   },
   {
     slot: 2,
-    label: "Feature",
-    where: "Large tile on the left of the showcase, below the watch row.",
-    ratio: "4:5 portrait · 1600 × 2000 px or larger",
+    label: "Brand List",
+    where: "“Shopping Brand List” — a grid of brand tiles; each photo gets a name and a link, shown in this order.",
+    ratio: "1:1 square · 800 × 800 px or larger",
   },
   {
     slot: 3,
-    label: "Promo top",
-    where: "Upper tile on the right of the showcase.",
+    label: "Promo left",
+    where: "Left photo of the pair below the watch row.",
     ratio: "3:2 landscape · 1800 × 1200 px or larger",
   },
   {
     slot: 4,
-    label: "Promo bottom",
-    where: "Lower tile on the right of the showcase.",
+    label: "Promo right",
+    where: "Right photo of the pair below the watch row.",
     ratio: "3:2 landscape · 1800 × 1200 px or larger",
   },
   {
     slot: 5,
     label: "Wide banner",
-    where: "Long banner closing the showcase, full width.",
+    where: "Full-width banner after the Brand List.",
     ratio: "3:1 panoramic · 2700 × 900 px or larger",
   },
 ] as const;
+
+export type BrandTile = { url: string; label: string; href: string };
+
+export const BRAND_LIST_SLOT = 2;
 
 export type SiteImageSlot = (typeof SITE_IMAGE_SLOTS)[number]["slot"];
 
@@ -44,6 +48,8 @@ export type SiteImage = {
   imageUrl: string | null;
   /** All photos in order; more than one shows as a slideshow. */
   imageUrls: string[];
+  /** Brand List (slot 2) tiles, in display order. */
+  items: BrandTile[];
   alt: string | null;
   heading: string | null;
   caption: string | null;
@@ -51,10 +57,10 @@ export type SiteImage = {
   updatedAt: string | null;
 };
 
-export const SITE_IMAGE_COLUMNS = 'slot, imageUrl, imageUrls, alt, heading, caption, linkUrl, updatedAt';
+export const SITE_IMAGE_COLUMNS = 'slot, imageUrl, imageUrls, items, alt, heading, caption, linkUrl, updatedAt';
 
 export function emptySiteImage(slot: SiteImageSlot): SiteImage {
-  return { slot, imageUrl: null, imageUrls: [], alt: null, heading: null, caption: null, linkUrl: null, updatedAt: null };
+  return { slot, imageUrl: null, imageUrls: [], items: [], alt: null, heading: null, caption: null, linkUrl: null, updatedAt: null };
 }
 
 // Rows keyed by slot, every slot present (empty when not set).
@@ -66,7 +72,14 @@ export function bySlot(rows: Partial<SiteImage>[] | null): Record<SiteImageSlot,
   for (const r of rows ?? []) {
     if (!r.slot || !(r.slot in out)) continue;
     const urls = r.imageUrls?.length ? r.imageUrls : r.imageUrl ? [r.imageUrl] : [];
-    out[r.slot as SiteImageSlot] = { ...out[r.slot as SiteImageSlot], ...r, imageUrls: urls, imageUrl: urls[0] ?? null } as SiteImage;
+    const items = Array.isArray(r.items) ? r.items.filter((t) => t && typeof t.url === "string") : [];
+    out[r.slot as SiteImageSlot] = {
+      ...out[r.slot as SiteImageSlot],
+      ...r,
+      imageUrls: urls,
+      imageUrl: urls[0] ?? null,
+      items,
+    } as SiteImage;
   }
   return out;
 }
