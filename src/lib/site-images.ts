@@ -40,7 +40,15 @@ export const SITE_IMAGE_SLOTS = [
     where: "Site logo in the header (centre), in place of the text wordmark.",
     ratio: "PNG with transparent background or SVG · about 600 × 200 px",
   },
+  {
+    slot: 7,
+    label: "Zesprit Info",
+    where: "Policy & information images (shipping, warranty, returns…) near the bottom of the homepage; each can have a title and a link.",
+    ratio: "any shape · all images in this block the same size look best, 1200 px wide or larger",
+  },
 ] as const;
+
+export const INFO_SLOT = 7;
 
 export const LOGO_SLOT = 6;
 

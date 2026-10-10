@@ -4,7 +4,7 @@ import { getShopRow } from "@/lib/storefront";
 import { SiteHeader } from "@/components/site-header";
 import { ShopRow } from "@/components/shop-row";
 import { ShopRowCard } from "@/components/product-card";
-import { BrandList, HeroBanner, Showcase } from "@/components/site-showcase";
+import { BrandList, HeroBanner, InfoImages, Showcase } from "@/components/site-showcase";
 import { getSiteImages } from "@/lib/site-images";
 import { SiteFooter } from "@/components/site-footer";
 import { ReviewCard, ReviewScore } from "@/components/reviews";
@@ -129,6 +129,8 @@ export default async function Home() {
           <div>Insured worldwide shipping</div>
           <div>12-month mechanical guarantee</div>
         </section>
+
+        <InfoImages image={siteImages[7]} />
 
         <section className="cta-final">
           <Link className="link" href="/collections/all">

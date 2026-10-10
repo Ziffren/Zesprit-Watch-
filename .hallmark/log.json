@@ -232,5 +232,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "owner's brand tile photos",
     "brief": "Website images block 2 Feature → Brand List, shown like the reference; header Watches sorted by stock count"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "Zesprit Info block — owner's policy/info images (optional title + link) as a responsive row near the page end; admin reuses the tile editor; Logo block (header)",
+    "theme": "custom (locked tokens)",
+    "enrichment": "owner images",
+    "brief": "Block for policy/information images and a logo block"
   }
 ]

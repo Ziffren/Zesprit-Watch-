@@ -131,3 +131,39 @@ export function BrandList({ image }: { image: SiteImage }) {
     </section>
   );
 }
+
+// Slot 7 — "Zesprit Info": the owner's policy / information images
+// (shipping, warranty, returns…), each with an optional title and link,
+// shown at their own proportions in the order set in admin.
+export function InfoImages({ image }: { image: SiteImage }) {
+  if (image.items.length === 0) return null;
+  const n = image.items.length;
+  return (
+    <section className="info-images" aria-label={image.heading ?? "Z’esprit Watch information"}>
+      {image.heading && <h2 className="info-images__title">{image.heading}</h2>}
+      <ul className="info-images__grid" data-count={n > 4 ? "many" : n}>
+        {image.items.map((t, i) => (
+          <li key={`${i}-${t.url}`}>
+            <MaybeLink href={t.href || null} className="info-tile">
+              <Image
+                className="info-tile__img"
+                src={t.url}
+                alt={t.label || image.heading || "Z’esprit Watch information"}
+                width={1200}
+                height={800}
+                quality={85}
+                sizes={n === 1 ? "(max-width: 960px) 100vw, 76rem" : "(max-width: 640px) 100vw, (max-width: 960px) 50vw, 25rem"}
+              />
+              {t.label && (
+                <span className="info-tile__label">
+                  {t.label}
+                  {t.href && <span aria-hidden="true"> →</span>}
+                </span>
+              )}
+            </MaybeLink>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}

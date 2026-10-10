@@ -35,12 +35,14 @@ function TileRow({
   row,
   index,
   options,
+  nameRequired,
   onPatch,
   onRemove,
 }: {
   row: Row;
   index: number;
   options: LinkOption[];
+  nameRequired: boolean;
   onPatch: (p: Partial<Row>) => void;
   onRemove: () => void;
 }) {
@@ -80,8 +82,8 @@ function TileRow({
               if (v === CUSTOM) return setCustom(true);
               setCustom(false);
               const opt = options.find((o) => o.href === v);
-              // Picking a collection also names the tile, unless a name was typed.
-              onPatch({ href: v, ...(opt && !row.label.trim() ? { label: opt.label } : {}) });
+              // Picking a collection also names a brand tile, unless a name was typed.
+              onPatch({ href: v, ...(opt && nameRequired && !row.label.trim() ? { label: opt.label } : {}) });
             }}
           >
             <option value="">— No link —</option>
@@ -100,8 +102,13 @@ function TileRow({
           </label>
         )}
         <label className="admin-field">
-          <span>Name shown</span>
-          <input value={row.label} onChange={(e) => onPatch({ label: e.target.value })} maxLength={60} placeholder="e.g. Credor" />
+          <span>{nameRequired ? "Name shown" : "Title (optional)"}</span>
+          <input
+            value={row.label}
+            onChange={(e) => onPatch({ label: e.target.value })}
+            maxLength={60}
+            placeholder={nameRequired ? "e.g. Credor" : "e.g. Free worldwide shipping"}
+          />
         </label>
       </div>
 
@@ -115,7 +122,21 @@ function TileRow({
 // Block 2 — "Shopping Brand List". Upload several square photos at once;
 // each becomes a tile with a name + link. Drag to set the order shown on
 // the homepage.
-export function BrandListForm({ image, options, where, ratio }: { image: SiteImage; options: LinkOption[]; where: string; ratio: string }) {
+export function BrandListForm({
+  image,
+  options,
+  where,
+  ratio,
+  variant = "brands",
+}: {
+  image: SiteImage;
+  options: LinkOption[];
+  where: string;
+  ratio: string;
+  /** "info" = block 7 Zesprit Info: optional names, no View all button. */
+  variant?: "brands" | "info";
+}) {
+  const info = variant === "info";
   const dndId = useId();
   const [rows, setRows] = useState<Row[]>(
     image.items.map((t, i) => ({ id: `${i}-${t.url}`, url: t.url, label: t.label, href: t.href, status: "done", progress: 100 })),
@@ -158,7 +179,7 @@ export function BrandListForm({ image, options, where, ratio }: { image: SiteIma
       for (let job = queue.shift(); job; job = queue.shift()) {
         const { id, file, url: preview } = job;
         try {
-          const url = await uploadPhoto(file, "site/brands", (progress) => patch(id, { progress }));
+          const url = await uploadPhoto(file, info ? "site/info" : "site/brands", (progress) => patch(id, { progress }));
           URL.revokeObjectURL(preview);
           patch(id, { url, status: "done", progress: 100 });
         } catch (err) {
@@ -183,6 +204,7 @@ export function BrandListForm({ image, options, where, ratio }: { image: SiteIma
     setMessage(null);
     startSaving(async () => {
       const res = await saveBrandList({
+        slot: image.slot,
         heading,
         linkUrl,
         items: rows.filter((r) => r.status === "done").map((r) => ({ url: r.url, label: r.label, href: r.href })),
@@ -194,23 +216,35 @@ export function BrandListForm({ image, options, where, ratio }: { image: SiteIma
   }
 
   return (
-    <section className="admin-panel slot-form brand-list-form" aria-labelledby="brand-list-title">
+    <section className="admin-panel slot-form brand-list-form" aria-labelledby={`tile-block-${image.slot}`}>
       <div className="slot-form__head">
-        <svg className="slot-map" viewBox="0 0 60 64" aria-hidden="true">
-          <rect x="1" y="1" width="58" height="62" rx="3" className="slot-map__page" />
-          <rect x="5" y="4" width="50" height="3" rx="1" className="slot-map__nav" />
-          <rect x="5" y="9" width="50" height="14" rx="1.5" className="slot-map__off" />
-          <rect x="5" y="25" width="50" height="7" rx="1.5" className="slot-map__row" />
-          <rect x="5" y="34" width="24" height="6" rx="1.5" className="slot-map__off" />
-          <rect x="31" y="34" width="24" height="6" rx="1.5" className="slot-map__off" />
-          {[0, 1, 2, 3, 4].map((i) => (
-            <rect key={i} x={5 + i * 10.2} y="42" width="8.6" height="8.6" rx="1" className="slot-map__on" />
-          ))}
-          <rect x="5" y="53" width="50" height="7" rx="1.5" className="slot-map__off" />
-        </svg>
+        {info ? (
+          <svg className="slot-map" viewBox="0 0 60 64" aria-hidden="true">
+            <rect x="1" y="1" width="58" height="62" rx="3" className="slot-map__page" />
+            <rect x="5" y="4" width="50" height="3" rx="1" className="slot-map__nav" />
+            <rect x="5" y="9" width="50" height="14" rx="1.5" className="slot-map__off" />
+            <rect x="5" y="25" width="50" height="20" rx="1.5" className="slot-map__off" />
+            {[0, 1, 2].map((i) => (
+              <rect key={i} x={5 + i * 17} y="48" width="16" height="9" rx="1" className="slot-map__on" />
+            ))}
+          </svg>
+        ) : (
+          <svg className="slot-map" viewBox="0 0 60 64" aria-hidden="true">
+            <rect x="1" y="1" width="58" height="62" rx="3" className="slot-map__page" />
+            <rect x="5" y="4" width="50" height="3" rx="1" className="slot-map__nav" />
+            <rect x="5" y="9" width="50" height="14" rx="1.5" className="slot-map__off" />
+            <rect x="5" y="25" width="50" height="7" rx="1.5" className="slot-map__row" />
+            <rect x="5" y="34" width="24" height="6" rx="1.5" className="slot-map__off" />
+            <rect x="31" y="34" width="24" height="6" rx="1.5" className="slot-map__off" />
+            {[0, 1, 2, 3, 4].map((i) => (
+              <rect key={i} x={5 + i * 10.2} y="42" width="8.6" height="8.6" rx="1" className="slot-map__on" />
+            ))}
+            <rect x="5" y="53" width="50" height="7" rx="1.5" className="slot-map__off" />
+          </svg>
+        )}
         <div>
-          <h2 id="brand-list-title">
-            <span className="slot-form__num">2</span> Brand List
+          <h2 id={`tile-block-${image.slot}`}>
+            <span className="slot-form__num">{image.slot}</span> {info ? "Zesprit Info" : "Brand List"}
           </h2>
           <p className="admin-hint">{where}</p>
           <p className="admin-hint">Best: {ratio}</p>
@@ -229,9 +263,10 @@ export function BrandListForm({ image, options, where, ratio }: { image: SiteIma
               setHeading(e.target.value);
               setDirty(true);
             }}
-            placeholder="Shopping Brand List"
+            placeholder={info ? "The Z’esprit promise (optional)" : "Shopping Brand List"}
           />
         </label>
+        {!info && (
         <label className="admin-field">
           <span>“View all” link</span>
           <input
@@ -243,6 +278,7 @@ export function BrandListForm({ image, options, where, ratio }: { image: SiteIma
             placeholder="/collections/all"
           />
         </label>
+        )}
       </div>
 
       <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -254,6 +290,7 @@ export function BrandListForm({ image, options, where, ratio }: { image: SiteIma
                 row={r}
                 index={i}
                 options={options}
+                nameRequired={!info}
                 onPatch={(p) => patch(r.id, p)}
                 onRemove={() => {
                   if (r.url.startsWith("blob:")) URL.revokeObjectURL(r.url);
@@ -275,7 +312,7 @@ export function BrandListForm({ image, options, where, ratio }: { image: SiteIma
         }}
       >
         <span>
-          <strong>+ Add brand photos</strong> — choose several at once, or drop them here
+          <strong>{info ? "+ Add info images" : "+ Add brand photos"}</strong> — choose several at once, or drop them here
         </span>
         <input
           type="file"

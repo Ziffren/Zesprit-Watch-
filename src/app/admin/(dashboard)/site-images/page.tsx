@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { BRAND_LIST_SLOT, LOGO_SLOT, SITE_IMAGE_COLUMNS, SITE_IMAGE_SLOTS, bySlot, type SiteImage } from "@/lib/site-images";
+import { BRAND_LIST_SLOT, INFO_SLOT, LOGO_SLOT, SITE_IMAGE_COLUMNS, SITE_IMAGE_SLOTS, bySlot, type SiteImage } from "@/lib/site-images";
 import { BrandListForm, type LinkOption } from "./brand-list-form";
 import { LogoForm } from "./logo-form";
 import { SlotForm } from "./slot-form";
@@ -16,6 +16,11 @@ export default async function SiteImagesPage() {
     ...(cols ?? []).filter((c) => !c.isBrand).map((c) => ({ label: `${c.name} (collection)`, href: `/collections/${c.slug}` })),
     { label: "All watches", href: "/collections/all" },
     { label: "Sold list", href: "/collections/all?status=sold" },
+    { label: "Contact page", href: "/contact" },
+    { label: "Privacy page", href: "/privacy" },
+    { label: "Journal", href: "/journal" },
+    { label: "Watch Sourcing", href: "/sourcing" },
+    { label: "Reviews", href: "/reviews" },
   ];
   const images = bySlot(data as Partial<SiteImage>[] | null);
   const live = SITE_IMAGE_SLOTS.filter((s) => images[s.slot].imageUrl).length;
@@ -37,7 +42,9 @@ export default async function SiteImagesPage() {
         )}
         <div className="slot-list">
           {SITE_IMAGE_SLOTS.map((s) => (
-            s.slot === LOGO_SLOT ? (
+            s.slot === INFO_SLOT ? (
+              <BrandListForm key={s.slot} image={images[s.slot]} options={options} where={s.where} ratio={s.ratio} variant="info" />
+            ) : s.slot === LOGO_SLOT ? (
               <LogoForm key={s.slot} image={images[s.slot]} where={s.where} ratio={s.ratio} />
             ) : s.slot === BRAND_LIST_SLOT ? (
               <BrandListForm key={s.slot} image={images[s.slot]} options={options} where={s.where} ratio={s.ratio} />
