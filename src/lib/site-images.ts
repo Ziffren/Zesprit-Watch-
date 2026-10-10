@@ -6,30 +6,35 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 export const SITE_IMAGE_SLOTS = [
   {
     slot: 1,
+    aspect: 2,
     label: "Hero banner",
     where: "Full-width banner at the very top of the homepage, under the menu.",
     ratio: "2:1 landscape · 2400 × 1200 px or larger",
   },
   {
     slot: 2,
+    aspect: 0.8,
     label: "Feature",
     where: "Large tile on the left of the showcase, below the watch row.",
     ratio: "4:5 portrait · 1600 × 2000 px or larger",
   },
   {
     slot: 3,
+    aspect: 1.5,
     label: "Promo top",
     where: "Upper tile on the right of the showcase.",
     ratio: "3:2 landscape · 1800 × 1200 px or larger",
   },
   {
     slot: 4,
+    aspect: 1.5,
     label: "Promo bottom",
     where: "Lower tile on the right of the showcase.",
     ratio: "3:2 landscape · 1800 × 1200 px or larger",
   },
   {
     slot: 5,
+    aspect: 3,
     label: "Wide banner",
     where: "Long banner closing the showcase, full width.",
     ratio: "3:1 panoramic · 2700 × 900 px or larger",
