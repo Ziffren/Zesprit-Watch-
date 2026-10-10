@@ -15,6 +15,7 @@ import { depositAmount, getShopSettings } from "@/lib/deposits";
 import { QUALITY_PROMISE, SHIPPING_INFO } from "@/lib/product-info";
 import { SaveButton } from "./save-button";
 import { ProductGallery } from "./product-gallery";
+import { SiteFooter } from "@/components/site-footer";
 
 export default async function WatchDetailPage({
   params,
@@ -181,13 +182,7 @@ export default async function WatchDetailPage({
         )}
       </main>
 
-      <footer className="foot-mast">
-        <p className="wordmark">Z&rsquo;esprit Watch</p>
-        <p className="tagline muted">Vintage watches, restored to keep time again.</p>
-        <p className="links muted">
-          <Link href="/journal">Journal</Link> · Care Guide · <Link href="/contact">Contact</Link> · <Link href="/privacy">Privacy</Link>
-        </p>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

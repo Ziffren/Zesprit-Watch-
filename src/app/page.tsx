@@ -6,6 +6,7 @@ import { ShopRow } from "@/components/shop-row";
 import { ShopRowCard } from "@/components/product-card";
 import { HeroBanner, Showcase } from "@/components/site-showcase";
 import { getSiteImages } from "@/lib/site-images";
+import { SiteFooter } from "@/components/site-footer";
 
 // "New" / "Reduced" badges are date-based, so refresh at least hourly even
 // when no product is saved (saving revalidates immediately).
@@ -109,15 +110,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="foot-mast" id="footer">
-        <p className="wordmark">Z&rsquo;esprit Watch</p>
-        <p className="tagline muted">
-          Vintage watches, restored to keep time again.
-        </p>
-        <p className="links muted">
-          <Link href="/journal">Journal</Link> · Care Guide · <Link href="/contact">Contact</Link> · <Link href="/privacy">Privacy</Link>
-        </p>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

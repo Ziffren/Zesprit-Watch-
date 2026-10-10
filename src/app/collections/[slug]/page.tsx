@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { COLLECTION_PAGE_SIZE, getCollectionPage } from "@/lib/storefront";
 import { SiteHeader } from "@/components/site-header";
 import { ProductCard } from "@/components/product-card";
+import { SiteFooter } from "@/components/site-footer";
 
 // Badges are date-based and stock changes often — always render fresh.
 export const dynamic = "force-dynamic";
@@ -83,13 +84,7 @@ export default async function CollectionPage({
         )}
       </main>
 
-      <footer className="foot-mast">
-        <p className="wordmark">Z&rsquo;esprit Watch</p>
-        <p className="tagline muted">Vintage watches, restored to keep time again.</p>
-        <p className="links muted">
-          <Link href="/journal">Journal</Link> · Care Guide · <Link href="/contact">Contact</Link> · <Link href="/privacy">Privacy</Link>
-        </p>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

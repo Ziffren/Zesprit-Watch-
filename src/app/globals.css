@@ -3359,3 +3359,38 @@ a.showcase__tile:focus-visible {
 .collection-grid-public .product__media {
   border-radius: var(--radius-control);
 }
+
+/* Footer social links */
+.foot-social {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  margin-top: var(--space-sm);
+}
+
+.foot-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-short) var(--ease-out);
+}
+
+.foot-social a:hover {
+  color: var(--color-accent-2);
+}
+
+.foot-social a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* Paragraphs carry a global max-width (measure); centre them in the footer
+   so tagline, links and socials line up under the wordmark. */
+.foot-mast p {
+  margin-inline: auto;
+}
