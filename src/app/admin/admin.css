@@ -2237,3 +2237,107 @@
 .admin-table tr[data-changed] td {
   background: color-mix(in srgb, var(--color-accent) 10%, var(--color-paper));
 }
+
+/* ---------- Messages inbox ---------- */
+
+.msg-from {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: inherit;
+  text-decoration: none;
+}
+
+.msg-from:hover .msg-from__name {
+  text-decoration: underline;
+}
+
+.msg-from > span:last-child {
+  display: grid;
+}
+
+.msg-from__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.msg-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--color-accent) 22%, var(--color-paper));
+  color: var(--color-ink);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+.msg-avatar--lg {
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: var(--text-sm);
+}
+
+.msg-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent-2);
+}
+
+.msg-table tr[data-unread] td {
+  font-weight: 600;
+}
+
+.msg-table tr[data-unread] .admin-hint {
+  font-weight: 400;
+}
+
+.msg-snippet {
+  display: grid;
+  gap: 2px;
+  max-width: 34rem;
+}
+
+.msg-about {
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+  color: var(--color-accent-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msg-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.msg-bubble {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--admin-head-bg);
+  border-radius: var(--admin-card-radius);
+  border-top-left-radius: 4px;
+  line-height: 1.6;
+}
+
+.msg-about-panel {
+  gap: var(--space-2xs);
+}
+
+.msg-about-panel a {
+  color: var(--color-accent-2);
+  overflow-wrap: anywhere;
+}
+
+.msg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}

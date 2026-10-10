@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getBrandMenu } from "@/lib/storefront";
 import { WatchesMenu } from "./watches-menu";
 import { AccountLink } from "./account-link";
+import { MessageMe } from "./message-me";
 import { SOCIAL_LINKS } from "@/lib/site-links";
 
 type Section = "home" | "watches" | "shop" | "sourcing" | null;
@@ -111,9 +112,7 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
             </svg>
             <span className="cart-count">0</span>
           </a>
-          <Link className="cta-solid" href="/contact">
-            Let&rsquo;s Connect
-          </Link>
+          <MessageMe />
         </div>
       </div>
     </header>

@@ -3394,3 +3394,81 @@ a.showcase__tile:focus-visible {
 .foot-mast p {
   margin-inline: auto;
 }
+
+/* ---------- Header "Message Me" + shared message form ---------- */
+/* Hallmark · component: message-me button + dialog · states: default · hover · focus · active · pending · error · success · guest/signed-in */
+
+.message-me-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  font: inherit;
+  font-size: var(--text-base);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--color-ink);
+  background: var(--color-paper-light);
+  border: var(--rule-hair) solid var(--color-ink);
+  border-radius: var(--radius-control);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--color-ink) 10%, transparent);
+  cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out),
+    transform var(--dur-micro) var(--ease-out);
+}
+
+.message-me-btn:hover {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.message-me-btn:active {
+  transform: translateY(1px);
+}
+
+.message-me-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 40rem) {
+  .message-me-btn {
+    min-height: 40px;
+    padding: 0 var(--space-sm);
+    font-size: var(--text-sm);
+  }
+}
+
+/* The form sits flat inside its panel (Contact card or dialog). */
+.auth-card .message-form,
+.auth-card .message-sent {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.message-form .cta-solid {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.message-form__note {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.message-form__note a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.message-form__loading {
+  padding: var(--space-xl) 0;
+  text-align: center;
+  color: var(--color-muted);
+}
