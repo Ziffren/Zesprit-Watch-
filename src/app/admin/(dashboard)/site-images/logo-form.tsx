@@ -56,7 +56,7 @@ export function LogoForm({ image, where, ratio }: { image: SiteImage; where: str
           <p className="admin-hint">Best: {ratio}</p>
         </div>
         <span className="admin-badge" data-tone={image.imageUrl ? "active" : "draft"}>
-          {image.imageUrl ? "Showing" : "Text wordmark"}
+          {image.imageUrl ? "Showing" : "Default icon"}
         </span>
       </div>
 
@@ -66,8 +66,9 @@ export function LogoForm({ image, where, ratio }: { image: SiteImage; where: str
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt="" />
           ) : (
-            <span className="logo-form__placeholder">Z&rsquo;ESPRIT WATCH</span>
+            <span className="logo-form__placeholder logo-form__placeholder--icon">fan icon</span>
           )}
+          <span className="logo-form__placeholder">Z&rsquo;ESPRIT WATCH</span>
         </div>
         <div className="logo-form__actions">
           <button type="button" className="admin-btn" onClick={() => fileRef.current?.click()} disabled={busy != null}>
@@ -111,7 +112,7 @@ export function LogoForm({ image, where, ratio }: { image: SiteImage; where: str
 
       <div className="slot-form__foot">
         <span className="admin-hint" aria-live="polite">
-          {dirty ? "Unsaved changes" : state.savedAt ? "Saved — live in the header" : "Without a logo the header shows the text wordmark."}
+          {dirty ? "Unsaved changes" : state.savedAt ? "Saved — live in the header" : "Without a logo the header shows the fan icon above the wordmark."}
         </span>
         <button className="admin-btn admin-btn--primary" type="submit" disabled={pending || busy != null || !dirty}>
           {pending ? "Saving…" : "Save"}

@@ -37,8 +37,8 @@ export const SITE_IMAGE_SLOTS = [
   {
     slot: 6,
     label: "Logo",
-    where: "Site logo in the header (centre), in place of the text wordmark.",
-    ratio: "PNG with transparent background or SVG · about 600 × 200 px",
+    where: "Logo mark in the header, above the “Z’esprit Watch” wordmark (replaces the fan icon).",
+    ratio: "square-ish PNG with transparent background or SVG · about 400 × 400 px",
   },
   {
     slot: 7,

@@ -61,22 +61,21 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
 
         <div className="nav-centered__center">
           <Sticker kind="sourcing" active={active === "sourcing"} />
-          <Link className={logo ? "nav-centered__brand nav-centered__brand--logo" : "nav-centered__brand"} href="/" aria-label="Z’esprit Watch — home">
+          <Link className="nav-centered__brand" href="/" aria-label="Z’esprit Watch — home">
             {logo ? (
-              // Uploaded in Admin → Website images → Logo. Plain <img> so SVG logos work too.
+              // Uploaded in Admin → Website images → Logo; replaces the fan
+              // icon above the wordmark. Plain <img> so SVG logos work too.
               // eslint-disable-next-line @next/next/no-img-element
-              <img className="nav-centered__logo" src={logo.url} alt={logo.alt} />
+              <img className="nav-centered__logo" src={logo.url} alt="" />
             ) : (
-              <>
-                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                  <path d="M7 23a13 13 0 0 1 26 0" stroke="var(--color-ink)" strokeWidth="1.5" />
-                  <line x1="6" y1="23" x2="34" y2="23" stroke="var(--color-ink)" strokeWidth="1.5" />
-                  <line x1="20" y1="23" x2="20" y2="12" stroke="var(--color-accent-2)" strokeWidth="1.5" />
-                  <circle cx="20" cy="23" r="2" fill="var(--color-ink)" />
-                </svg>
-                <span className="nav-centered__wordmark">Z&rsquo;esprit Watch</span>
-              </>
+              <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                <path d="M7 23a13 13 0 0 1 26 0" stroke="var(--color-ink)" strokeWidth="1.5" />
+                <line x1="6" y1="23" x2="34" y2="23" stroke="var(--color-ink)" strokeWidth="1.5" />
+                <line x1="20" y1="23" x2="20" y2="12" stroke="var(--color-accent-2)" strokeWidth="1.5" />
+                <circle cx="20" cy="23" r="2" fill="var(--color-ink)" />
+              </svg>
             )}
+            <span className="nav-centered__wordmark">Z&rsquo;esprit Watch</span>
           </Link>
           <Sticker kind="reviews" active={active === "reviews"} />
         </div>
