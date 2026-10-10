@@ -10,6 +10,7 @@ import { DepositForm } from "./deposit-form";
 import { BuyButtons } from "./buy-buttons";
 import { PieceMessageForm } from "./piece-message";
 import { ShareButton } from "./share-button";
+import { RequestPiece } from "./request-piece";
 import { depositAmount, getShopSettings } from "@/lib/deposits";
 import { QUALITY_PROMISE, SHIPPING_INFO } from "@/lib/product-info";
 import { SaveButton } from "./save-button";
@@ -42,15 +43,23 @@ export default async function WatchDetailPage({
           </div>
 
           <div className="watch-detail__info">
-            <PieceBadges isNew={watch.isNew} isReduced={watch.isReduced} onHold={watch.status === "HOLD"} />
+            <PieceBadges
+              isNew={watch.status !== "SOLD" && watch.isNew}
+              isReduced={watch.status !== "SOLD" && watch.isReduced}
+              onHold={watch.status === "HOLD"}
+            />
             <p className="watch-detail__brand">{watch.brand}</p>
             <h1 className="watch-detail__title">{watch.name}</h1>
-            <PiecePrice
-              className="watch-detail__price"
-              price={formatPrice(watch.priceCents)}
-              priceSet={watch.priceCents != null}
-              compareAt={watch.compareAt}
-            />
+            {watch.status === "SOLD" ? (
+              <p className="watch-detail__sold">Sold</p>
+            ) : (
+              <PiecePrice
+                className="watch-detail__price"
+                price={formatPrice(watch.priceCents)}
+                priceSet={watch.priceCents != null}
+                compareAt={watch.compareAt}
+              />
+            )}
 
             {watch.status === "AVAILABLE" ? (
               <BuyButtons
@@ -75,13 +84,14 @@ export default async function WatchDetailPage({
                 </p>
               </div>
             ) : (
-              <div className="status-notice">
-                <p className="status-notice__title">This piece has found its home</p>
-                <p>
-                  It&rsquo;s no longer available — <Link href="/collections/all">browse the current collection</Link> or{" "}
-                  <Link href="/sourcing">ask us to source one</Link>.
-                </p>
-              </div>
+              <RequestPiece
+                gate={customer.status}
+                next={`/watches/${watch.id}`}
+                brand={watch.brand}
+                model={watch.name}
+                pageUrl={`https://zesprit-watch.vercel.app/watches/${watch.id}`}
+                profile={customer.status === "ready" ? customer.profile : null}
+              />
             )}
 
             <div className="accordions">

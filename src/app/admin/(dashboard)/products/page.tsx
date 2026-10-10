@@ -37,9 +37,14 @@ export default async function ProductsPage({
     <>
       <header className="admin-topbar">
         <p className="admin-topbar__title">Products</p>
-        <Link className="admin-btn admin-btn--primary" href="/admin/products/new">
+        <div style={{ display: "flex", gap: "var(--space-xs)" }}>
+          <Link className="admin-btn" href="/admin/products/prices">
+            Edit prices
+          </Link>
+          <Link className="admin-btn admin-btn--primary" href="/admin/products/new">
           New product
         </Link>
+        </div>
       </header>
 
       <div className="admin-content">

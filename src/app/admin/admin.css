@@ -2183,3 +2183,57 @@
 .admin-dl__warn {
   color: var(--color-accent-2);
 }
+
+/* ---------- Bulk price editor ---------- */
+
+.price-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.price-toolbar__select {
+  font: inherit;
+  font-size: var(--text-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--admin-input-border);
+  border-radius: var(--admin-radius);
+  background: var(--color-paper);
+}
+
+.price-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  border: var(--rule-hair) solid var(--admin-input-border);
+  border-radius: var(--admin-radius);
+  background: var(--color-paper-light);
+  padding: 0 var(--space-xs);
+}
+
+.price-cell:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-focus) 30%, transparent);
+}
+
+.price-cell span {
+  color: var(--color-muted);
+}
+
+.price-cell input {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  border: 0;
+  background: transparent;
+  padding: var(--space-xs) 0;
+  outline: none;
+}
+
+.admin-table tr[data-changed] td {
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-paper));
+}
