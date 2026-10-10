@@ -2341,3 +2341,41 @@
   flex-wrap: wrap;
   gap: var(--space-xs);
 }
+
+/* Admin → Reviews */
+.review-table td {
+  vertical-align: top;
+}
+
+.review-table td > .admin-hint {
+  display: block;
+}
+
+.review-table__name {
+  display: block;
+  font-weight: 500;
+}
+
+.review-table__ratings {
+  white-space: nowrap;
+}
+
+.review-table__ratings strong {
+  display: block;
+}
+
+.review-table__comment {
+  max-width: 34rem;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.review-table tr[data-hidden] td {
+  opacity: 0.6;
+}
+
+.review-table__actions {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: flex-end;
+}

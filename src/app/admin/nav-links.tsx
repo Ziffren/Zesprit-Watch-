@@ -23,6 +23,8 @@ const insightsLinks = [{ href: "/admin/analytics", label: "Analytics" }];
 
 const inboxLinks = [{ href: "/admin/messages", label: "Messages" }];
 
+const reviewLinks = [{ href: "/admin/reviews", label: "Reviews" }];
+
 export function AdminNav({ unreadMessageCount = 0 }: { unreadMessageCount?: number }) {
   const pathname = usePathname();
 
@@ -100,6 +102,16 @@ export function AdminNav({ unreadMessageCount = 0 }: { unreadMessageCount?: numb
           {unreadMessageCount > 0 && (
             <span className="admin-nav__unread-badge">{unreadMessageCount}</span>
           )}
+        </Link>
+      ))}
+      {reviewLinks.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className="admin-nav__link"
+          data-active={pathname.startsWith(link.href)}
+        >
+          {link.label}
         </Link>
       ))}
     </nav>

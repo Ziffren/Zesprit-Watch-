@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, EB_Garamond } from "next/font/google";
+import { Bodoni_Moda, Bricolage_Grotesque, EB_Garamond } from "next/font/google";
 import { Suspense } from "react";
 import { PageTracker } from "./page-tracker";
 import { NavigationProgress } from "@/components/navigation-progress";
@@ -18,6 +18,13 @@ const ebGaramond = EB_Garamond({
   weight: ["400", "500"],
 });
 
+// Accent face for one element only — the header "Reviews" sticker.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-accent",
+  subsets: ["latin"],
+  weight: ["800"],
+});
+
 export const metadata: Metadata = {
   title: "Z’esprit Watch — Vintage Watches, Restored",
   description:
@@ -28,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${bodoniModa.variable} ${ebGaramond.variable} h-full antialiased`}
+      className={`${bodoniModa.variable} ${ebGaramond.variable} ${bricolage.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <PageTracker />

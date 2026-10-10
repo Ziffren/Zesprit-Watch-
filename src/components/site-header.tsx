@@ -6,7 +6,7 @@ import { MessageMe } from "./message-me";
 import { HeaderCounts } from "./header-counts";
 import { SOCIAL_LINKS } from "@/lib/site-links";
 
-type Section = "home" | "watches" | "shop" | "sourcing" | null;
+type Section = "home" | "watches" | "shop" | "sourcing" | "reviews" | null;
 
 // Storefront header (centred lockup): Home · Watches ▾ · Shop · Social ·
 // About on the left, wordmark centred, social/cart/CTA on the right.
@@ -56,8 +56,10 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
               <Link href="/sourcing">Watch Sourcing</Link>
               <Link href="/#footer">Social</Link>
               <Link href="/#heritage">About</Link>
+              <ReviewsLink active={active === "reviews"} where="menu" />
             </nav>
           </details>
+          <ReviewsLink active={active === "reviews"} where="tablet" />
         </div>
 
         <Link className="nav-centered__brand" href="/" aria-label="Z’esprit Watch — home">
@@ -69,6 +71,7 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
           </svg>
           <span className="nav-centered__wordmark">Z&rsquo;esprit Watch</span>
         </Link>
+        <ReviewsLink active={active === "reviews"} where="phone" />
 
         <div className="nav-centered__actions">
           <a
@@ -100,11 +103,28 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
               />
             </svg>
           </a>
+          <ReviewsLink active={active === "reviews"} where="desktop" />
           <AccountLink />
           <HeaderCounts />
           <MessageMe />
         </div>
       </div>
     </header>
+  );
+}
+
+// The one loud item in the header: a tilted brass sticker in a bold
+// grotesque, so customers spot where to leave a review.
+// Placed once per layout: in the actions group on desktop, beside "Menu" on
+// tablets, beside the wordmark on phones, and in the menu list (CSS shows
+// the right one).
+function ReviewsLink({ active, where }: { active: boolean; where: "desktop" | "tablet" | "menu" | "phone" }) {
+  return (
+    <Link className={`nav-reviews nav-reviews--${where}`} href="/reviews" aria-current={active ? "page" : undefined}>
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+        <path d="m12 3.2 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7Z" fill="currentColor" />
+      </svg>
+      Reviews
+    </Link>
   );
 }

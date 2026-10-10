@@ -211,5 +211,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "none",
     "brief": "Click photo/title/brand; heart saves to wishlist, one per customer, count shown"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "reviews — header sticker (Bricolage Grotesque 800, brass, tilted; per-breakpoint placement), /reviews page (sticky score rail + star form + review cards), homepage 'What customers say' band, admin Reviews table",
+    "theme": "custom (locked tokens + --font-accent for the sticker only)",
+    "enrichment": "none",
+    "brief": "Customer reviews: 3 criteria × 5 stars + comment, shown on site; header entry bold and eye-catching"
   }
 ]

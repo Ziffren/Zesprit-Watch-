@@ -7,13 +7,19 @@ import { ShopRowCard } from "@/components/product-card";
 import { HeroBanner, Showcase } from "@/components/site-showcase";
 import { getSiteImages } from "@/lib/site-images";
 import { SiteFooter } from "@/components/site-footer";
+import { ReviewCard, ReviewScore } from "@/components/reviews";
+import { getReviews } from "@/lib/reviews";
 
 // "New" / "Reduced" badges are date-based, so refresh at least hourly even
 // when no product is saved (saving revalidates immediately).
 export const revalidate = 3600;
 
 export default async function Home() {
-  const [{ pieces, total }, siteImages] = await Promise.all([getShopRow(), getSiteImages()]);
+  const [{ pieces, total }, siteImages, { summary, reviews }] = await Promise.all([
+    getShopRow(),
+    getSiteImages(),
+    getReviews(1),
+  ]);
 
   return (
     <>
@@ -42,6 +48,25 @@ export default async function Home() {
         </section>
 
         <Showcase images={{ 2: siteImages[2], 3: siteImages[3], 4: siteImages[4], 5: siteImages[5] }} />
+
+        <section className="home-reviews" aria-labelledby="home-reviews-title">
+          <div className="home-reviews__head">
+            <h2 id="home-reviews-title">What customers say</h2>
+            <ReviewScore summary={summary} compact />
+            <Link className="cta-solid home-reviews__cta" href="/reviews">
+              {summary.count ? "Read all reviews · Write yours" : "Be the first to review"}
+            </Link>
+          </div>
+          {reviews.length > 0 && (
+            <ul className="home-reviews__list">
+              {reviews.slice(0, 3).map((r) => (
+                <li key={r.id}>
+                  <ReviewCard review={r} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <section className="heritage" id="heritage">
           <div className="heritage__copy">
