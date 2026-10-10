@@ -218,5 +218,12 @@
     "theme": "custom (locked tokens + --font-accent for the sticker only)",
     "enrichment": "none",
     "brief": "Customer reviews: 3 criteria × 5 stars + comment, shown on site; header entry bold and eye-catching"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "header — mirrored sticker pair flanking the wordmark: Watch Sourcing (oxblood, +3°) · wordmark · Reviews (brass, −3°), equal widths; two-row header below 78rem",
+    "theme": "custom (locked tokens + --font-accent stickers only)",
+    "enrichment": "none",
+    "brief": "Watch Sourcing styled like Reviews; both symmetric beside the logo"
   }
 ]

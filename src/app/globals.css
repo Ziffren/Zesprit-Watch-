@@ -241,7 +241,8 @@ button {
 }
 
 /* The desktop link row (6 items) needs room beside the centred wordmark:
-   full size from 1440px, tighter below, and folded into "Menu" under 72rem. */
+   full size from 1440px, tighter below, and folded into "Menu" under 78rem
+   (the wordmark is flanked by the two stickers, so the centre is wider). */
 @media (max-width: 89.9rem) {
   .nav-centered__links--desktop {
     font-size: var(--text-base);
@@ -249,7 +250,7 @@ button {
   }
 }
 
-@media (max-width: 72rem) {
+@media (max-width: 78rem) {
   .nav-centered__links--desktop {
     display: none;
   }
@@ -258,7 +259,7 @@ button {
   }
 }
 
-@media (max-width: 60rem) {
+@media (max-width: 78rem) {
   .nav-centered__links--mobile {
     position: absolute;
     top: calc(100% + var(--space-2xs));
@@ -277,11 +278,11 @@ button {
   }
 }
 
-/* Two rows (menu · actions, then the wordmark) below 52rem — narrower than
-   that, the centred wordmark collides with the actions group. */
-@media (max-width: 52rem) {
+/* Two rows (menu · actions, then sticker · wordmark · sticker) below 78rem —
+   narrower than that, the centre group collides with the actions. */
+@media (max-width: 78rem) {
   :root {
-    --nav-h: 161px; /* nav-centered__row wraps to two lines below 52rem */
+    --nav-h: 161px; /* nav-centered__row wraps to two lines below 78rem */
   }
   .nav-centered__row {
     display: flex;
@@ -298,7 +299,7 @@ button {
     order: 2;
     gap: var(--space-sm);
   }
-  .nav-centered__brand {
+  .nav-centered__center {
     order: 3;
     flex-basis: 100%;
   }
@@ -4137,115 +4138,96 @@ a.row-card__brand:hover {
   }
 }
 
-/* ---------- Header: Reviews sticker ---------- */
+/* ---------- Header: Sourcing + Reviews stickers flanking the wordmark ---------- */
 /* Hallmark · component: nav sticker · genre: editorial (one playful accent) · theme: custom
  * states: default · hover · focus · active · current
+ * Mirror pair: Sourcing (oxblood, tilted right) · wordmark · Reviews (brass, tilted left).
  */
 
-.nav-centered a.nav-reviews {
+.nav-centered__center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.nav-centered a.nav-sticker {
+  --tilt: -3deg;
+  --sticker-bg: var(--color-accent);
+  --sticker-fg: var(--color-ink);
   display: inline-flex;
   align-items: center;
-  gap: 0.35em;
+  justify-content: center;
+  /* Equal widths keep the wordmark dead centre between the pair. */
+  min-width: 11.4em;
+  gap: 0.4em;
   font-family: var(--font-accent), var(--font-body);
   font-weight: 800;
-  font-size: 0.82em;
+  font-size: var(--text-sm);
   letter-spacing: 0.01em;
   line-height: 1;
-  color: var(--color-ink);
-  background: var(--color-accent);
-  padding: 0.5em 0.85em 0.48em;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--sticker-fg);
+  background: var(--sticker-bg);
+  padding: 0.55em 0.9em 0.5em;
   border: 1.5px solid var(--color-ink);
   border-radius: 999px;
   box-shadow: 2px 2px 0 var(--color-ink);
-  transform: rotate(-3deg);
+  transform: rotate(var(--tilt));
   transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out),
-    background-color var(--dur-short) var(--ease-out);
+    background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
 }
 
-.nav-centered a.nav-reviews:hover {
+.nav-centered a.nav-sticker--sourcing {
+  --tilt: 3deg;
+  --sticker-bg: var(--color-accent-2);
+  --sticker-fg: var(--color-paper);
+}
+
+.nav-centered a.nav-sticker:hover {
   border-color: var(--color-ink);
   transform: rotate(0deg) translate(-1px, -1px);
   box-shadow: 3px 3px 0 var(--color-ink);
 }
 
-.nav-centered a.nav-reviews:active {
+.nav-centered a.nav-sticker:active {
   transform: rotate(0deg) translate(1px, 1px);
   box-shadow: 0 0 0 var(--color-ink);
 }
 
-.nav-centered a.nav-reviews:focus-visible {
+.nav-centered a.nav-sticker:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 3px;
 }
 
-.nav-centered a.nav-reviews[aria-current="page"] {
+.nav-centered a.nav-sticker[aria-current="page"] {
   background: var(--color-ink);
-  color: var(--color-accent);
+  color: var(--sticker-bg);
 }
 
-.nav-centered a.nav-reviews svg {
+.nav-centered a.nav-sticker--sourcing[aria-current="page"] {
+  color: var(--color-paper);
+  box-shadow: 2px 2px 0 var(--color-accent-2);
+}
+
+.nav-centered a.nav-sticker svg {
+  flex: none;
   transition: transform var(--dur-long) var(--ease-out);
 }
 
-.nav-centered a.nav-reviews:hover svg {
+.nav-centered a.nav-sticker--reviews:hover svg {
   transform: rotate(72deg) scale(1.15);
 }
 
-.nav-centered a.nav-reviews {
-  text-decoration: none;
-  white-space: nowrap;
-  font-size: var(--text-sm);
-}
-
-.nav-centered__links--mobile a.nav-reviews {
-  margin-top: var(--space-2xs);
-  font-size: var(--text-sm);
-}
-
-/* One copy per layout. */
-.nav-reviews--tablet {
-  display: none !important;
-}
-
-.nav-centered__menu {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
+.nav-centered a.nav-sticker--sourcing:hover svg {
+  transform: rotate(-14deg) scale(1.15);
 }
 
 @media (max-width: 89.9rem) {
   .icon-link.icon-link--social {
     display: none;
-  }
-}
-
-@media (max-width: 72rem) {
-  .nav-reviews--desktop {
-    display: none !important;
-  }
-  .nav-reviews--tablet {
-    display: inline-flex !important;
-  }
-}
-
-.nav-reviews--phone {
-  display: none !important;
-}
-
-@media (max-width: 40rem) {
-  .nav-reviews--tablet {
-    display: none !important;
-  }
-  .nav-centered__row {
-    position: relative;
-  }
-  .nav-centered a.nav-reviews--phone {
-    display: inline-flex !important;
-    position: absolute;
-    right: var(--page-gutter);
-    bottom: calc(var(--space-lg) - 0.2rem);
-    font-size: var(--text-xs);
-    padding: 0.5em 0.8em 0.45em;
   }
 }
 
@@ -4603,11 +4585,11 @@ a.row-card__brand:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav-centered a.nav-reviews,
-  .nav-centered a.nav-reviews:hover {
+  .nav-centered a.nav-sticker,
+  .nav-centered a.nav-sticker:hover {
     transform: none;
   }
-  .nav-centered a.nav-reviews svg,
+  .nav-centered a.nav-sticker svg,
   .star-input__star {
     transition: none;
   }
@@ -4665,8 +4647,32 @@ a.row-card__brand:hover {
   }
 }
 
-@media (max-width: 22rem) {
-  .nav-centered a.nav-reviews--phone svg {
+@media (max-width: 40rem) {
+  .nav-centered__center {
+    gap: var(--space-sm);
+  }
+  .nav-centered a.nav-sticker {
+    font-size: var(--text-xs);
+    min-width: 7.4em;
+    padding: 0.55em 0.75em 0.5em;
+  }
+  .nav-sticker__extra {
     display: none;
+  }
+}
+
+@media (max-width: 24rem) {
+  .nav-centered a.nav-sticker svg {
+    display: none;
+  }
+  .nav-centered__center {
+    gap: var(--space-xs);
+  }
+  .nav-centered a.nav-sticker {
+    min-width: 6.6em;
+    padding-inline: 0.6em;
+  }
+  .nav-centered__wordmark {
+    letter-spacing: 0.04em;
   }
 }

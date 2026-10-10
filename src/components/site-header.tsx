@@ -27,9 +27,6 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
             <Link href="/collections/all" {...current("shop")}>
               Shop
             </Link>
-            <Link href="/sourcing" {...current("sourcing")}>
-              Watch Sourcing
-            </Link>
             <Link href="/#footer">Social</Link>
             <Link href="/#heritage">About</Link>
           </nav>
@@ -56,13 +53,14 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
               <Link href="/sourcing">Watch Sourcing</Link>
               <Link href="/#footer">Social</Link>
               <Link href="/#heritage">About</Link>
-              <ReviewsLink active={active === "reviews"} where="menu" />
+              <Link href="/reviews">Reviews</Link>
             </nav>
           </details>
-          <ReviewsLink active={active === "reviews"} where="tablet" />
         </div>
 
-        <Link className="nav-centered__brand" href="/" aria-label="Z’esprit Watch — home">
+        <div className="nav-centered__center">
+          <Sticker kind="sourcing" active={active === "sourcing"} />
+          <Link className="nav-centered__brand" href="/" aria-label="Z’esprit Watch — home">
           <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
             <path d="M7 23a13 13 0 0 1 26 0" stroke="var(--color-ink)" strokeWidth="1.5" />
             <line x1="6" y1="23" x2="34" y2="23" stroke="var(--color-ink)" strokeWidth="1.5" />
@@ -70,8 +68,9 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
             <circle cx="20" cy="23" r="2" fill="var(--color-ink)" />
           </svg>
           <span className="nav-centered__wordmark">Z&rsquo;esprit Watch</span>
-        </Link>
-        <ReviewsLink active={active === "reviews"} where="phone" />
+          </Link>
+          <Sticker kind="reviews" active={active === "reviews"} />
+        </div>
 
         <div className="nav-centered__actions">
           <a
@@ -103,7 +102,6 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
               />
             </svg>
           </a>
-          <ReviewsLink active={active === "reviews"} where="desktop" />
           <AccountLink />
           <HeaderCounts />
           <MessageMe />
@@ -113,18 +111,40 @@ export async function SiteHeader({ active = null }: { active?: Section }) {
   );
 }
 
-// The one loud item in the header: a tilted brass sticker in a bold
-// grotesque, so customers spot where to leave a review.
-// Placed once per layout: in the actions group on desktop, beside "Menu" on
-// tablets, beside the wordmark on phones, and in the menu list (CSS shows
-// the right one).
-function ReviewsLink({ active, where }: { active: boolean; where: "desktop" | "tablet" | "menu" | "phone" }) {
-  return (
-    <Link className={`nav-reviews nav-reviews--${where}`} href="/reviews" aria-current={active ? "page" : undefined}>
+// The two loud items in the header, flanking the wordmark as a mirrored
+// pair: tilted stickers in a bold grotesque so customers spot them.
+const STICKERS = {
+  sourcing: {
+    href: "/sourcing",
+    label: (
+      <>
+        <span className="nav-sticker__extra">Watch </span>Sourcing
+      </>
+    ),
+    icon: (
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6" stroke="currentColor" strokeWidth="2.6" />
+        <path d="m15 15 5 5" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  reviews: {
+    href: "/reviews",
+    label: "Reviews",
+    icon: (
       <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
         <path d="m12 3.2 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7Z" fill="currentColor" />
       </svg>
-      Reviews
+    ),
+  },
+} as const;
+
+function Sticker({ kind, active }: { kind: keyof typeof STICKERS; active: boolean }) {
+  const s = STICKERS[kind];
+  return (
+    <Link className={`nav-sticker nav-sticker--${kind}`} href={s.href} aria-current={active ? "page" : undefined}>
+      {s.icon}
+      {s.label}
     </Link>
   );
 }
