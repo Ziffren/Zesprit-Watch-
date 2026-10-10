@@ -197,5 +197,12 @@
     "theme": "custom (locked tokens)",
     "enrichment": "none",
     "brief": "Replace the long request form with buttons; sign-in required to buy"
+  },
+  {
+    "date": "2026-10-10",
+    "component": "listing filter bar — availability segments (Available/Sold/All), On sale chip, sort select (price, newest/oldest, most loved), live count; Sold badge + muted sold cards",
+    "theme": "custom (locked tokens)",
+    "enrichment": "none",
+    "brief": "Shared filter on /collections/all, brand and collection pages"
   }
 ]

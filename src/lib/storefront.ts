@@ -2,6 +2,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { formatPrice } from "@/lib/admin/types";
 import { matchesCollection, type Rule } from "@/lib/collection-rules";
+import type { CollectionQuery, StatusFilter } from "@/lib/collection-query";
 
 // "New" and "Reduced" badges both look back this far.
 const BADGE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -19,6 +20,8 @@ export type StorefrontPiece = {
   isReduced: boolean;
   /** A deposit has been received — still listed, not purchasable. */
   onHold: boolean;
+  /** Sold pieces only appear when a listing is filtered to show them. */
+  sold: boolean;
   imageUrl: string | null;
   hour: number;
   min: number;
@@ -27,7 +30,7 @@ export type StorefrontPiece = {
 // Shown until the owner publishes real products in /admin/products.
 const placeholder = (id: string, name: string, detail: string, hour: number, min: number): StorefrontPiece => ({
   id, name, detail, hour, min, brand: "Z’esprit Watch",
-  price: "Price on request", priceSet: false, compareAt: null, isNew: false, isReduced: false, onHold: false, imageUrl: null,
+  price: "Price on request", priceSet: false, compareAt: null, isNew: false, isReduced: false, onHold: false, sold: false, imageUrl: null,
 });
 const placeholderPieces: StorefrontPiece[] = [
   placeholder("meridian", "The Meridian", "Hand-wound · steel case", 35, 210),
@@ -76,6 +79,25 @@ export function priceBadges(
 
 function toPiece(p: PieceRow, now: number): StorefrontPiece {
   const { hour, min } = anglesFromId(p.id);
+  if (p.status === "SOLD") {
+    // Sold: no price, no New/Reduced badges.
+    return {
+      id: p.id,
+      name: p.productName,
+      brand: p.brand,
+      detail: p.tags?.length ? p.tags.slice(0, 2).join(" · ") : p.brand,
+      price: "Sold",
+      priceSet: false,
+      compareAt: null,
+      isNew: false,
+      isReduced: false,
+      onHold: false,
+      sold: true,
+      imageUrl: p.photoUrls?.[0] ?? null,
+      hour,
+      min,
+    };
+  }
   return {
     id: p.id,
     name: p.productName,
@@ -85,6 +107,7 @@ function toPiece(p: PieceRow, now: number): StorefrontPiece {
     priceSet: p.priceCents != null,
     imageUrl: p.photoUrls?.[0] ?? null,
     onHold: p.status === "HOLD",
+    sold: false,
     hour,
     min,
     ...priceBadges(p, now),
@@ -288,29 +311,34 @@ export type CollectionPage = {
 
 export const COLLECTION_PAGE_SIZE = 24;
 
-// /collections/[slug] — a brand, themed or automated collection, or "all".
-// Shows pieces in stock, most valuable first, 24 per page.
-export async function getCollectionPage(slug: string, page: number): Promise<CollectionPage | null> {
+const STATUS_SETS: Record<StatusFilter, string[]> = {
+  available: ["AVAILABLE", "HOLD"],
+  sold: ["SOLD"],
+  all: ["AVAILABLE", "HOLD", "SOLD"],
+};
+
+// /collections/[slug] — a brand, themed or automated collection, or "all",
+// with the shared filter bar: status (available / sold / all), on sale, and
+// sort (price, date, most loved). 24 per page.
+export async function getCollectionPage(slug: string, q: CollectionQuery): Promise<CollectionPage | null> {
   if (!isSupabaseConfigured) return null;
 
   try {
     const supabase = createPublicClient();
+    const statuses = STATUS_SETS[q.status];
     let meta: Omit<CollectionPage, "pieces" | "total" | "page" | "pageCount">;
     let rows: PieceRow[];
 
-    const allAvailable = async () => {
-      const { data } = await supabase
-        .from("products")
-        .select(PIECE_COLUMNS)
-        .in("status", ["AVAILABLE", "HOLD"])
-        .order("priceCents", { ascending: false, nullsFirst: false })
-        .order("createdAt", { ascending: false });
+    const byStatus = async (ids?: string[]) => {
+      let query = supabase.from("products").select(PIECE_COLUMNS).in("status", statuses).limit(2000);
+      if (ids) query = query.in("id", ids);
+      const { data } = await query;
       return (data ?? []) as PieceRow[];
     };
 
     if (slug === "all") {
       meta = { name: "All watches", slug, descriptionHtml: null, isBrand: false };
-      rows = await allAvailable();
+      rows = await byStatus();
     } else {
       const { data: c } = await supabase
         .from("collections")
@@ -323,7 +351,7 @@ export async function getCollectionPage(slug: string, page: number): Promise<Col
       if (c.isSmart) {
         // Automated collections are evaluated at read time, same rules as admin.
         const now = Date.now();
-        rows = (await allAvailable()).filter((p) =>
+        rows = (await byStatus()).filter((p) =>
           matchesCollection(
             { ...p, tags: p.tags ?? [] },
             { rules: (c.rules ?? []) as Rule[], excludeRules: (c.excludeRules ?? []) as Rule[], matchAll: c.matchAll },
@@ -333,29 +361,51 @@ export async function getCollectionPage(slug: string, page: number): Promise<Col
       } else {
         const { data: links } = await supabase.from("watch_collections").select("watchId").eq("collectionId", c.id);
         const ids = (links ?? []).map((l) => l.watchId);
-        if (ids.length === 0) {
-          rows = [];
-        } else {
-          const { data } = await supabase
-            .from("products")
-            .select(PIECE_COLUMNS)
-            .in("id", ids)
-            .in("status", ["AVAILABLE", "HOLD"])
-            .order("priceCents", { ascending: false, nullsFirst: false })
-            .order("createdAt", { ascending: false });
-          rows = (data ?? []) as PieceRow[];
-        }
+        rows = ids.length === 0 ? [] : await byStatus(ids);
       }
     }
 
-    const total = rows.length;
-    const pageCount = Math.max(1, Math.ceil(total / COLLECTION_PAGE_SIZE));
-    const current = Math.min(Math.max(1, page), pageCount);
     const now = Date.now();
-    const pieces = rows
-      .slice((current - 1) * COLLECTION_PAGE_SIZE, current * COLLECTION_PAGE_SIZE)
-      .map((p) => toPiece(p, now));
-    return { ...meta, pieces, total, page: current, pageCount };
+    let pieces = rows.map((r) => ({ row: r, piece: toPiece(r, now) }));
+    if (q.sale) pieces = pieces.filter((x) => x.piece.isReduced);
+
+    let saves = new Map<string, number>();
+    if (q.sort === "popular") {
+      const { data } = await supabase.rpc("product_save_counts");
+      saves = new Map(((data ?? []) as { watchId: string; saves: number }[]).map((r) => [r.watchId, Number(r.saves)]));
+    }
+    const price = (r: PieceRow) => r.priceCents;
+    const created = (r: PieceRow) => new Date(r.createdAt).getTime();
+    pieces.sort((a, b) => {
+      const A = a.row, B = b.row;
+      switch (q.sort) {
+        case "price-asc":
+        case "price-desc": {
+          // Unpriced pieces always last, whichever direction.
+          if (price(A) == null && price(B) == null) return created(B) - created(A);
+          if (price(A) == null) return 1;
+          if (price(B) == null) return -1;
+          return q.sort === "price-asc" ? price(A)! - price(B)! : price(B)! - price(A)!;
+        }
+        case "newest":
+          return created(B) - created(A);
+        case "oldest":
+          return created(A) - created(B);
+        case "popular":
+          return (saves.get(B.id) ?? 0) - (saves.get(A.id) ?? 0) || created(B) - created(A);
+      }
+    });
+
+    const total = pieces.length;
+    const pageCount = Math.max(1, Math.ceil(total / COLLECTION_PAGE_SIZE));
+    const current = Math.min(q.page, pageCount);
+    return {
+      ...meta,
+      pieces: pieces.slice((current - 1) * COLLECTION_PAGE_SIZE, current * COLLECTION_PAGE_SIZE).map((x) => x.piece),
+      total,
+      page: current,
+      pageCount,
+    };
   } catch {
     return null;
   }

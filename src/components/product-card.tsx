@@ -18,10 +18,21 @@ export function WatchIcon({ hour, min, large = false }: { hour: number; min: num
 }
 
 // "New" / "Reduced" chips, pinned to the photo's corner.
-export function PieceBadges({ isNew, isReduced, onHold = false }: { isNew: boolean; isReduced: boolean; onHold?: boolean }) {
-  if (!isNew && !isReduced && !onHold) return null;
+export function PieceBadges({
+  isNew,
+  isReduced,
+  onHold = false,
+  sold = false,
+}: {
+  isNew: boolean;
+  isReduced: boolean;
+  onHold?: boolean;
+  sold?: boolean;
+}) {
+  if (!isNew && !isReduced && !onHold && !sold) return null;
   return (
     <span className="piece-badges">
+      {sold && <span className="piece-badge piece-badge--sold">Sold</span>}
       {onHold && <span className="piece-badge piece-badge--hold">On hold</span>}
       {isReduced && <span className="piece-badge piece-badge--reduced">Reduced</span>}
       {isNew && <span className="piece-badge piece-badge--new">New</span>}
@@ -74,7 +85,7 @@ export function ShopRowCard({ piece }: { piece: StorefrontPiece }) {
         ) : (
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}
-        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} />
+        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} sold={piece.sold} />
       </span>
       <span className="row-card__title">{piece.name}</span>
       <span className="row-card__brand">{piece.brand}</span>
@@ -86,7 +97,7 @@ export function ShopRowCard({ piece }: { piece: StorefrontPiece }) {
 export function ProductCard({ piece, headingLevel = 3 }: { piece: StorefrontPiece; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
-    <article className="product">
+    <article className="product" data-sold={piece.sold || undefined}>
       <div className="product__media">
         {piece.imageUrl ? (
           <Image
@@ -99,7 +110,7 @@ export function ProductCard({ piece, headingLevel = 3 }: { piece: StorefrontPiec
         ) : (
           <WatchIcon hour={piece.hour} min={piece.min} />
         )}
-        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} />
+        <PieceBadges isNew={piece.isNew} isReduced={piece.isReduced} onHold={piece.onHold} sold={piece.sold} />
       </div>
       <div className="product__meta">
         <Heading className="product__name">{piece.name}</Heading>

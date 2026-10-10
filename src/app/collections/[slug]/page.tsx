@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { COLLECTION_PAGE_SIZE, getCollectionPage } from "@/lib/storefront";
+import { parseCollectionQuery, type CollectionQuery } from "@/lib/collection-query";
 import { SiteHeader } from "@/components/site-header";
 import { ProductCard } from "@/components/product-card";
 import { SiteFooter } from "@/components/site-footer";
+import { FilterBar } from "./filter-bar";
 
 // Badges are date-based and stock changes often — always render fresh.
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const c = await getCollectionPage(slug, 1);
+  const c = await getCollectionPage(slug, parseCollectionQuery({}));
   return { title: c ? `${c.name} — Z’esprit Watch` : "Collection — Z’esprit Watch" };
 }
 
@@ -20,16 +22,24 @@ export default async function CollectionPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const { slug } = await params;
-  const { page: pageParam } = await searchParams;
-  const c = await getCollectionPage(slug, Number(pageParam) || 1);
+  const query = parseCollectionQuery(await searchParams);
+  const c = await getCollectionPage(slug, query);
   if (!c) notFound();
 
   const from = c.total === 0 ? 0 : (c.page - 1) * COLLECTION_PAGE_SIZE + 1;
   const to = Math.min(c.page * COLLECTION_PAGE_SIZE, c.total);
-  const href = (p: number) => (p <= 1 ? `/collections/${c.slug}` : `/collections/${c.slug}?page=${p}`);
+  const href = (p: number) => {
+    const sp = new URLSearchParams();
+    if (query.sort !== "price-desc") sp.set("sort", query.sort);
+    if (query.status !== "available") sp.set("status", query.status);
+    if (query.sale) sp.set("sale", "1");
+    if (p > 1) sp.set("page", String(p));
+    const qs = sp.toString();
+    return qs ? `/collections/${c.slug}?${qs}` : `/collections/${c.slug}`;
+  };
 
   return (
     <>
@@ -50,18 +60,21 @@ export default async function CollectionPage({
 
         <header className="collection-page__head">
           <h1 className="collection-page__title">{c.name}</h1>
-          <p className="collection-page__count">
-            {c.total === 0 ? "No pieces in stock right now" : `${c.total} ${c.total === 1 ? "piece" : "pieces"} in stock · highest price first`}
-          </p>
           {c.descriptionHtml && (
             <div className="collection-page__desc rich-text-content" dangerouslySetInnerHTML={{ __html: c.descriptionHtml }} />
           )}
         </header>
 
+        <FilterBar query={query} total={c.total} />
+
         {c.total === 0 ? (
           <p className="collection-page__empty">
-            Nothing from {c.name} is available at the moment — new pieces arrive regularly.{" "}
-            <Link href="/collections/all">Browse all watches →</Link>
+            {emptyText(c.name, query)}{" "}
+            {isFiltered(query) ? (
+              <Link href={`/collections/${c.slug}`}>Clear filters →</Link>
+            ) : (
+              <Link href="/collections/all">Browse all watches →</Link>
+            )}
           </p>
         ) : (
           <ul className="collection-grid-public">
@@ -87,4 +100,12 @@ export default async function CollectionPage({
       <SiteFooter />
     </>
   );
+}
+
+const isFiltered = (q: CollectionQuery) => q.status !== "available" || q.sale;
+
+function emptyText(name: string, q: CollectionQuery) {
+  if (q.sale) return `Nothing from ${name} is on sale right now.`;
+  if (q.status === "sold") return `No sold pieces from ${name} yet.`;
+  return `Nothing from ${name} is available at the moment — new pieces arrive regularly.`;
 }
